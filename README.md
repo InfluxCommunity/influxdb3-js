@@ -1,6 +1,6 @@
 
 <p align="center">
-    <img src="net_logo.svg" alt=".NET Logo" width="150px">
+    <img src="js_logo.png" alt="JavaScript Logo" width="150px">
 </p>
 <p align="center">
     <a href="https://www.npmjs.com/package/@influxdata/influxdb3-client">
