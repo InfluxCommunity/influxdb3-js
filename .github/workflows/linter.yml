@@ -36,4 +36,4 @@ jobs:
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
           TYPESCRIPT_STANDARD_TSCONFIG_FILE: tsconfig.json
           VALIDATE_GITHUB_ACTIONS: true
-          FILTER_REGEX_EXCLUDE: scripts/.*,tsup\.config\.ts
+          FILTER_REGEX_EXCLUDE: scripts/.*|tsup\.config\.ts
