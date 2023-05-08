@@ -34,4 +34,5 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_TYPESCRIPT_ES: true
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          TYPESCRIPT_STANDARD_TSCONFIG_FILE: tsconfig.json
           VALIDATE_GITHUB_ACTIONS: true

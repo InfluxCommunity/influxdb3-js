@@ -37,11 +37,11 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-documenter": "^7.19.12",
+    "@microsoft/api-documenter": "^7.22.4",
     "@types/node": "^18",
-    "gh-pages": "^4.0.0",
-    "lerna": "^6.0.1",
-    "prettier": "^2.7.1",
-    "rimraf": "^4.1.1"
+    "gh-pages": "^5.0.0",
+    "lerna": "^6.6.2",
+    "prettier": "^2.8.8",
+    "rimraf": "^5.0.0"
   }
 }
