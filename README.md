@@ -1,4 +1,3 @@
-
 <p align="center">
     <img src="js_logo.png" alt="JavaScript Logo" width="150px">
 </p>
@@ -34,9 +33,9 @@ which allows you to execute SQL queries against InfluxDB IOx.
 To write or query InfluxDB 3, add `@influxdata/influxdb3-client` as a dependency to your project using your favorite package manager.
 
 ```sh
-$ npm install --save @influxdata/influxdb3-client
-$ yarn add @influxdata/influxdb3-client
-$ pnpm add @influxdata/influxdb3-client
+npm install --save @influxdata/influxdb3-client
+yarn add @influxdata/influxdb3-client
+pnpm add @influxdata/influxdb3-client
 ```
 
 If you target Node.js, use [@influxdata/influxdb3-client](./packages/client/README.md).
