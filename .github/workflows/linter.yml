@@ -24,12 +24,11 @@ jobs:
 
       - name: Lint Code Base
         uses: github/super-linter@v4.9.2
-        working-directory: packages/client
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LINTER_RULES_PATH: '../..'
+          LINTER_RULES_PATH: '.'
           MARKDOWN_CONFIG_FILE: .markdownlint.yml
           VALIDATE_MARKDOWN: true
           VALIDATE_BASH: true

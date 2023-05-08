@@ -6,8 +6,7 @@
   },
   "plugins": [
     "@typescript-eslint/eslint-plugin",
-    "prettier",
-    "eslint-plugin-tsdoc"
+    "prettier"
   ],
   "env": {
     "node": true,
