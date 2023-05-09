@@ -11,8 +11,8 @@ import zlib from 'zlib'
 import {CLIENT_LIB_VERSION} from '../../../../src/impl/version'
 import {waitForCondition} from '../../util/waitForCondition'
 import {AddressInfo} from 'net'
-import {ConnectionOptions} from '../../../../src';
-import {CollectedLogs, collectLogging} from '../../../util';
+import {ConnectionOptions} from '../../../../src'
+import {CollectedLogs, collectLogging} from '../../../util'
 
 function sendTestData(
   connectionOptions: ConnectionOptions,
