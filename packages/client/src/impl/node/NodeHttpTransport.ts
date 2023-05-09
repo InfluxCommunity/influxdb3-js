@@ -17,7 +17,7 @@ import completeCommunicationObserver from '../completeCommunicationObserver'
 import {CLIENT_LIB_VERSION} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
-import {ConnectionOptions, DEFAULT_ConnectionOptions} from "../../options/connection";
+import {ConnectionOptions, DEFAULT_ConnectionOptions} from '../../options/connection';
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -61,7 +61,7 @@ export class NodeHttpTransport implements Transport {
    */
   constructor(connectionOptions: ConnectionOptions) {
     const {
-      host: _url,
+      url: _url,
       proxyUrl,
       token,
       transportOptions,
@@ -108,7 +108,7 @@ export class NodeHttpTransport implements Transport {
         this.defaultOptions['follow-redirects']?.https?.request ?? https.request
     } else {
       throw new Error(
-        `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.host}"`
+        `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.url}"`
       )
     }
     this.headers = {

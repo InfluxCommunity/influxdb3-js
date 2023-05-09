@@ -50,11 +50,11 @@ To start with the client, import the `InfluxDB` type and create a `InfluxDB` by 
 ```javascript
 import {InfluxDB} from '@influxdata/influxdb3-client/src'
 
-let host = 'https://eu-central-1-1.aws.cloud2.influxdata.com/';
+let url = 'https://eu-central-1-1.aws.cloud2.influxdata.com/';
 let database = 'my-database';
 let token = 'my-token';
 
-let client = new InfluxDB({host: host, database: database, token: token});
+let client = new InfluxDB({url: url, database: database, token: token});
 ```
 
 to insert data, you can use code like this:

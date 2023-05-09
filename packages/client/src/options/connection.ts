@@ -5,7 +5,7 @@ import {Transport} from '../transport'
  */
 export interface ConnectionOptions {
   /** base URL */
-  host: string
+  url: string
   /** database to be used for InfluxDB operations */
   database?: string
   /** authentication token */

@@ -75,7 +75,7 @@ describe('FetchTransport', () => {
     })
   })
   describe('request', () => {
-    const transport = new FetchTransport({host: 'http://test:8086'})
+    const transport = new FetchTransport({url: 'http://test:8086'})
     it('receives json data', async () => {
       emulateFetchApi({
         headers: {'content-type': 'application/json'},
@@ -102,7 +102,7 @@ describe('FetchTransport', () => {
     })
     it('receives custom headers', async () => {
       const transport = new FetchTransport({
-        host: 'http://test:8086',
+        url: 'http://test:8086',
         headers: {extra: 'yes'},
       })
       let options: any
@@ -130,7 +130,7 @@ describe('FetchTransport', () => {
         },
         (req) => (lastRequest = req)
       )
-      const transport = new FetchTransport({host: 'http://test:8086'})
+      const transport = new FetchTransport({url: 'http://test:8086'})
       transport.requestDecorator = (request): void => {
         request.body = 'modified'
       }
@@ -290,7 +290,7 @@ describe('FetchTransport', () => {
       })
       expect(request?.credentials).is.deep.equal('omit')
       const custom = new FetchTransport({
-        host: 'http://test:8086',
+        url: 'http://test:8086',
         transportOptions: {credentials: 'my-val'},
       })
       await custom.request('/whatever', '', {
@@ -300,7 +300,7 @@ describe('FetchTransport', () => {
     })
   })
   describe('send', () => {
-    const transport = new FetchTransport({host: 'http://test:8086'})
+    const transport = new FetchTransport({url: 'http://test:8086'})
     function fakeCallbacks(): any {
       return {
         next: sinon.fake(),
@@ -515,7 +515,7 @@ describe('FetchTransport', () => {
       expect(request?.credentials).is.deep.equal('omit')
       await new Promise((resolve) =>
         new FetchTransport({
-          host: 'http://test:8086',
+          url: 'http://test:8086',
           transportOptions: {credentials: 'my-val'},
         }).send(
           'http://test:8086',
@@ -544,7 +544,7 @@ describe('FetchTransport', () => {
         complete(): void {},
       }
       const spy = sinon.spy(observer)
-      new FetchTransport({host: '/test'}).send(
+      new FetchTransport({url: '/test'}).send(
         '/test',
         '',
         {
@@ -579,7 +579,7 @@ describe('FetchTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new FetchTransport({host: '/test'}).send(
+      new FetchTransport({url: '/test'}).send(
         '/test',
         '',
         {
@@ -610,7 +610,7 @@ describe('FetchTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new FetchTransport({host: '/test'}).send(
+      new FetchTransport({url: '/test'}).send(
         '/test',
         '',
         {
@@ -634,7 +634,7 @@ describe('FetchTransport', () => {
     })
   })
   describe('iterate', () => {
-    const transport = new FetchTransport({host: 'http://test:8086'})
+    const transport = new FetchTransport({url: 'http://test:8086'})
     ;[
       {
         body: 'a',
