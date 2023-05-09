@@ -43,7 +43,6 @@
       {"varsIgnorePattern": "^_", "argsIgnorePattern": "^_"}
     ],
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-empty-interface": "off",
-    "tsdoc/syntax": "error"
+    "@typescript-eslint/no-empty-interface": "off"
   }
 }

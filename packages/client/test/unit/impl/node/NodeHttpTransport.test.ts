@@ -67,7 +67,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport from http url', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086',
+        host: 'http://test:8086',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -79,7 +79,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport from https url', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'https://test:8086',
+        host: 'https://test:8086',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -91,7 +91,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport with contextPath', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/influx',
+        host: 'http://test:8086/influx',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -103,7 +103,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport with contextPath/', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/influx/',
+        host: 'http://test:8086/influx/',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -117,13 +117,13 @@ describe('NodeHttpTransport', () => {
       expect(
         () =>
           new NodeHttpTransport({
-            url: 'other://test:8086',
+            host: 'other://test:8086',
           })
       ).to.throw()
     })
     it('warn about unsupported /api/v2 context path', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/api/v2',
+        host: 'http://test:8086/api/v2',
       })
       // don;t use context path at all
       expect(transport.contextPath).equals('')
@@ -136,7 +136,7 @@ describe('NodeHttpTransport', () => {
     })
     it('ignores undefined values', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086',
+        host: 'http://test:8086',
         timeout: undefined,
       })
       expect(transport.defaultOptions).to.deep.equal({
@@ -223,7 +223,7 @@ describe('NodeHttpTransport', () => {
             new NodeHttpTransport({
               ...extras,
               ...transportOptions,
-              url: transportOptions.url + (extras.contextPath ?? ''),
+              host: transportOptions.url + (extras.contextPath ?? ''),
             }).send(
               '/test',
               '',
@@ -586,7 +586,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -630,7 +630,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -675,7 +675,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -760,7 +760,7 @@ describe('NodeHttpTransport', () => {
           const transport = new NodeHttpTransport({
             ...extras,
             ...transportOptions,
-            url: transportOptions.url + (extras.contextPath ?? ''),
+            host: transportOptions.url + (extras.contextPath ?? ''),
           })
           try {
             let result = ''
@@ -1284,7 +1284,7 @@ describe('NodeHttpTransport', () => {
         )
         .persist()
       const data = await new NodeHttpTransport({
-        url: targetUrl,
+        host: targetUrl,
         proxyUrl: transportOptions.url,
       }).request('/test', '', {
         method: 'GET',

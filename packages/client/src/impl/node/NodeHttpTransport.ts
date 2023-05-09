@@ -61,7 +61,7 @@ export class NodeHttpTransport implements Transport {
    */
   constructor(connectionOptions: ConnectionOptions) {
     const {
-      url: _url,
+      host: _url,
       proxyUrl,
       token,
       transportOptions,
@@ -108,7 +108,7 @@ export class NodeHttpTransport implements Transport {
         this.defaultOptions['follow-redirects']?.https?.request ?? https.request
     } else {
       throw new Error(
-        `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.url}"`
+        `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.host}"`
       )
     }
     this.headers = {

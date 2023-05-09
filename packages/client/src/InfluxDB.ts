@@ -16,16 +16,16 @@ export default class InfluxDB {
    */
   constructor(options: ClientOptions | string) {
     if (typeof options === 'string') {
-      this._options = {url: options}
+      this._options = {host: options}
     } else if (options !== null && typeof options === 'object') {
       this._options = options
     } else {
       throw new IllegalArgumentError('No url or configuration specified!')
     }
-    const url = this._options.url
+    const url = this._options.host
     if (typeof url !== 'string')
       throw new IllegalArgumentError('No url specified!')
-    if (url.endsWith('/')) this._options.url = url.substring(0, url.length - 1)
+    if (url.endsWith('/')) this._options.host = url.substring(0, url.length - 1)
     this.transport = this._options.transport ?? new TransportImpl(this._options)
   }
 }

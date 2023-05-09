@@ -12,7 +12,7 @@ describe('InfluxDB', () => {
     })
     it('is created from configuration with url', () => {
       expect(
-        (new InfluxDB({url: 'http://localhost:8086'}) as any)._options
+        (new InfluxDB({host: 'http://localhost:8086'}) as any)._options
       ).to.deep.equal({
         url: 'http://localhost:8086',
       })
@@ -21,7 +21,7 @@ describe('InfluxDB', () => {
       expect(
         (
           new InfluxDB({
-            url: 'https://localhost:8086?token=a',
+            host: 'https://localhost:8086?token=a',
             token: 'b',
           }) as any
         )._options
@@ -39,7 +39,7 @@ describe('InfluxDB', () => {
     })
     it('is created from configuration with url with trailing slash', () => {
       expect(
-        (new InfluxDB({url: 'http://localhost:8086/'}) as any)._options
+        (new InfluxDB({host: 'http://localhost:8086/'}) as any)._options
       ).to.deep.equal({
         url: 'http://localhost:8086',
       })
@@ -63,14 +63,14 @@ describe('InfluxDB', () => {
       expect(
         () =>
           new InfluxDB({
-            url: 'ws://localhost:8086?token=b',
+            host: 'ws://localhost:8086?token=b',
           })
       ).to.throw('Unsupported')
     })
     it('creates instance with transport initialized', () => {
       expect(
         new InfluxDB({
-          url: 'http://localhost:8086',
+          host: 'http://localhost:8086',
         })
       ).has.property('transport')
       expect(
@@ -93,7 +93,7 @@ describe('InfluxDB', () => {
       }
       expect(
         new InfluxDB({
-          url: 'https://localhost:8086',
+          host: 'https://localhost:8086',
           transportOptions: {
             'follow-redirects': followRedirects,
           },
