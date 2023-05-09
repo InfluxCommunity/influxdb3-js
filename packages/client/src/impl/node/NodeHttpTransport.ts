@@ -6,12 +6,10 @@ import {RequestTimedOutError, AbortError, HttpError} from '../../errors'
 import {Transport, SendOptions} from '../../transport'
 import {
   Cancellable,
-  ChunkCombiner,
   CommunicationObserver,
   Headers,
   ResponseStartedFn,
 } from '../../results'
-import nodeChunkCombiner from './nodeChunkCombiner'
 import zlib from 'zlib'
 import completeCommunicationObserver from '../completeCommunicationObserver'
 import {CLIENT_LIB_VERSION} from '../version'
@@ -47,9 +45,6 @@ class CancellableImpl implements Cancellable {
  * Transport layer on top of node http or https library.
  */
 export class NodeHttpTransport implements Transport {
-  /* required transport member */
-  readonly chunkCombiner: ChunkCombiner = nodeChunkCombiner
-
   private defaultOptions: {[key: string]: any}
   private requestApi: (
     options: http.RequestOptions,
