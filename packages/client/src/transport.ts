@@ -1,8 +1,4 @@
-import {
-  CommunicationObserver,
-  ResponseStartedFn,
-  ChunkCombiner,
-} from './results'
+import {CommunicationObserver, ResponseStartedFn} from './results'
 /**
  * Options for sending a request message.
  */
@@ -66,9 +62,4 @@ export interface Transport {
     requestBody: any,
     options: SendOptions
   ): AsyncIterableIterator<Uint8Array>
-
-  /**
-   * Combines response chunks to create a single response object.
-   */
-  readonly chunkCombiner: ChunkCombiner
 }
