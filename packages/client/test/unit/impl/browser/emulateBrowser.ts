@@ -89,7 +89,7 @@ export class AbortController {
   private listeners: Array<() => void> = []
   signal = {
     aborted: false,
-    addEventListener: (type: string, listener: () => void) => {
+    addEventListener: (type: string, listener: () => void): void => {
       this.listeners.push(listener)
     },
   }
