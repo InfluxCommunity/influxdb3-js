@@ -1,7 +1,4 @@
-import {
-  CommunicationObserver,
-  ResponseStartedFn,
-} from './results'
+import {CommunicationObserver, ResponseStartedFn} from './results'
 /**
  * Options for sending a request message.
  */
