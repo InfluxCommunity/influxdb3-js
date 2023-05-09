@@ -48,7 +48,7 @@ If you target browsers (including [Deno](https://deno.land/) and [Ionic](https:/
 To start with the client, import the `InfluxDB` type and create a `InfluxDB` by constructor initializer:
 
 ```javascript
-import {InfluxDB} from '@influxdata/influxdb3-client'
+import {InfluxDB} from '@influxdata/influxdb3-client/src'
 
 let host = 'https://eu-central-1-1.aws.cloud2.influxdata.com/';
 let database = 'my-database';
