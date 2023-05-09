@@ -9,7 +9,7 @@ import {
   Headers,
   ResponseStartedFn,
 } from '../../results'
-import {ConnectionOptions} from '../../options/connection';
+import {ConnectionOptions} from '../../options/connection'
 
 function getResponseHeaders(response: Response): Headers {
   const headers: Headers = {}

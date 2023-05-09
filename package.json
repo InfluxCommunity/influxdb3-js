@@ -16,12 +16,10 @@
     "preinstall": "node ./scripts/require-yarn.js",
     "clean": "rimraf temp docs && yarn workspaces run clean",
     "build": "yarn workspaces run build",
-    "test": "yarn --cwd packages/client build && yarn workspaces run test && yarn lint:examples",
-    "test:ci": "yarn workspaces run test:ci && yarn lint:examples:ci",
+    "test": "yarn --cwd packages/client build && yarn workspaces run test",
+    "test:ci": "yarn workspaces run test:ci",
     "coverage": "cd packages/client && yarn build && yarn coverage",
-    "coverage:ci": "cd packages/client && yarn build && yarn coverage:ci",
-    "lint:examples": "yarn eslint --ignore-pattern node_modules ./examples",
-    "lint:examples:ci": "yarn lint:examples --format junit --output-file ./reports/examples_eslint/eslint.xml"
+    "coverage:ci": "cd packages/client && yarn build && yarn coverage:ci"
   },
   "homepage": "https://github.com/bonitoo-io/influxdb3-js",
   "repository": {

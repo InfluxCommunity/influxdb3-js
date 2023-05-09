@@ -1,8 +1,8 @@
 import {Transport} from './transport'
 // replaced by ./impl/browser/FetchTransport in browser builds
 import TransportImpl from './impl/node/NodeHttpTransport'
-import {ClientOptions} from './options/connection';
-import {IllegalArgumentError} from './errors';
+import {ClientOptions} from './options/connection'
+import {IllegalArgumentError} from './errors'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
  */

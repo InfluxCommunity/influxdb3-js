@@ -17,7 +17,10 @@ import completeCommunicationObserver from '../completeCommunicationObserver'
 import {CLIENT_LIB_VERSION} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
-import {ConnectionOptions, DEFAULT_ConnectionOptions} from '../../options/connection';
+import {
+  ConnectionOptions,
+  DEFAULT_ConnectionOptions,
+} from '../../options/connection'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,

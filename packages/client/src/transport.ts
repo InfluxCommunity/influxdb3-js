@@ -1,4 +1,8 @@
-import {CommunicationObserver, ResponseStartedFn, ChunkCombiner} from './results'
+import {
+  CommunicationObserver,
+  ResponseStartedFn,
+  ChunkCombiner,
+} from './results'
 /**
  * Options for sending a request message.
  */
