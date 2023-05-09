@@ -1,0 +1,87 @@
+version: 2.1
+
+commands:
+  init-dependencies:
+    steps:
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-v2-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install --frozen-lockfile
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-v2-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+jobs:
+  tests:
+    parameters:
+      image:
+        type: string
+        default: &default-image 'cimg/node:18.16'
+    docker:
+      - image: << parameters.image >>
+    steps:
+      - checkout
+      - init-dependencies
+      - run:
+          name: Run tests
+          command: |
+            yarn build
+            yarn test:ci
+            yarn apidoc:ci
+      # Upload results
+      - store_test_results:
+          path: ./reports
+  coverage:
+    parameters:
+    docker:
+      - image: *default-image
+    steps:
+      - checkout
+      - init-dependencies
+      - run:
+          name: Runs tests with coverage
+          command: |
+            yarn --version
+            yarn run coverage:ci
+      - run:
+          name: Report test results to codecov
+          command: |
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
+            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig
+            curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+            gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+            shasum -a 256 -c codecov.SHA256SUM
+            chmod +x ./codecov
+            ./codecov
+      - store_artifacts:
+          path: ./packages/client/coverage
+
+workflows:
+  build:
+    jobs:
+      - tests:
+          name: 'tests-node-18'
+          filters:
+            branches:
+      - tests:
+          name: 'tests-node-16'
+          image: 'cimg/node:16.20'
+          filters:
+            branches:
+              ignore: gh-pages
+      - tests:
+          name: 'tests-node-20'
+          image: 'cimg/node:20.1.0'
+          filters:
+            branches:
+              ignore: gh-pages
+      - coverage:
+          filters:
+            branches:
+              ignore: gh-pages

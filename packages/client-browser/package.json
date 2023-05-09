@@ -1,0 +1,50 @@
+{
+  "name": "@influxdata/influxdb3-client-browser",
+  "version": "1.0.0",
+  "description": "InfluxDB 3 client for browser",
+  "scripts": {
+    "apidoc:extract": "echo \"Nothing to do\"",
+    "test": "echo \"Nothing to do\"",
+    "test:ci": "echo \"Nothing to do\"",
+    "build": "yarn run clean && cpr ../client/dist ./dist",
+    "clean": "rimraf dist"
+  },
+  "main": "dist/index.browser.js",
+  "module": "dist/index.browser.mjs",
+  "module:browser": "dist/index.browser.mjs",
+  "browser": "dist/index.browser.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "browser": {
+        "import": "./dist/index.browser.mjs",
+        "require": "./dist/index.browser.js",
+        "script": "./dist/influxdb.js",
+        "umd": "./dist/index.browser.js"
+      },
+      "deno": "./dist/index.browser.mjs",
+      "import": "./dist/index.browser.mjs",
+      "require": "./dist/index.browser.js"
+    }
+  },
+  "homepage": "https://github.com/bonitoo-io/influxdb3-js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bonitoo-io/influxdb3-js",
+    "directory": "packages/client-browser"
+  },
+  "keywords": [
+    "influxdb",
+    "influxdata"
+  ],
+  "author": {
+    "name": "InfluxData"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@influxdata/influxdb3-client": "^1.0.0",
+    "cpr": "^3.0.1",
+    "rimraf": "^5.0.0"
+  }
+}
