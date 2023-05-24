@@ -87,9 +87,13 @@ export default class WriteApiImpl implements WriteApi {
     precision: WritePrecisionType,
     writeOptions?: Partial<WriteOptions>
   ) {
-    this.path = `/api/v2/write?org=${encodeURIComponent(
-      org
-    )}&bucket=${encodeURIComponent(bucket)}&precision=${precision}`
+    //TODO: org
+    /*
+    org=${encodeURIComponent(
+          org
+        )}&
+    */
+    this.path = `/api/v2/write?bucket=${encodeURIComponent(bucket)}&precision=${precision}`
     if (writeOptions?.consistency) {
       this.path += `&consistency=${encodeURIComponent(
         writeOptions.consistency
