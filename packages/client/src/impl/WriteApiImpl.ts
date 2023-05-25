@@ -7,11 +7,9 @@ import {
 import {Transport, SendOptions} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
-import {HttpError, RetryDelayStrategy} from '../errors'
+import {HttpError} from '../errors'
 import {Point} from '../Point'
 import {currentTime, dateToProtocolTimestamp} from '../util/currentTime'
-import {createRetryDelayStrategy} from './retryStrategy'
-import RetryBuffer from './RetryBuffer'
 import utf8Length from '../util/utf8Length'
 
 class WriteBuffer {
@@ -77,23 +75,17 @@ export default class WriteApiImpl implements WriteApi {
   private currentTime: () => string
   private dateToProtocolTimestamp: (d: Date) => string
 
-  retryBuffer: RetryBuffer
-  retryStrategy: RetryDelayStrategy
-
   constructor(
     private transport: Transport,
-    org: string,
     bucket: string,
     precision: WritePrecisionType,
-    writeOptions?: Partial<WriteOptions>
+    writeOptions?: Partial<WriteOptions>,
+    org?: string
   ) {
-    //TODO: org
-    /*
-    org=${encodeURIComponent(
-          org
-        )}&
-    */
-    this.path = `/api/v2/write?bucket=${encodeURIComponent(bucket)}&precision=${precision}`
+    const orgURI = org ? `org=${encodeURIComponent(org)}&` : ''
+    this.path = `/api/v2/write?${orgURI}bucket=${encodeURIComponent(
+      bucket
+    )}&precision=${precision}`
     if (writeOptions?.consistency) {
       this.path += `&consistency=${encodeURIComponent(
         writeOptions.consistency
@@ -146,13 +138,6 @@ export default class WriteApiImpl implements WriteApi {
       scheduleNextSend
     )
     this.sendBatch = this.sendBatch.bind(this)
-    // retry buffer
-    this.retryStrategy = createRetryDelayStrategy(this.writeOptions)
-    this.retryBuffer = new RetryBuffer(
-      this.writeOptions.maxBufferLines,
-      this.sendBatch,
-      this.writeOptions.writeRetrySkipped
-    )
   }
 
   sendBatch(
@@ -225,12 +210,6 @@ export default class WriteApiImpl implements WriteApi {
                 `Write to InfluxDB failed (attempt: ${failedAttempts}).`,
                 error
               )
-              self.retryBuffer.addLines(
-                lines,
-                retryAttempts - 1,
-                self.retryStrategy.nextDelay(error, failedAttempts),
-                expires
-              )
               reject(error)
               return
             }
@@ -241,7 +220,6 @@ export default class WriteApiImpl implements WriteApi {
             // older implementations of transport do not report status code
             if (responseStatusCode == 204 || responseStatusCode == undefined) {
               self.writeOptions.writeSuccess.call(self, lines)
-              self.retryStrategy.success()
               resolve()
             } else {
               const message = `204 HTTP response status code expected, but ${responseStatusCode} returned`
@@ -305,21 +283,11 @@ export default class WriteApiImpl implements WriteApi {
       if (line) this.writeBuffer.add(line)
     }
   }
-  async flush(withRetryBuffer?: boolean): Promise<void> {
+  async flush(): Promise<void> {
     await this.writeBuffer.flush()
-    if (withRetryBuffer) {
-      return await this.retryBuffer.flush()
-    }
   }
   close(): Promise<void> {
     const retVal = this.writeBuffer.flush().finally(() => {
-      const remaining = this.retryBuffer.close()
-      if (remaining) {
-        Log.error(
-          `Retry buffer closed with ${remaining} items that were not written to InfluxDB!`,
-          null
-        )
-      }
       this.closed = true
     })
     return retVal
@@ -327,7 +295,7 @@ export default class WriteApiImpl implements WriteApi {
   dispose(): number {
     this._clearFlushTimeout()
     this.closed = true
-    return this.retryBuffer.close() + this.writeBuffer.length
+    return this.writeBuffer.length
   }
 
   // PointSettings

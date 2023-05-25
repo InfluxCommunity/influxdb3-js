@@ -50,14 +50,12 @@ export default class InfluxDB {
    * @returns WriteApi instance
    */
   getWriteApi(
-    org: string,
     bucket: string,
     precision: WritePrecisionType = 'ns',
     writeOptions?: Partial<WriteOptions>
   ): WriteApi {
     return new WriteApiImpl(
       this.transport,
-      org,
       bucket,
       precision,
       writeOptions ?? this._options.writeOptions
