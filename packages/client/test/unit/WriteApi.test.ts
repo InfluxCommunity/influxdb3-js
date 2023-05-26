@@ -86,8 +86,8 @@ describe('WriteApi', () => {
       await subject.close().catch((e) => expect.fail('should not happen', e))
     })
     it.skip('fails on close without server connection', async () => {
-      subject.writeRecord('test value=1')
-      subject.writeRecords(['test value=2', 'test value=3'])
+      subject.write('test value=1')
+      subject.write(['test value=2', 'test value=3'])
       await subject
         .close()
         .then(() => expect.fail('failure expected'))
@@ -99,8 +99,8 @@ describe('WriteApi', () => {
     it('fails on write if it is closed already', async () => {
       await subject.close()
 
-      await rejects(subject.writeRecord('text value=1'))
-      await rejects(subject.writeRecords(['text value=1', 'text value=2']))
+      await rejects(subject.write('text value=1'))
+      await rejects(subject.write(['text value=1', 'text value=2']))
       await rejects(
         subject.writePoint(new Point('test').floatField('value', 1))
       )
@@ -359,10 +359,10 @@ describe('WriteApi', () => {
           return [200, '', {}]
         })
         .persist()
-      subject.writeRecord('test value=1')
+      subject.write('test value=1')
       // flushes the previous record by writing a next one
       // that would exceed 15 maxBatchBytes
-      subject.writeRecord('test value=2')
+      subject.write('test value=2')
       await waitForCondition(() => writeCounters.failedLineCount == 1)
       expect(logs.error).has.length(1)
       expect(logs.error[0][0]).equals('Write to InfluxDB failed.')

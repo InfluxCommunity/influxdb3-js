@@ -46,7 +46,7 @@ describe('my test', () => {
       .intField('testId', testId)
     // TODO:
     // .timestamp(Date.now())
-    writeApi.writePoint(point)
+    writeApi.writePoints([point])
 
     await writeApi.close()
   })

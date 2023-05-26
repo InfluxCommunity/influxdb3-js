@@ -16,18 +16,11 @@ export default interface WriteApi extends PointSettings {
   useDefaultTags(tags: {[key: string]: string}): WriteApi
 
   /**
-   * Write a line of [Line Protocol](https://bit.ly/2QL99fu).
-   *
-   * @param record - line of InfluxDB Line Protocol
-   */
-  writeRecord(record: string): Promise<void>
-
-  /**
    * Write lines of [Line Protocol](https://bit.ly/2QL99fu).
    *
    * @param records - lines in InfluxDB Line Protocol
    */
-  writeRecords(records: Array<string>): Promise<void>
+  write(records: string | Array<string>): Promise<void>
 
   /**
    * Write point.
