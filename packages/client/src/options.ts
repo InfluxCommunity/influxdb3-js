@@ -81,9 +81,7 @@ export interface WriteRetryOptions extends RetryDelayStrategyOptions {
   writeFailed(
     this: WriteApi,
     error: Error,
-    lines: Array<string>,
-    attempt: number,
-    expires: number
+    lines: Array<string>
   ): Promise<void> | void
 
   /**
@@ -100,10 +98,6 @@ export interface WriteRetryOptions extends RetryDelayStrategyOptions {
    */
   writeRetrySkipped(entry: {lines: Array<string>; expires: number}): void
 
-  /** max count of retries after the first write fails */
-  maxRetries: number
-  /** max time (millis) that can be spent with retries */
-  maxRetryTime: number
   /** the maximum size of retry-buffer (in lines) */
   maxBufferLines: number
 }
@@ -145,8 +139,6 @@ export const DEFAULT_WriteOptions: WriteOptions = {
   writeFailed: function () {},
   writeSuccess: function () {},
   writeRetrySkipped: function () {},
-  maxRetries: 5,
-  maxRetryTime: 180_000,
   maxBufferLines: 32_000,
   // a copy of DEFAULT_RetryDelayStrategyOptions, so that DEFAULT_WriteOptions could be tree-shaken
   retryJitter: 200,

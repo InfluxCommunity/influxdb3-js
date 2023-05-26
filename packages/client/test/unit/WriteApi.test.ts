@@ -12,7 +12,6 @@ import {
   PointSettings,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
-import {Log} from '../../src/util/logger'
 import {waitForCondition} from './util/waitForCondition'
 import zlib from 'zlib'
 
@@ -160,49 +159,6 @@ describe('WriteApi', () => {
         )
       })
     })
-    it('does not retry write when maxRetries is zero', async () => {
-      useSubject({maxRetries: 0, batchSize: 1})
-      subject.writeRecord('test value=1')
-      await waitForCondition(() => logs.error.length > 0)
-      await subject.close().then(() => {
-        expect(logs.error).to.length(1)
-        expect(logs.warn).is.deep.equal([])
-      })
-    })
-    it('does not retry write when writeFailed handler returns a Promise', async () => {
-      useSubject({
-        maxRetries: 3,
-        batchSize: 1,
-        writeFailed: (error: Error, lines: string[], attempts: number) => {
-          Log.warn(
-            `CUSTOMERRORHANDLING ${!!error} ${lines.length} ${attempts}`,
-            undefined
-          )
-          return Promise.resolve()
-        },
-      })
-      subject.writeRecord('test value=1')
-      await waitForCondition(() => logs.warn.length > 0)
-      await subject.close().then(() => {
-        expect(logs.error).length(0)
-        expect(logs.warn).is.deep.equal([
-          ['CUSTOMERRORHANDLING true 1 1', undefined],
-        ])
-      })
-    })
-    it('uses the pre-configured batchSize', async () => {
-      useSubject({flushInterval: 0, maxRetries: 0, batchSize: 2})
-      subject.writeRecords(['test value=1', 'test value=2', 'test value=3'])
-      await waitForCondition(() => logs.error.length > 0) // wait for HTTP call to fail
-      let count = subject.dispose()
-      expect(logs.error).has.length(1)
-      expect(logs.warn).has.length(0)
-      expect(count).equals(1)
-      count = subject.dispose() // dispose is idempotent
-      expect(logs.error).has.length(1) // no more errorrs
-      expect(logs.warn).has.length(0)
-      expect(count).equals(1)
-    })
     it('implementation uses expected defaults', () => {
       useSubject({})
       const writeOptions = (subject as any).writeOptions as WriteOptions
@@ -290,31 +246,8 @@ describe('WriteApi', () => {
       await subject.close()
       collectLogging.after()
     })
-    it('flushes the records automatically in intervals', async () => {
-      useSubject({flushInterval: 5, maxRetries: 0, batchSize: 10})
-      subject.writeRecord('test value=1')
-      await waitForCondition(() => logs.error.length >= 1) // wait for HTTP call to fail
-      expect(logs.error).has.length(1)
-      subject.writeRecord('test value=2')
-      await waitForCondition(() => logs.error.length >= 2)
-      expect(logs.error).has.length(2)
-      await subject.flush().then(() => {
-        expect(logs.error).has.length(2)
-      })
-    })
-    it('flushes the records automatically in batches', async () => {
-      useSubject({flushInterval: 0, maxRetries: 0, batchSize: 1})
-      subject.writeRecord('test value=1')
-      await waitForCondition(() => logs.error.length >= 1) // wait for HTTP call to fail
-      expect(logs.error).has.length(1)
-      subject.writeRecord('test value=2')
-      await waitForCondition(() => logs.error.length >= 2)
-      expect(logs.error).has.length(2)
-      await subject.flush()
-      expect(logs.error).has.length(2)
-    })
     it.skip('flushes the records automatically when size exceeds maxBatchBytes', async () => {
-      useSubject({flushInterval: 0, maxRetries: 0, maxBatchBytes: 15})
+      useSubject({flushInterval: 0, maxBatchBytes: 15})
       const messages: string[] = []
       nock(clientOptions.url)
         .post(WRITE_PATH_NS)
@@ -368,7 +301,6 @@ describe('WriteApi', () => {
       const writeCounters = createWriteCounters()
       useSubject({
         flushInterval: 5,
-        maxRetries: 1,
         randomRetry: false,
         batchSize: 10,
         writeSuccess: writeCounters.writeSuccess,
@@ -433,7 +365,6 @@ describe('WriteApi', () => {
       const writeCounters = createWriteCounters()
       useSubject({
         flushInterval: 5,
-        maxRetries: 1,
         randomRetry: false,
         batchSize: 10,
         writeSuccess: writeCounters.writeSuccess,
@@ -504,7 +435,6 @@ describe('WriteApi', () => {
       const writeCounters = createWriteCounters()
       // required because of https://github.com/influxdata/influxdb-client-js/issues/263
       useSubject({
-        maxRetries: 0,
         flushInterval: 2000, // do not flush automatically in the test
         batchSize: 10,
         maxBatchBytes: 15,

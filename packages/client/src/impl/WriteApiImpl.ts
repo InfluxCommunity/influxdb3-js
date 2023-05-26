@@ -116,10 +116,7 @@ export default class WriteApiImpl implements WriteApi {
         if (!this.closed) {
           this._timeoutHandle = setTimeout(
             () =>
-              this.sendBatch(
-                this.writeBuffer.reset(),
-                this.writeOptions.maxRetries
-              ).catch((_e) => {
+              this.sendBatch(this.writeBuffer.reset()).catch((_e) => {
                 // an error is logged in case of failure, avoid UnhandledPromiseRejectionWarning
               }),
             this.writeOptions.flushInterval
@@ -133,40 +130,17 @@ export default class WriteApiImpl implements WriteApi {
       this.writeOptions.maxBatchBytes,
       (lines) => {
         this._clearFlushTimeout()
-        return this.sendBatch(lines, this.writeOptions.maxRetries)
+        return this.sendBatch(lines)
       },
       scheduleNextSend
     )
     this.sendBatch = this.sendBatch.bind(this)
   }
 
-  sendBatch(
-    lines: string[],
-    retryAttempts: number,
-    expires: number = Date.now() + this.writeOptions.maxRetryTime
-  ): Promise<void> {
+  sendBatch(lines: string[]): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
-    const failedAttempts = self.writeOptions.maxRetries + 1 - retryAttempts
     if (!this.closed && lines.length > 0) {
-      if (expires <= Date.now()) {
-        const error = new Error('Max retry time exceeded.')
-        const onRetry = self.writeOptions.writeFailed.call(
-          self,
-          error,
-          lines,
-          failedAttempts,
-          expires
-        )
-        if (onRetry) {
-          return onRetry
-        }
-        Log.error(
-          `Write to InfluxDB failed (attempt: ${failedAttempts}).`,
-          error
-        )
-        return Promise.reject(error)
-      }
       return new Promise<void>((resolve, reject) => {
         let responseStatusCode: number | undefined
         const callbacks = {
@@ -178,9 +152,7 @@ export default class WriteApiImpl implements WriteApi {
             const onRetry = self.writeOptions.writeFailed.call(
               self,
               error,
-              lines,
-              failedAttempts,
-              expires
+              lines
             )
             if (onRetry) {
               onRetry.then(resolve, reject)
@@ -202,14 +174,10 @@ export default class WriteApiImpl implements WriteApi {
             // retry if possible
             if (
               !self.closed &&
-              retryAttempts > 0 &&
               (!(error instanceof HttpError) ||
                 (error as HttpError).statusCode >= 429)
             ) {
-              Log.warn(
-                `Write to InfluxDB failed (attempt: ${failedAttempts}).`,
-                error
-              )
+              Log.warn(`Write to InfluxDB failed.`, error)
               reject(error)
               return
             }
