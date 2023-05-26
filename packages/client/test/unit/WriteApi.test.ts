@@ -14,6 +14,7 @@ import {
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
 import {waitForCondition} from './util/waitForCondition'
 import zlib from 'zlib'
+import {rejects} from 'assert'
 
 const clientOptions: ClientOptions = {
   url: 'http://fake:8086',
@@ -81,11 +82,8 @@ describe('WriteApi', () => {
       await subject.close().catch(console.error)
       collectLogging.after()
     })
-    it('can be closed and flushed without any data', async () => {
+    it('can be closed without any data', async () => {
       await subject.close().catch((e) => expect.fail('should not happen', e))
-      await subject
-        .flush(true)
-        .catch((e) => expect.fail('should not happen', e))
     })
     it.skip('fails on close without server connection', async () => {
       subject.writeRecord('test value=1')
@@ -98,66 +96,29 @@ describe('WriteApi', () => {
           expect(e).to.be.ok
         })
     })
-    it('fails on flush without server connection', async () => {
-      subject.writeRecord('test value=1')
-      subject.writeRecords(['test value=2', 'test value=3'])
-      await subject
-        .flush()
-        .then(() => expect.fail('failure expected'))
-        .catch((e) => {
-          expect([...logs.error, ...logs.warn]).to.length(1)
-          expect(e).to.be.ok
-        })
-    })
     it('fails on write if it is closed already', async () => {
       await subject.close()
-      expect(() => subject.writeRecord('text value=1')).to.throw(
-        'writeApi: already closed!'
-      )
-      expect(() =>
-        subject.writeRecords(['text value=1', 'text value=2'])
-      ).to.throw('writeApi: already closed!')
-      expect(() =>
+
+      await rejects(subject.writeRecord('text value=1'))
+      await rejects(subject.writeRecords(['text value=1', 'text value=2']))
+      await rejects(
         subject.writePoint(new Point('test').floatField('value', 1))
-      ).to.throw('writeApi: already closed!')
-      expect(() =>
+      )
+      await rejects(
         subject.writePoints([new Point('test').floatField('value', 1)])
-      ).to.throw('writeApi: already closed!')
+      )
     })
   })
   describe('configuration', () => {
     let subject: WriteApi
-    let logs: CollectedLogs
     function useSubject(writeOptions: Partial<WriteOptions>): void {
       subject = new InfluxDB({
         ...clientOptions,
       }).getWriteApi(BUCKET, PRECISION, writeOptions)
     }
-    beforeEach(() => {
-      // logs = collectLogging.decorate()
-      logs = collectLogging.replace()
-    })
     afterEach(async () => {
       await subject.close()
       collectLogging.after()
-    })
-    it.skip('flushes the data in specified batchSize', async () => {
-      useSubject({
-        flushInterval: 0,
-        batchSize: 1,
-      })
-      subject.writeRecord('test value=1')
-      subject.writeRecords(['test value=2', 'test value=3'])
-      // wait for http calls to finish
-      await waitForCondition(() => logs.warn.length >= 3)
-      await subject.close().then(() => {
-        expect(logs.error).to.length(1)
-        expect(logs.warn).length(3) // 3 warnings about write failure
-        expect(logs.error[0][0]).includes(
-          '3',
-          'Warning message informs about count of missing lines'
-        )
-      })
     })
     it('implementation uses expected defaults', () => {
       useSubject({})
@@ -227,56 +188,6 @@ describe('WriteApi', () => {
       })
       const p = new Point('a').floatField('b', 1).timestamp('')
       expect(p.toLineProtocol(writeAPI)).equals('a,a\\ b=c,x=y\\ z b=1')
-    })
-  })
-  describe('flush on background', () => {
-    let subject: WriteApi
-    let logs: CollectedLogs
-    function useSubject(writeOptions: Partial<WriteOptions>): void {
-      subject = createApi(BUCKET, 'ns', {
-        retryJitter: 0,
-        ...writeOptions,
-      })
-    }
-    beforeEach(() => {
-      // logs = collectLogging.decorate()
-      logs = collectLogging.replace()
-    })
-    afterEach(async () => {
-      await subject.close()
-      collectLogging.after()
-    })
-    it.skip('flushes the records automatically when size exceeds maxBatchBytes', async () => {
-      useSubject({flushInterval: 0, maxBatchBytes: 15})
-      const messages: string[] = []
-      nock(clientOptions.url)
-        .post(WRITE_PATH_NS)
-        .reply((_uri, _requestBody) => {
-          messages.push(_requestBody.toString())
-          return [204, '', {}]
-        })
-        .persist()
-      subject.writeRecord('test value=1')
-      expect(logs.error).has.length(0) // not flushed yet
-      expect(messages).has.length(0) // not flushed yet
-      subject.writeRecord('test value=2')
-      await waitForCondition(() => messages.length == 1) // wait for background HTTP call
-      expect(logs.error).has.length(0)
-      expect(messages).has.length(1)
-      expect(messages[0]).equals('test value=1')
-      await subject.flush()
-      expect(logs.error).has.length(0)
-      expect(messages).has.length(2)
-      expect(messages[1]).equals('test value=2')
-      subject.writeRecord('test value=4321') // greater or equal to 15 bytes, it should be written immediatelly
-      await waitForCondition(() => messages.length == 3) // wait for background HTTP call
-      subject.writeRecord('t v=1')
-      subject.writeRecord('t v=2')
-      await subject.flush()
-      expect(logs.error).has.length(0)
-      expect(messages).has.length(4)
-      expect(messages[2]).equals('test value=4321')
-      expect(messages[3]).equals('t v=1\nt v=2')
     })
   })
   describe('usage of server API', () => {
@@ -462,7 +373,6 @@ describe('WriteApi', () => {
       )
       expect(logs.warn).deep.equals([])
       expect(authorization).equals(`Token ${clientOptions.token}`)
-      expect(subject.dispose()).equals(1) // the second record was not written
     })
     it.skip('sends custom http header', async () => {
       useSubject({
@@ -494,7 +404,7 @@ describe('WriteApi', () => {
           return [204, '', {}]
         })
         .persist()
-      subject.writePoint(new Point('test').floatField('value', 1))
+      await subject.writePoint(new Point('test').floatField('value', 1))
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])
@@ -513,7 +423,7 @@ describe('WriteApi', () => {
           return [204, '', {}]
         })
         .persist()
-      subject.writePoint(new Point('test').floatField('value', 1))
+      await subject.writePoint(new Point('test').floatField('value', 1))
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])
@@ -533,7 +443,7 @@ describe('WriteApi', () => {
           ]
         })
         .persist()
-      subject.writePoint(new Point('test').floatField('value', 1))
+      await subject.writePoint(new Point('test').floatField('value', 1))
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([

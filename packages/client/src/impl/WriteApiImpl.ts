@@ -10,68 +10,13 @@ import {Log} from '../util/logger'
 import {HttpError} from '../errors'
 import {Point} from '../Point'
 import {currentTime, dateToProtocolTimestamp} from '../util/currentTime'
-import utf8Length from '../util/utf8Length'
-
-class WriteBuffer {
-  length = 0
-  bytes = -1
-  lines: string[]
-
-  constructor(
-    private maxChunkRecords: number,
-    private maxBatchBytes: number,
-    private flushFn: (lines: string[]) => Promise<void>,
-    private scheduleSend: () => void
-  ) {
-    this.lines = new Array<string>(maxChunkRecords)
-  }
-
-  add(record: string): void {
-    const size = utf8Length(record)
-    if (this.length === 0) {
-      this.scheduleSend()
-    } else if (this.bytes + size + 1 >= this.maxBatchBytes) {
-      // the new size already exceeds maxBatchBytes, send it
-      this.flush().catch((_e) => {
-        // an error is logged in case of failure, avoid UnhandledPromiseRejectionWarning
-      })
-    }
-    this.lines[this.length] = record
-    this.length++
-    this.bytes += size + 1
-    if (
-      this.length >= this.maxChunkRecords ||
-      this.bytes >= this.maxBatchBytes
-    ) {
-      this.flush().catch((_e) => {
-        // an error is logged in case of failure, avoid UnhandledPromiseRejectionWarning
-      })
-    }
-  }
-  flush(): Promise<void> {
-    const lines = this.reset()
-    if (lines.length > 0) {
-      return this.flushFn(lines)
-    } else {
-      return Promise.resolve()
-    }
-  }
-  reset(): string[] {
-    const retVal = this.lines.slice(0, this.length)
-    this.length = 0
-    this.bytes = -1 // lines are joined with \n
-    return retVal
-  }
-}
 
 export default class WriteApiImpl implements WriteApi {
   public path: string
 
-  private writeBuffer: WriteBuffer
   private closed = false
   private writeOptions: WriteOptions
   private sendOptions: SendOptions
-  private _timeoutHandle: any = undefined
   private currentTime: () => string
   private dateToProtocolTimestamp: (d: Date) => string
 
@@ -109,31 +54,6 @@ export default class WriteApiImpl implements WriteApi {
       gzipThreshold: this.writeOptions.gzipThreshold,
     }
 
-    const scheduleNextSend = (): void => {
-      if (this.writeOptions.flushInterval > 0) {
-        this._clearFlushTimeout()
-        /* istanbul ignore else manually reviewed, hard to reproduce */
-        if (!this.closed) {
-          this._timeoutHandle = setTimeout(
-            () =>
-              this.sendBatch(this.writeBuffer.reset()).catch((_e) => {
-                // an error is logged in case of failure, avoid UnhandledPromiseRejectionWarning
-              }),
-            this.writeOptions.flushInterval
-          )
-        }
-      }
-    }
-    // write buffer
-    this.writeBuffer = new WriteBuffer(
-      this.writeOptions.batchSize,
-      this.writeOptions.maxBatchBytes,
-      (lines) => {
-        this._clearFlushTimeout()
-        return this.sendBatch(lines)
-      },
-      scheduleNextSend
-    )
     this.sendBatch = this.sendBatch.bind(this)
   }
 
@@ -214,56 +134,39 @@ export default class WriteApiImpl implements WriteApi {
     }
   }
 
-  private _clearFlushTimeout(): void {
-    if (this._timeoutHandle !== undefined) {
-      clearTimeout(this._timeoutHandle)
-      this._timeoutHandle = undefined
-    }
-  }
-
-  writeRecord(record: string): void {
+  async writeRecord(record: string): Promise<void> {
     if (this.closed) {
       throw new Error('writeApi: already closed!')
     }
-    this.writeBuffer.add(record)
+    await this.sendBatch([record])
   }
-  writeRecords(records: ArrayLike<string>): void {
+  async writeRecords(records: ArrayLike<string>): Promise<void> {
     if (this.closed) {
       throw new Error('writeApi: already closed!')
     }
     for (let i = 0; i < records.length; i++) {
-      this.writeBuffer.add(records[i])
+      // TODO: send in batch
+      await this.sendBatch([records[i]])
     }
   }
-  writePoint(point: Point): void {
+  async writePoint(point: Point): Promise<void> {
     if (this.closed) {
       throw new Error('writeApi: already closed!')
     }
     const line = point.toLineProtocol(this)
-    if (line) this.writeBuffer.add(line)
+    if (line) await this.sendBatch([line])
   }
-  writePoints(points: ArrayLike<Point>): void {
+  async writePoints(points: ArrayLike<Point>): Promise<void> {
     if (this.closed) {
       throw new Error('writeApi: already closed!')
     }
     for (let i = 0; i < points.length; i++) {
       const line = points[i].toLineProtocol(this)
-      if (line) this.writeBuffer.add(line)
+      if (line) await this.sendBatch([line])
     }
   }
-  async flush(): Promise<void> {
-    await this.writeBuffer.flush()
-  }
-  close(): Promise<void> {
-    const retVal = this.writeBuffer.flush().finally(() => {
-      this.closed = true
-    })
-    return retVal
-  }
-  dispose(): number {
-    this._clearFlushTimeout()
+  async close(): Promise<void> {
     this.closed = true
-    return this.writeBuffer.length
   }
 
   // PointSettings

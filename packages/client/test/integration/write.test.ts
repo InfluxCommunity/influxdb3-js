@@ -48,8 +48,6 @@ describe('my test', () => {
     // .timestamp(Date.now())
     writeApi.writePoint(point)
 
-    await writeApi.flush()
-
     await writeApi.close()
   })
 })
