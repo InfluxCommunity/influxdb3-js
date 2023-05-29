@@ -5,7 +5,7 @@
   "scripts": {
     "apidoc:extract": "api-extractor run",
     "build": "yarn run clean && yarn tsup --config ./tsup.config.browser.ts && yarn tsup",
-    "clean": "rimraf dist build coverage .nyc_output doc *.lcov reports",
+    "clean": "rimraf --glob dist build coverage .nyc_output doc *.lcov reports",
     "coverage": "nyc mocha --require ts-node/register 'test/**/*.test.ts' --exit",
     "coverage:ci": "yarn run coverage && yarn run coverage:lcov",
     "coverage:lcov": "yarn run --silent nyc report --reporter=text-lcov > coverage/coverage.lcov",
@@ -16,9 +16,9 @@
     "test:ci": "yarn run lint:ci && yarn run test:all --exit --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/core_mocha/test-results.xml",
     "test:watch": "mocha --require esbuild-runner/register 'test/unit/**/*.test.ts' --watch-extensions ts --watch",
     "typecheck": "tsc --noEmit --pretty",
-    "lint": "eslint 'src/**/*.ts' 'test/**/*.ts'",
+    "lint": "eslint src/**/*.ts test/**/*.ts",
     "lint:ci": "yarn run lint --format junit --output-file ../../reports/core_eslint/eslint.xml",
-    "lint:fix": "eslint --fix 'src/**/*.ts'"
+    "lint:fix": "eslint --fix src/**/*.ts"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
