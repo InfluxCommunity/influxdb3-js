@@ -31,9 +31,6 @@ export default class WriteApiImpl implements WriteApi {
     const precision = this.writeOptions.precision
     this.currentTime = currentTime[precision]
     this.dateToProtocolTimestamp = dateToProtocolTimestamp[precision]
-    if (this.writeOptions.defaultTags) {
-      this.useDefaultTags(this.writeOptions.defaultTags)
-    }
     this.sendOptions = {
       method: 'POST',
       headers: {
@@ -44,6 +41,7 @@ export default class WriteApiImpl implements WriteApi {
     }
 
     this.doWrite = this.doWrite.bind(this)
+    this.convertTime = this.convertTime.bind(this)
   }
 
   _createWritePath(bucket: string, org?: string) {
@@ -152,20 +150,13 @@ export default class WriteApiImpl implements WriteApi {
   async writePoints(points: ArrayLike<Point>): Promise<void> {
     await this.doWrite(
       Array.from(points)
-        .map((p) => p.toLineProtocol(this))
+        .map((p) => p.toLineProtocol(this.convertTime))
         .filter(isDefined)
     )
   }
 
   async close(): Promise<void> {
     this.closed = true
-  }
-
-  // PointSettings
-  defaultTags: {[key: string]: string} | undefined
-  useDefaultTags(tags: {[key: string]: string}): WriteApi {
-    this.defaultTags = tags
-    return this
   }
 
   convertTime(value: string | number | Date | undefined): string | undefined {

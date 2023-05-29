@@ -112,8 +112,6 @@ export interface WriteOptions extends WriteRetryOptions {
   flushInterval: number
   /** Precision to use in writes for timestamp. default ns */
   precision: WritePrecisionType
-  /** default tags, unescaped */
-  defaultTags?: Record<string, string>
   /** HTTP headers that will be sent with every write request */
   headers?: {[key: string]: string}
   /** When specified, write bodies larger than the threshold are gzipped  */

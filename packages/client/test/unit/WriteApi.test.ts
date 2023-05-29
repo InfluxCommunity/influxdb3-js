@@ -9,7 +9,6 @@ import {
   InfluxDB,
   WritePrecisionType,
   DEFAULT_WriteOptions,
-  PointSettings,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
 import {waitForCondition} from './util/waitForCondition'
@@ -133,62 +132,30 @@ describe('WriteApi', () => {
     const writeAPI = createApi(BUCKET, {
       retryJitter: 0,
       precision: 'ms',
-    }) as PointSettings
+    })
     it('converts empty string to no timestamp', () => {
       const p = new Point('a').floatField('b', 1).timestamp('')
-      expect(p.toLineProtocol(writeAPI)).equals('a b=1')
+      expect(p.toLineProtocol(writeAPI.convertTime)).equals('a b=1')
     })
     it('converts number to timestamp', () => {
       const p = new Point('a').floatField('b', 1).timestamp(1.2)
-      expect(p.toLineProtocol(writeAPI)).equals('a b=1 1')
+      expect(p.toLineProtocol(writeAPI.convertTime)).equals('a b=1 1')
     })
     it('converts Date to timestamp', () => {
       const d = new Date()
       const p = new Point('a').floatField('b', 1).timestamp(d)
-      expect(p.toLineProtocol(writeAPI)).equals(`a b=1 ${d.getTime()}`)
+      expect(p.toLineProtocol(writeAPI.convertTime)).equals(
+        `a b=1 ${d.getTime()}`
+      )
     })
     it('converts undefined to local timestamp', () => {
       const p = new Point('a').floatField('b', 1)
-      expect(p.toLineProtocol(writeAPI)).satisfies((x: string) => {
+      expect(p.toLineProtocol(writeAPI.convertTime)).satisfies((x: string) => {
         return x.startsWith('a b=1')
       }, `does not start with 'a b=1'`)
-      expect(p.toLineProtocol(writeAPI)).satisfies((x: string) => {
+      expect(p.toLineProtocol(writeAPI.convertTime)).satisfies((x: string) => {
         return Date.now() - Number.parseInt(x.substring('a b=1 '.length)) < 1000
       })
-    })
-  })
-  describe('convert default tags to line protocol', () => {
-    it('works with tags OOTB', () => {
-      const writeAPI = createApi(BUCKET, {
-        retryJitter: 0,
-        precision: 'ms',
-      })
-      const p = new Point('a').floatField('b', 1).timestamp('')
-      expect(p.toLineProtocol(writeAPI)).equals('a b=1')
-    })
-    it('setups tags using useDefaultTags ', () => {
-      const writeAPI = createApi(BUCKET, {
-        retryJitter: 0,
-        precision: 'ms',
-      })
-      const p = new Point('a').floatField('b', 1).timestamp('')
-      writeAPI.useDefaultTags({
-        x: 'y z',
-        'a b': 'c',
-      })
-      expect(p.toLineProtocol(writeAPI)).equals('a,a\\ b=c,x=y\\ z b=1')
-    })
-    it('setups tags from configuration', () => {
-      const writeAPI = createApi(BUCKET, {
-        retryJitter: 0,
-        defaultTags: {
-          x: 'y z',
-          'a b': 'c',
-        },
-        precision: 'ms',
-      })
-      const p = new Point('a').floatField('b', 1).timestamp('')
-      expect(p.toLineProtocol(writeAPI)).equals('a,a\\ b=c,x=y\\ z b=1')
     })
   })
   describe('usage of server API', () => {
@@ -197,7 +164,6 @@ describe('WriteApi', () => {
     function useSubject(writeOptions: Partial<WriteOptions>): void {
       subject = createApi(BUCKET, {
         retryJitter: 0,
-        defaultTags: {xtra: '1'},
         ...writeOptions,
       })
     }

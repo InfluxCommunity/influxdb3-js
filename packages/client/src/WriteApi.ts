@@ -1,4 +1,8 @@
-import {Point, PointSettings} from './Point'
+import {Point} from './Point'
+
+export type TimeConverter = (
+  value: string | number | Date | undefined
+) => string | undefined
 
 /**
  * Asynchronous API that writes time-series data into InfluxDB.
@@ -6,15 +10,7 @@ import {Point, PointSettings} from './Point'
  * to optimize data transfer to InfluxDB server, use `flush` to send
  * the buffered data to InfluxDB immediately.
  */
-export default interface WriteApi extends PointSettings {
-  /**
-   * Instructs to use the following default tags  when writing points.
-   * Not applicable for writing records/lines.
-   * @param tags - default tags
-   * @returns this
-   */
-  useDefaultTags(tags: {[key: string]: string}): WriteApi
-
+export default interface WriteApi {
   /**
    * Write lines of [Line Protocol](https://bit.ly/2QL99fu).
    *
@@ -48,4 +44,7 @@ export default interface WriteApi extends PointSettings {
    * but it can be changed after the API is obtained.
    */
   path: string
+
+  /** convertTime serializes Point's timestamp to a line protocol value */
+  convertTime?: TimeConverter
 }

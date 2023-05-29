@@ -1,18 +1,6 @@
+import {TimeConverter} from './WriteApi'
 import {convertTimeToNanos} from './util/currentTime'
 import {escape} from './util/escape'
-
-/**
- * Settings that control the way of how a {@link Point} is serialized
- * to a protocol line.
- */
-export interface PointSettings {
-  /** default tags to add to every point */
-  defaultTags?: {[key: string]: string}
-  /** convertTime serializes Point's timestamp to a line protocol value */
-  convertTime?: (
-    value: string | number | Date | undefined
-  ) => string | undefined
-}
 
 /**
  * Point defines values of a single measurement.
@@ -196,7 +184,7 @@ export class Point {
    * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
    * @returns an InfluxDB protocol line out of this instance
    */
-  public toLineProtocol(settings?: Partial<PointSettings>): string | undefined {
+  public toLineProtocol(convertTime?: TimeConverter): string | undefined {
     if (!this.name) return undefined
     let fieldsLine = ''
     Object.keys(this.fields)
@@ -210,10 +198,7 @@ export class Point {
       })
     if (fieldsLine.length === 0) return undefined // no fields present
     let tagsLine = ''
-    const tags =
-      settings && settings.defaultTags
-        ? {...settings.defaultTags, ...this.tags}
-        : this.tags
+    const tags = this.tags
     Object.keys(tags)
       .sort()
       .forEach((x) => {
@@ -226,8 +211,8 @@ export class Point {
         }
       })
     let time = this.time
-    if (settings && settings.convertTime) {
-      time = settings.convertTime(time)
+    if (convertTime) {
+      time = convertTime(time)
     } else {
       time = convertTimeToNanos(time)
     }

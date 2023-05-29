@@ -8,7 +8,7 @@ import {IllegalArgumentError} from './errors'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
  */
-export default class InfluxDB {
+export default class InfluxDBClient {
   private readonly _options: ClientOptions
   readonly transport: Transport
 
@@ -32,8 +32,7 @@ export default class InfluxDB {
   }
 
   /**
-   * Creates WriteApi for the supplied organization and bucket. BEWARE that returned instances must be closed
-   * in order to flush the remaining data and close already scheduled retry executions.
+   * Creates WriteApi for the supplied organization and bucket.
    *
    * @remarks
    * Use {@link WriteOptions} to customize retry strategy options, data chunking
