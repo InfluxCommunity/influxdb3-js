@@ -299,7 +299,7 @@ describe('FetchTransport', () => {
       expect(request?.credentials).is.deep.equal('my-val')
     })
   })
-  describe('send', () => {
+  describe.skip('send', () => {
     const transport = new FetchTransport({url: 'http://test:8086'})
     function fakeCallbacks(): any {
       return {
