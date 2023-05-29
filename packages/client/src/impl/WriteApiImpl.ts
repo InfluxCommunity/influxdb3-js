@@ -1,9 +1,5 @@
 import WriteApi from '../WriteApi'
-import {
-  DEFAULT_WriteOptions,
-  WriteOptions,
-  WritePrecisionType,
-} from '../options'
+import {DEFAULT_WriteOptions, WriteOptions} from '../options'
 import {Transport, SendOptions} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
@@ -24,23 +20,15 @@ export default class WriteApiImpl implements WriteApi {
   constructor(
     private transport: Transport,
     bucket: string,
-    precision: WritePrecisionType,
     writeOptions?: Partial<WriteOptions>,
     org?: string
   ) {
-    const orgURI = org ? `org=${encodeURIComponent(org)}&` : ''
-    this.path = `/api/v2/write?${orgURI}bucket=${encodeURIComponent(
-      bucket
-    )}&precision=${precision}`
-    if (writeOptions?.consistency) {
-      this.path += `&consistency=${encodeURIComponent(
-        writeOptions.consistency
-      )}`
-    }
     this.writeOptions = {
       ...DEFAULT_WriteOptions,
       ...writeOptions,
     }
+    this.path = this._createWritePath(bucket, org)
+    const precision = this.writeOptions.precision
     this.currentTime = currentTime[precision]
     this.dateToProtocolTimestamp = dateToProtocolTimestamp[precision]
     if (this.writeOptions.defaultTags) {
@@ -56,6 +44,20 @@ export default class WriteApiImpl implements WriteApi {
     }
 
     this.doWrite = this.doWrite.bind(this)
+  }
+
+  _createWritePath(bucket: string, org?: string) {
+    const query: string[] = [
+      `bucket=${encodeURIComponent(bucket)}`,
+      `precision=${this.writeOptions.precision}`,
+    ]
+    if (org) query.push(`org=${encodeURIComponent(org)}`)
+    const consistency = this.writeOptions?.consistency
+    if (consistency)
+      query.push(`consistency=${encodeURIComponent(consistency)}`)
+
+    const path = `/api/v2/write?${query.join('&')}`
+    return path
   }
 
   doWrite(lines: string[]): Promise<void> {

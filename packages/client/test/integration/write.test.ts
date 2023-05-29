@@ -30,7 +30,7 @@ describe('my test', () => {
       token,
     })
 
-    const writeApi = client.getWriteApi(database, 'ns')
+    const writeApi = client.getWriteApi(database)
 
     const hrtime = process.hrtime()
     const timeInNs = hrtime[0] * 1e9 + hrtime[1]

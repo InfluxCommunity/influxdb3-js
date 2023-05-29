@@ -110,6 +110,8 @@ export interface WriteOptions extends WriteRetryOptions {
   batchSize: number
   /** delay between data flushes in milliseconds, at most `batch size` records are sent during flush  */
   flushInterval: number
+  /** Precision to use in writes for timestamp. default ns */
+  precision: WritePrecisionType
   /** default tags, unescaped */
   defaultTags?: Record<string, string>
   /** HTTP headers that will be sent with every write request */
@@ -122,19 +124,11 @@ export interface WriteOptions extends WriteRetryOptions {
   consistency?: 'any' | 'one' | 'quorum' | 'all'
 }
 
-/** default RetryDelayStrategyOptions */
-export const DEFAULT_RetryDelayStrategyOptions = {
-  retryJitter: 200,
-  minRetryDelay: 5000,
-  maxRetryDelay: 125000,
-  exponentialBase: 5,
-  randomRetry: true,
-}
-
 /** default writeOptions */
 export const DEFAULT_WriteOptions: WriteOptions = {
   batchSize: 1000,
   maxBatchBytes: 50_000_000, // default max batch size in the cloud
+  precision: 'ns',
   flushInterval: 60000,
   writeFailed: function () {},
   writeSuccess: function () {},

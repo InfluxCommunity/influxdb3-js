@@ -3,7 +3,7 @@ import {Transport} from './transport'
 import WriteApiImpl from './impl/WriteApiImpl'
 // replaced by ./impl/browser/FetchTransport in browser builds
 import TransportImpl from './impl/node/NodeHttpTransport'
-import {ClientOptions, WriteOptions, WritePrecisionType} from './options'
+import {ClientOptions, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
@@ -45,19 +45,13 @@ export default class InfluxDB {
    *
    * @param org - Specifies the destination organization for writes. Takes either the ID or Name interchangeably.
    * @param bucket - The destination bucket for writes.
-   * @param precision - Timestamp precision for line items.
    * @param writeOptions - Custom write options.
    * @returns WriteApi instance
    */
-  getWriteApi(
-    bucket: string,
-    precision: WritePrecisionType = 'ns',
-    writeOptions?: Partial<WriteOptions>
-  ): WriteApi {
+  getWriteApi(bucket: string, writeOptions?: Partial<WriteOptions>): WriteApi {
     return new WriteApiImpl(
       this.transport,
       bucket,
-      precision,
       writeOptions ?? this._options.writeOptions
     )
   }

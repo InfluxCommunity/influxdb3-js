@@ -26,15 +26,11 @@ const PRECISION: WritePrecisionType = 's'
 
 const WRITE_PATH_NS = `/api/v2/write?org=${ORG}&bucket=${BUCKET}&precision=ns`
 
-function createApi(
-  bucket: string,
-  precision: WritePrecisionType,
-  options: Partial<WriteOptions>
-): WriteApi {
+function createApi(bucket: string, options: Partial<WriteOptions>): WriteApi {
   return new InfluxDB({
     ...clientOptions,
     ...{writeOptions: options},
-  }).getWriteApi(bucket, precision)
+  }).getWriteApi(bucket)
 }
 
 interface WriteListeners {
@@ -71,7 +67,8 @@ describe('WriteApi', () => {
     let subject: WriteApi
     let logs: CollectedLogs
     beforeEach(() => {
-      subject = createApi(BUCKET, PRECISION, {
+      subject = createApi(BUCKET, {
+        precision: PRECISION,
         retryJitter: 0,
       })
       // logs = collectLogging.decorate()
@@ -114,7 +111,7 @@ describe('WriteApi', () => {
     function useSubject(writeOptions: Partial<WriteOptions>): void {
       subject = new InfluxDB({
         ...clientOptions,
-      }).getWriteApi(BUCKET, PRECISION, writeOptions)
+      }).getWriteApi(BUCKET, {...writeOptions, precision: PRECISION})
     }
     afterEach(async () => {
       await subject.close()
@@ -133,8 +130,9 @@ describe('WriteApi', () => {
     })
   })
   describe('convert point time to line protocol', () => {
-    const writeAPI = createApi(BUCKET, 'ms', {
+    const writeAPI = createApi(BUCKET, {
       retryJitter: 0,
+      precision: 'ms',
     }) as PointSettings
     it('converts empty string to no timestamp', () => {
       const p = new Point('a').floatField('b', 1).timestamp('')
@@ -161,15 +159,17 @@ describe('WriteApi', () => {
   })
   describe('convert default tags to line protocol', () => {
     it('works with tags OOTB', () => {
-      const writeAPI = createApi(BUCKET, 'ms', {
+      const writeAPI = createApi(BUCKET, {
         retryJitter: 0,
+        precision: 'ms',
       })
       const p = new Point('a').floatField('b', 1).timestamp('')
       expect(p.toLineProtocol(writeAPI)).equals('a b=1')
     })
     it('setups tags using useDefaultTags ', () => {
-      const writeAPI = createApi(BUCKET, 'ms', {
+      const writeAPI = createApi(BUCKET, {
         retryJitter: 0,
+        precision: 'ms',
       })
       const p = new Point('a').floatField('b', 1).timestamp('')
       writeAPI.useDefaultTags({
@@ -179,12 +179,13 @@ describe('WriteApi', () => {
       expect(p.toLineProtocol(writeAPI)).equals('a,a\\ b=c,x=y\\ z b=1')
     })
     it('setups tags from configuration', () => {
-      const writeAPI = createApi(BUCKET, 'ms', {
+      const writeAPI = createApi(BUCKET, {
         retryJitter: 0,
         defaultTags: {
           x: 'y z',
           'a b': 'c',
         },
+        precision: 'ms',
       })
       const p = new Point('a').floatField('b', 1).timestamp('')
       expect(p.toLineProtocol(writeAPI)).equals('a,a\\ b=c,x=y\\ z b=1')
@@ -194,7 +195,7 @@ describe('WriteApi', () => {
     let subject: WriteApi
     let logs: CollectedLogs
     function useSubject(writeOptions: Partial<WriteOptions>): void {
-      subject = createApi(BUCKET, 'ns', {
+      subject = createApi(BUCKET, {
         retryJitter: 0,
         defaultTags: {xtra: '1'},
         ...writeOptions,
