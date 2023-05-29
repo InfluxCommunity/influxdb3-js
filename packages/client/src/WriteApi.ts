@@ -6,9 +6,7 @@ export type TimeConverter = (
 
 /**
  * Asynchronous API that writes time-series data into InfluxDB.
- * This API always buffers points/lines to create batches under the hood
- * to optimize data transfer to InfluxDB server, use `flush` to send
- * the buffered data to InfluxDB immediately.
+ * This API always sends data to InfluxDB immediately
  */
 export default interface WriteApi {
   /**
@@ -33,7 +31,6 @@ export default interface WriteApi {
   writePoints(points: ArrayLike<Point>): Promise<void>
 
   /**
-   * Flushes this writer and cancels retries of write operations that failed.
    * @returns completition promise
    */
   close(): Promise<void>

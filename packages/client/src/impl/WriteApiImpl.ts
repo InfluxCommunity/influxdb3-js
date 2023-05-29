@@ -79,12 +79,6 @@ export default class WriteApiImpl implements WriteApi {
         responseStatusCode = statusCode
       },
       error(error: Error): void {
-        // call the writeFailed listener and check if we can retry
-        const onRetry = self.writeOptions.writeFailed.call(self, error, lines)
-        if (onRetry) {
-          onRetry.then(resolve, reject)
-          return
-        }
         // ignore informational message about the state of InfluxDB
         // enterprise cluster, if present
         if (
@@ -114,7 +108,6 @@ export default class WriteApiImpl implements WriteApi {
       complete(): void {
         // older implementations of transport do not report status code
         if (responseStatusCode == 204 || responseStatusCode == undefined) {
-          self.writeOptions.writeSuccess.call(self, lines)
           resolve()
         } else {
           const message = `204 HTTP response status code expected, but ${responseStatusCode} returned`

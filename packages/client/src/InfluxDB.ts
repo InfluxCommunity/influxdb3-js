@@ -35,8 +35,7 @@ export default class InfluxDBClient {
    * Creates WriteApi for the supplied organization and bucket.
    *
    * @remarks
-   * Use {@link WriteOptions} to customize retry strategy options, data chunking
-   * and flushing options. See {@link DEFAULT_WriteOptions} to see the defaults.
+   * Use {@link WriteOptions}, see {@link DEFAULT_WriteOptions} to see the defaults.
    *
    * See also {@link https://github.com/influxdata/influxdb-client-js/blob/master/examples/write.mjs | write example},
    * {@link https://github.com/influxdata/influxdb-client-js/blob/master/examples/writeAdvanced.mjs | writeAdvanced example},

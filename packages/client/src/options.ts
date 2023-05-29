@@ -1,5 +1,4 @@
 import {Transport} from './transport'
-import WriteApi from './WriteApi'
 
 /**
  * Option for the communication with InfluxDB server.
@@ -43,102 +42,23 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options that configure strategy for retrying failed requests.
- */
-export interface RetryDelayStrategyOptions {
-  /** add `random(retryJitter)` milliseconds delay when retrying HTTP calls */
-  retryJitter: number
-  /** minimum delay when retrying write (milliseconds) */
-  minRetryDelay: number
-  /** maximum delay when retrying write (milliseconds) */
-  maxRetryDelay: number
-  /** base for the exponential retry delay */
-  exponentialBase: number
-  /**
-   * randomRetry indicates whether the next retry delay is deterministic (false) or random (true).
-   * The deterministic delay starts with `minRetryDelay * exponentialBase` and it is multiplied
-   * by `exponentialBase` until it exceeds `maxRetryDelay`.
-   * When random is `true`, the next delay is computed as a random number between next retry attempt (upper)
-   * and the lower number in the deterministic sequence. `random(retryJitter)` is added to every returned value.
-   */
-  randomRetry: boolean
-}
-
-/**
- * Options that configure strategy for retrying failed InfluxDB write operations.
- */
-export interface WriteRetryOptions extends RetryDelayStrategyOptions {
-  /**
-   * WriteFailed is called to inform about write errors.
-   * @param this - the instance of the API that failed
-   * @param error - write error
-   * @param lines - failed lines
-   * @param attempt - count of already failed attempts to write the lines (1 ... maxRetries+1)
-   * @param expires - expiration time for the lines to be retried in millis since epoch
-   * @returns a Promise to force the API to use it as a result of the flush operation,
-   * void/undefined to continue with default retry mechanism
-   */
-  writeFailed(
-    this: WriteApi,
-    error: Error,
-    lines: Array<string>
-  ): Promise<void> | void
-
-  /**
-   * WriteSuccess is informed about successfully written lines.
-   * @param this - the instance of the API in use
-   * @param lines - written lines
-   */
-  writeSuccess(this: WriteApi, lines: Array<string>): void
-
-  /**
-   * WriteRetrySkipped is informed about lines that were removed from the retry buffer
-   * to keep the size of the retry buffer under the configured limit (maxBufferLines).
-   * @param entry - lines that were skipped
-   */
-  writeRetrySkipped(entry: {lines: Array<string>; expires: number}): void
-
-  /** the maximum size of retry-buffer (in lines) */
-  maxBufferLines: number
-}
-
-/**
  * Options used by {@link WriteApi} .
  */
-export interface WriteOptions extends WriteRetryOptions {
-  /** max number of records/lines to send in a batch   */
-  batchSize: number
-  /** delay between data flushes in milliseconds, at most `batch size` records are sent during flush  */
-  flushInterval: number
+export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
   precision: WritePrecisionType
   /** HTTP headers that will be sent with every write request */
   headers?: {[key: string]: string}
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
-  /** max size of a batch in bytes */
-  maxBatchBytes: number
   /** InfluxDB Enterprise write consistency as explained in https://docs.influxdata.com/enterprise_influxdb/v1.9/concepts/clustering/#write-consistency */
   consistency?: 'any' | 'one' | 'quorum' | 'all'
 }
 
 /** default writeOptions */
 export const DEFAULT_WriteOptions: WriteOptions = {
-  batchSize: 1000,
-  maxBatchBytes: 50_000_000, // default max batch size in the cloud
   precision: 'ns',
-  flushInterval: 60000,
-  writeFailed: function () {},
-  writeSuccess: function () {},
-  writeRetrySkipped: function () {},
-  maxBufferLines: 32_000,
-  // a copy of DEFAULT_RetryDelayStrategyOptions, so that DEFAULT_WriteOptions could be tree-shaken
-  retryJitter: 200,
-  minRetryDelay: 5000,
-  maxRetryDelay: 125000,
-  exponentialBase: 2,
   gzipThreshold: 1000,
-  randomRetry: true,
 }
 
 /**
