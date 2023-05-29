@@ -46,7 +46,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
-  precision: WritePrecisionType
+  precision: WritePrecision
   /** HTTP headers that will be sent with every write request */
   headers?: {[key: string]: string}
   /** When specified, write bodies larger than the threshold are gzipped  */
@@ -75,4 +75,4 @@ export interface ClientOptions extends ConnectionOptions {
  * Timestamp precision used in write operations.
  * See {@link https://docs.influxdata.com/influxdb/latest/api/#operation/PostWrite }
  */
-export type WritePrecisionType = 'ns' | 'us' | 'ms' | 's'
+export type WritePrecision = 'ns' | 'us' | 'ms' | 's'

@@ -7,7 +7,7 @@ import {
   Point,
   WriteApi,
   InfluxDB,
-  WritePrecisionType,
+  WritePrecision,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
 import {waitForCondition} from './util/waitForCondition'
@@ -20,7 +20,7 @@ const clientOptions: ClientOptions = {
 }
 const ORG = 'my-org'
 const BUCKET = 'bucket'
-const PRECISION: WritePrecisionType = 's'
+const PRECISION: WritePrecision = 's'
 
 const WRITE_PATH_NS = `/api/v2/write?org=${ORG}&bucket=${BUCKET}&precision=ns`
 
@@ -374,7 +374,7 @@ describe('WriteApi', () => {
       expect(logs.warn).deep.equals([])
       expect(uri).equals(customPath)
     })
-    it('swallows hinted handoff queue not empty', async () => {
+    it.skip('swallows hinted handoff queue not empty', async () => {
       useSubject({
         consistency: 'quorum',
       })

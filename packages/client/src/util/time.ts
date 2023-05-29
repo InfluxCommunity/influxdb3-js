@@ -1,3 +1,5 @@
+import {WritePrecision} from '../options'
+
 declare let process: any
 const zeroPadding = '000000000'
 let useHrTime = false
@@ -109,6 +111,23 @@ export function convertTimeToNanos(
     return value.length > 0 ? value : undefined
   } else if (value instanceof Date) {
     return `${value.getTime()}000000`
+  } else if (typeof value === 'number') {
+    return String(Math.floor(value))
+  } else {
+    return String(value)
+  }
+}
+
+export const convertTime = (
+  value: string | number | Date | undefined,
+  precision: WritePrecision = 'ns'
+): string | undefined => {
+  if (value === undefined) {
+    return currentTime[precision]()
+  } else if (typeof value === 'string') {
+    return value.length > 0 ? value : undefined
+  } else if (value instanceof Date) {
+    return dateToProtocolTimestamp[precision](value)
   } else if (typeof value === 'number') {
     return String(Math.floor(value))
   } else {

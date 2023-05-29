@@ -1,5 +1,5 @@
 import {TimeConverter} from './WriteApi'
-import {convertTimeToNanos} from './util/currentTime'
+import {convertTimeToNanos} from './util/time'
 import {escape} from './util/escape'
 
 /**

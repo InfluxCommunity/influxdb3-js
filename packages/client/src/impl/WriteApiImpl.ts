@@ -1,21 +1,20 @@
-import WriteApi from '../WriteApi'
+import WriteApi, {TimeConverter} from '../WriteApi'
 import {DEFAULT_WriteOptions, WriteOptions} from '../options'
 import {Transport, SendOptions} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
 import {HttpError} from '../errors'
 import {Point} from '../Point'
-import {currentTime, dateToProtocolTimestamp} from '../util/currentTime'
 import {isDefined} from '../util/common'
+import {convertTime} from '../util/time'
 
 export default class WriteApiImpl implements WriteApi {
   public path: string
+  public convertTime: TimeConverter
 
   private closed = false
   private writeOptions: WriteOptions
   private sendOptions: SendOptions
-  private currentTime: () => string
-  private dateToProtocolTimestamp: (d: Date) => string
 
   constructor(
     private transport: Transport,
@@ -28,9 +27,6 @@ export default class WriteApiImpl implements WriteApi {
       ...writeOptions,
     }
     this.path = this._createWritePath(bucket, org)
-    const precision = this.writeOptions.precision
-    this.currentTime = currentTime[precision]
-    this.dateToProtocolTimestamp = dateToProtocolTimestamp[precision]
     this.sendOptions = {
       method: 'POST',
       headers: {
@@ -41,7 +37,8 @@ export default class WriteApiImpl implements WriteApi {
     }
 
     this.doWrite = this.doWrite.bind(this)
-    this.convertTime = this.convertTime.bind(this)
+    this.convertTime = (value: string | number | Date | undefined) =>
+      convertTime(value, this.writeOptions.precision)
   }
 
   _createWritePath(bucket: string, org?: string) {
@@ -92,7 +89,6 @@ export default class WriteApiImpl implements WriteApi {
           callbacks.complete()
           return
         }
-        // retry if possible
         if (
           !self.closed &&
           (!(error instanceof HttpError) ||
@@ -143,26 +139,12 @@ export default class WriteApiImpl implements WriteApi {
   async writePoints(points: ArrayLike<Point>): Promise<void> {
     await this.doWrite(
       Array.from(points)
-        .map((p) => p.toLineProtocol(this.convertTime))
+        .map((p) => p.toLineProtocol())
         .filter(isDefined)
     )
   }
 
   async close(): Promise<void> {
     this.closed = true
-  }
-
-  convertTime(value: string | number | Date | undefined): string | undefined {
-    if (value === undefined) {
-      return this.currentTime()
-    } else if (typeof value === 'string') {
-      return value.length > 0 ? value : undefined
-    } else if (value instanceof Date) {
-      return this.dateToProtocolTimestamp(value)
-    } else if (typeof value === 'number') {
-      return String(Math.floor(value))
-    } else {
-      return String(value)
-    }
   }
 }
