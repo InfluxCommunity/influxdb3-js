@@ -1,8 +1,8 @@
 import {Point} from './Point'
 
-export type TimeConverter = (
-  value: string | number | Date | undefined
-) => string | undefined
+export interface TimeConverter {
+  (value: string | number | Date | undefined): string | undefined
+}
 
 /**
  * Asynchronous API that writes time-series data into InfluxDB.
