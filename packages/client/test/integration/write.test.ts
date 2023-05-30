@@ -30,8 +30,6 @@ describe('my test', () => {
       token,
     })
 
-    const writeApi = client.getWriteApi(database)
-
     const hrtime = process.hrtime()
     const timeInNs = hrtime[0] * 1e9 + hrtime[1]
 
@@ -46,8 +44,6 @@ describe('my test', () => {
       .intField('testId', testId)
     // TODO:
     // .timestamp(Date.now())
-    writeApi.writePoints([point])
-
-    await writeApi.close()
+    client.writePoints([point], database)
   })
 })

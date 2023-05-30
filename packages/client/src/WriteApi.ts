@@ -14,7 +14,7 @@ export default interface WriteApi {
    *
    * @param records - lines in InfluxDB Line Protocol
    */
-  write(records: string | Array<string>): Promise<void>
+  write(records: string | ArrayLike<string>): Promise<void>
 
   /**
    * Write point.

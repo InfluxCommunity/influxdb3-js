@@ -5,6 +5,7 @@ import WriteApiImpl from './impl/WriteApiImpl'
 import TransportImpl from './impl/node/NodeHttpTransport'
 import {ClientOptions, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
+import {Point} from './Point'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
  */
@@ -31,6 +32,60 @@ export default class InfluxDBClient {
     this.transport = this._options.transport ?? new TransportImpl(this._options)
   }
 
+  async write(
+    lines: string | ArrayLike<string>,
+    database: string,
+    writeOptions?: Partial<WriteOptions>
+  ): Promise<void> {
+    const writer = this.getWriteApi(
+      database,
+      writeOptions ?? this._options.writeOptions
+    )
+    setTimeout(() => {
+      writer.close()
+    }, 0)
+    return writer.write(lines)
+  }
+
+  async writePoint(
+    point: Point,
+    database: string,
+    writeOptions?: Partial<WriteOptions>
+  ): Promise<void> {
+    const writer = this.getWriteApi(
+      database,
+      writeOptions ?? this._options.writeOptions
+    )
+    setTimeout(() => {
+      writer.close()
+    }, 0)
+    return writer.writePoint(point)
+  }
+
+  async writePoints(
+    points: ArrayLike<Point>,
+    database: string,
+    writeOptions?: Partial<WriteOptions>
+  ): Promise<void> {
+    const writer = this.getWriteApi(
+      database,
+      writeOptions ?? this._options.writeOptions
+    )
+    setTimeout(() => {
+      writer.close()
+    }, 0)
+    return writer.writePoints(points)
+  }
+
+  get convertTime() {
+    return this.getWriteApi('').convertTime
+  }
+
+  async close(): Promise<void> {
+    // TODO:
+    return Promise.resolve()
+  }
+
   /**
    * Creates WriteApi for the supplied organization and bucket.
    *
@@ -46,7 +101,10 @@ export default class InfluxDBClient {
    * @param writeOptions - Custom write options.
    * @returns WriteApi instance
    */
-  getWriteApi(bucket: string, writeOptions?: Partial<WriteOptions>): WriteApi {
+  private getWriteApi(
+    bucket: string,
+    writeOptions?: Partial<WriteOptions>
+  ): WriteApi {
     return new WriteApiImpl(
       this.transport,
       bucket,
