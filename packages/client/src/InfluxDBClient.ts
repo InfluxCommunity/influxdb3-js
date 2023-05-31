@@ -6,11 +6,14 @@ import TransportImpl from './impl/node/NodeHttpTransport'
 import {ClientOptions, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
 import {Point} from './Point'
+import {convertTime} from './util/time'
+import {isDefined} from './util/common'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
  */
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
+  private readonly _writeApi: WriteApi
   readonly transport: Transport
 
   /**
@@ -30,85 +33,61 @@ export default class InfluxDBClient {
       throw new IllegalArgumentError('No url specified!')
     if (url.endsWith('/')) this._options.url = url.substring(0, url.length - 1)
     this.transport = this._options.transport ?? new TransportImpl(this._options)
+    this._writeApi = new WriteApiImpl(this.transport)
+  }
+
+  private _mergeWriteOptions = (writeOptions?: Partial<WriteOptions>) => {
+    return {
+      ...this._options.writeOptions,
+      ...writeOptions,
+    }
   }
 
   async write(
     lines: string | ArrayLike<string>,
     database: string,
+    org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
-    const writer = this.getWriteApi(
+    await this._writeApi.doWrite(
+      typeof lines === 'string' ? [lines] : Array.from(lines),
       database,
-      writeOptions ?? this._options.writeOptions
+      org,
+      this._mergeWriteOptions(writeOptions)
     )
-    setTimeout(() => {
-      writer.close()
-    }, 0)
-    return writer.write(lines)
   }
 
   async writePoint(
     point: Point,
     database: string,
+    org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
-    const writer = this.getWriteApi(
-      database,
-      writeOptions ?? this._options.writeOptions
-    )
-    setTimeout(() => {
-      writer.close()
-    }, 0)
-    return writer.writePoint(point)
+    await this.writePoints([point], database, org, writeOptions)
   }
 
   async writePoints(
     points: ArrayLike<Point>,
     database: string,
+    org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
-    const writer = this.getWriteApi(
+    await this._writeApi.doWrite(
+      Array.from(points)
+        .map((p) => p.toLineProtocol())
+        .filter(isDefined),
       database,
-      writeOptions ?? this._options.writeOptions
+      org,
+      this._mergeWriteOptions(writeOptions)
     )
-    setTimeout(() => {
-      writer.close()
-    }, 0)
-    return writer.writePoints(points)
   }
 
   get convertTime() {
-    return this.getWriteApi('').convertTime
+    return (value: string | number | Date | undefined) =>
+      convertTime(value, this._options.writeOptions?.precision)
   }
 
   async close(): Promise<void> {
-    // TODO:
-    return Promise.resolve()
-  }
-
-  /**
-   * Creates WriteApi for the supplied organization and bucket.
-   *
-   * @remarks
-   * Use {@link WriteOptions}, see {@link DEFAULT_WriteOptions} to see the defaults.
-   *
-   * See also {@link https://github.com/influxdata/influxdb-client-js/blob/master/examples/write.mjs | write example},
-   * {@link https://github.com/influxdata/influxdb-client-js/blob/master/examples/writeAdvanced.mjs | writeAdvanced example},
-   * and {@link https://github.com/influxdata/influxdb-client-js/blob/master/examples/index.html | browser example}.
-   *
-   * @param org - Specifies the destination organization for writes. Takes either the ID or Name interchangeably.
-   * @param bucket - The destination bucket for writes.
-   * @param writeOptions - Custom write options.
-   * @returns WriteApi instance
-   */
-  private getWriteApi(
-    bucket: string,
-    writeOptions?: Partial<WriteOptions>
-  ): WriteApi {
-    return new WriteApiImpl(
-      this.transport,
-      bucket,
-      writeOptions ?? this._options.writeOptions
-    )
+    await this._writeApi.close()
   }
 }

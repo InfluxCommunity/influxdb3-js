@@ -1,53 +1,24 @@
-import WriteApi, {TimeConverter} from '../WriteApi'
+import WriteApi from '../WriteApi'
 import {DEFAULT_WriteOptions, WriteOptions} from '../options'
-import {Transport, SendOptions} from '../transport'
+import {Transport} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
 import {HttpError} from '../errors'
-import {Point} from '../Point'
-import {isDefined} from '../util/common'
-import {convertTime} from '../util/time'
 
 export default class WriteApiImpl implements WriteApi {
-  public path: string
-  public convertTime: TimeConverter
-
   private closed = false
-  private writeOptions: WriteOptions
-  private sendOptions: SendOptions
 
-  constructor(
-    private transport: Transport,
-    bucket: string,
-    writeOptions?: Partial<WriteOptions>,
-    org?: string
-  ) {
-    this.writeOptions = {
-      ...DEFAULT_WriteOptions,
-      ...writeOptions,
-    }
-    this.path = this._createWritePath(bucket, org)
-    this.sendOptions = {
-      method: 'POST',
-      headers: {
-        'content-type': 'text/plain; charset=utf-8',
-        ...writeOptions?.headers,
-      },
-      gzipThreshold: this.writeOptions.gzipThreshold,
-    }
-
+  constructor(private transport: Transport) {
     this.doWrite = this.doWrite.bind(this)
-    this.convertTime = (value: string | number | Date | undefined) =>
-      convertTime(value, this.writeOptions.precision)
   }
 
-  _createWritePath(bucket: string, org?: string) {
+  _createWritePath(bucket: string, writeOptions: WriteOptions, org?: string) {
     const query: string[] = [
       `bucket=${encodeURIComponent(bucket)}`,
-      `precision=${this.writeOptions.precision}`,
+      `precision=${writeOptions.precision}`,
     ]
     if (org) query.push(`org=${encodeURIComponent(org)}`)
-    const consistency = this.writeOptions?.consistency
+    const consistency = writeOptions?.consistency
     if (consistency)
       query.push(`consistency=${encodeURIComponent(consistency)}`)
 
@@ -55,7 +26,12 @@ export default class WriteApiImpl implements WriteApi {
     return path
   }
 
-  doWrite(lines: string[]): Promise<void> {
+  doWrite(
+    lines: string[],
+    bucket: string,
+    org?: string,
+    writeOptions?: Partial<WriteOptions>
+  ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
     if (this.closed) {
@@ -118,30 +94,28 @@ export default class WriteApiImpl implements WriteApi {
         }
       },
     }
+
+    const writeOptionsOrDefault: WriteOptions = {
+      ...DEFAULT_WriteOptions,
+      ...writeOptions,
+    }
+    const sendOptions = {
+      method: 'POST',
+      headers: {
+        'content-type': 'text/plain; charset=utf-8',
+        ...writeOptions?.headers,
+      },
+      gzipThreshold: writeOptionsOrDefault.gzipThreshold,
+    }
+
     this.transport.send(
-      this.path,
+      this._createWritePath(bucket, writeOptionsOrDefault, org),
       lines.join('\n'),
-      this.sendOptions,
+      sendOptions,
       callbacks
     )
 
     return promise
-  }
-
-  async write(lines: string | ArrayLike<string>): Promise<void> {
-    await this.doWrite(typeof lines === 'string' ? [lines] : Array.from(lines))
-  }
-
-  async writePoint(point: Point): Promise<void> {
-    await this.writePoints([point])
-  }
-
-  async writePoints(points: ArrayLike<Point>): Promise<void> {
-    await this.doWrite(
-      Array.from(points)
-        .map((p) => p.toLineProtocol())
-        .filter(isDefined)
-    )
   }
 
   async close(): Promise<void> {

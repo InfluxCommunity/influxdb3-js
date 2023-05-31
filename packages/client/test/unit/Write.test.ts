@@ -50,7 +50,7 @@ function createWriteCounters(): WriteListeners {
   return retVal
 }
 
-describe('WriteApi', () => {
+describe('Write', () => {
   beforeEach(() => {
     nock.disableNetConnect()
     unhandledRejections.before()
@@ -382,6 +382,7 @@ describe('WriteApi', () => {
     //   expect(logs.warn).deep.equals([])
     //   expect(uri).equals(customPath)
     // })
+    // TODO: test default write options
     it.skip('swallows hinted handoff queue not empty', async () => {
       useSubject({
         consistency: 'quorum',
