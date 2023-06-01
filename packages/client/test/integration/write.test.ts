@@ -45,5 +45,7 @@ describe('my test', () => {
     // TODO:
     // .timestamp(Date.now())
     client.writePoints([point], database)
+
+    client.query()
   })
 })

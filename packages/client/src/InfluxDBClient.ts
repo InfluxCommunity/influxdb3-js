@@ -11,6 +11,33 @@ import {isDefined} from './util/common'
 /**
  * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
  */
+import * as grpc from '@grpc/grpc-js'
+import {FlightData, Ticket} from './Flight.pb'
+import {Observable} from 'rxjs'
+
+interface Rpc {
+  request(
+    service: string,
+    method: string,
+    data: Uint8Array
+  ): Promise<Uint8Array>
+  clientStreamingRequest(
+    service: string,
+    method: string,
+    data: Observable<Uint8Array>
+  ): Promise<Uint8Array>
+  serverStreamingRequest(
+    service: string,
+    method: string,
+    data: Uint8Array
+  ): Observable<Uint8Array>
+  bidirectionalStreamingRequest(
+    service: string,
+    method: string,
+    data: Observable<Uint8Array>
+  ): Observable<Uint8Array>
+}
+
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
   private readonly _writeApi: WriteApi
@@ -80,6 +107,105 @@ export default class InfluxDBClient {
       org,
       this._mergeWriteOptions(writeOptions)
     )
+  }
+
+  async *query() {
+    // query: string, database: string, queryType: QueryType = 'sql'
+
+    const conn = new grpc.Client(
+      'us-east-1-1.aws.cloud2.influxdata.com:443',
+      grpc.credentials.createInsecure()
+    )
+
+    type RpcImpl = (
+      service: string,
+      method: string,
+      data: Uint8Array
+    ) => Promise<Uint8Array>
+
+    const sendRequest: RpcImpl = (service, method, data) => {
+      // Conventionally in gRPC, the request path looks like
+      //   "package.names.ServiceName/MethodName",
+      // we therefore construct such a string
+      const path = `/${service}/${method}`
+
+      return new Promise((resolve, reject) => {
+        // makeUnaryRequest transmits the result (and error) with a callback
+        // transform this into a promise!
+        const resultCallback: any = (err: any, res: any) => {
+          if (err) {
+            return reject(err)
+          }
+          resolve(res)
+        }
+
+        function passThrough(argument: any) {
+          return argument
+        }
+
+        // Using passThrough as the serialize and deserialize functions
+        conn.makeUnaryRequest(
+          path,
+          passThrough,
+          passThrough,
+          data,
+          resultCallback
+        )
+      })
+    }
+    const rpc: Rpc = {
+      request: sendRequest,
+      bidirectionalStreamingRequest(_service, _method, _data) {
+        throw new Error('not implemented!')
+      },
+      clientStreamingRequest(_service, _method, _data) {
+        throw new Error('not implemented!')
+      },
+      serverStreamingRequest(_service, _method, _data): Observable<Uint8Array> {
+        throw new Error('not implemented!')
+      },
+    }
+
+    // const client = new FlightServiceClientImpl(rpc)
+
+    const query = `
+  SELECT *
+		FROM "stat"
+		WHERE
+		time >= now() - interval '10 minute'
+`
+
+    const ticketData = {
+      database: 'CI_TEST',
+      sql_query: query,
+      query_type: 'sql',
+    }
+
+    const ticket = Ticket.create({
+      ticket: Uint8Array.from(JSON.stringify(ticketData), (x) =>
+        x.charCodeAt(0)
+      ),
+    })
+    // const ticket = Ticket.fromJSON({ticket: ticketData})
+
+    // ticket.ticket = JSON.stringify(ticketData).to;
+
+    const ticketEncoded = Ticket.encode(ticket).finish()
+
+    // client.DoGet(ticket).subscribe((v) => {
+    //   debugger
+    //   console.log(v)
+    // })
+
+    const result = await rpc.request(
+      'arrow.flight.protocol.FlightService',
+      'DoGet',
+      ticketEncoded
+    )
+    const dataResult = FlightData.decode(result)
+    console.log(dataResult)
+
+    yield 0
   }
 
   get convertTime() {

@@ -61,6 +61,8 @@ export const DEFAULT_WriteOptions: WriteOptions = {
   gzipThreshold: 1000,
 }
 
+export type QueryType = 'sql' | 'influxql'
+
 /**
  * Options used by {@link InfluxDB} .
  */
