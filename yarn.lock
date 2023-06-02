@@ -1032,6 +1032,18 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@protobuf-ts/runtime-rpc@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.0.tgz#9431d9dfa1f49c6787bc88c6d3b71b4392082494"
+  integrity sha512-h2S86+u2cNJACjzbBubbjKmNrnXkTmJ9yJHW4t7ZVS9xdV1C68blsVIh3Su4ghR8Nlj0459FuIUTsjWR8hA/7g==
+  dependencies:
+    "@protobuf-ts/runtime" "^2.9.0"
+
+"@protobuf-ts/runtime@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.0.tgz#fca33476d0fcdd8255680321df893af7ed5bab21"
+  integrity sha512-DnJtLZFMglADv9jiawBmg0RaET4a6fNSAaAHuU6Ovw2ZhJ23ehIY0NrlYLS0Lc8HRH0S5rkLI1QF1A1h8uKUnA==
+
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@protobufjs/aspromise/-/aspromise-1.1.2.tgz#9b8b0cc663d669a7d8f6f5d0893a14d348f30fbf"

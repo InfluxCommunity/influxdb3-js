@@ -82,6 +82,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.8.14",
     "@grpc/proto-loader": "^0.7.7",
+    "@protobuf-ts/runtime-rpc": "^2.9.0",
     "@types/long": "^5.0.0",
     "apache-arrow": "^12.0.0",
     "long": "^5.2.3",
