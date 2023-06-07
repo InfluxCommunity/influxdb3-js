@@ -1,3 +1,4 @@
+import {expect} from 'chai'
 import {InfluxDB, Point} from '../../src'
 
 const getEnvVariables = () => {
@@ -46,6 +47,26 @@ describe('my test', () => {
     // .timestamp(Date.now())
     client.writePoints([point], database)
 
-    client.query()
+    const query = `
+    SELECT *
+      FROM "stat"
+      WHERE
+      time >= now() - interval '10 minute'
+    `
+
+    const queryType = 'sql'
+
+    const data = client.query(query, database, queryType)
+
+    let row: IteratorResult<Map<string, any>, void>
+    row = await data.next()
+
+    expect(row.done).to.equal(false)
+    expect(row.value?.get('unit')).to.equal('temperature')
+    expect(row.value?.get('avg')).to.equal(23.2)
+    expect(row.value?.get('max')).to.equal(45.0)
+
+    row = await data.next()
+    expect(row.done).to.equal(true)
   })
 })

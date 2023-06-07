@@ -3,7 +3,7 @@ import {Transport} from './transport'
 import WriteApiImpl from './impl/WriteApiImpl'
 // replaced by ./impl/browser/FetchTransport in browser builds
 import TransportImpl from './impl/node/NodeHttpTransport'
-import {ClientOptions, WriteOptions} from './options'
+import {ClientOptions, QueryType, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
 import {Point} from './Point'
 import {convertTime} from './util/time'
@@ -86,17 +86,11 @@ export default class InfluxDBClient {
     )
   }
 
-  async *query() {
-    // query: string, database: string, queryType: QueryType = 'sql'
-    const query = `
-  SELECT *
-		FROM "stat"
-		WHERE
-		time >= now() - interval '10 minute'
-`
-    const database = 'CI_TEST'
-    const queryType = 'sql'
-
+  async *query(
+    query: string,
+    database: string,
+    queryType: QueryType = 'sql'
+  ): AsyncGenerator<Map<string, any>, void, void> {
     const client = new FlightServiceClient(
       'us-east-1-1.aws.cloud2.influxdata.com:443',
       // grpc.credentials.createInsecure()
@@ -134,7 +128,19 @@ export default class InfluxDBClient {
       })
       .read()
 
-    yield 0
+    const mockData: Map<string, any>[] = [
+      new Map(
+        Object.entries({
+          unit: 'temperature',
+          avg: 23.2,
+          max: 45.0,
+        })
+      ),
+    ]
+
+    for (const row of mockData) {
+      yield row
+    }
   }
 
   get convertTime() {

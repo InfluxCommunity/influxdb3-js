@@ -45,5 +45,14 @@ const getEnvVariables = () => {
   // .timestamp(Date.now())
   client.writePoints([point], database)
 
-  client.query().next()
+  const query = `
+  SELECT *
+    FROM "stat"
+    WHERE
+    time >= now() - interval '10 minute'
+  `
+
+  const queryType = 'sql'
+
+  client.query(query, database, queryType).next()
 })()
