@@ -13,7 +13,32 @@ import {isDefined} from './util/common'
  */
 import * as grpc from '@grpc/grpc-js'
 import {FlightServiceClient} from './generated/Flight.grpc-client'
-import {Ticket} from './generated/Flight'
+import {FlightData, Ticket} from './generated/Flight'
+import {MessageReader, RecordBatchReader} from 'apache-arrow'
+import {tableFromIPC} from 'apache-arrow'
+import {Message} from './generated/flatc/org/apache/arrow/flatbuf/message'
+import * as flatbuffers from 'flatbuffers'
+import {RecordBatch} from './generated/flatc/org/apache/arrow/flatbuf/record-batch'
+
+function concatenateUint8Arrays(arrays: Uint8Array[]) {
+  // Calculate the total length of the concatenated array
+  let totalLength = 0
+  for (let i = 0; i < arrays.length; i++) {
+    totalLength += arrays[i].length
+  }
+
+  // Create a new Uint8Array with the total length
+  const concatenatedArray = new Uint8Array(totalLength)
+
+  // Copy each array into the concatenated array
+  let offset = 0
+  for (let i = 0; i < arrays.length; i++) {
+    concatenatedArray.set(arrays[i], offset)
+    offset += arrays[i].length
+  }
+
+  return concatenatedArray
+}
 
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
@@ -115,13 +140,56 @@ export default class InfluxDBClient {
     const token = this._options.token
     if (token) metadata.set('authorization', 'Bearer ' + token)
 
+    const dataCol: FlightData[] = []
+
     client
       .doGet(ticket, metadata)
-      .addListener('data', (data) => {
-        console.log(data)
+      .addListener('data', async (data: FlightData) => {
+        dataCol.push(data)
+        console.log()
       })
-      .addListener('end', () => {
+      .addListener('end', async () => {
         console.log('end')
+        const data = concatenateUint8Arrays(dataCol.map((x) => x.dataBody))
+        void data
+
+        const headerBuffer = new flatbuffers.ByteBuffer(dataCol[0].dataHeader)
+        void headerBuffer
+        const bodyBuffer = new flatbuffers.ByteBuffer(dataCol[0].dataBody)
+        void bodyBuffer
+
+        // Message.from()
+        const msg = Message.getRootAsMessage(headerBuffer)
+        void msg
+
+        const bodyBatch = RecordBatch.getRootAsRecordBatch(bodyBuffer)
+        void bodyBatch
+
+        const reader = new MessageReader([
+          dataCol[0].dataHeader,
+          dataCol[0].dataBody,
+        ])
+        void reader
+        // const table = tableFromIPC([dataCol[0].appMetadata, dataCol[0].dataBody])
+        // void table
+        const res = dataCol.map((x) =>
+          tableFromIPC([Buffer.from(x.dataHeader), Buffer.from(x.dataBody)])
+        )
+        void res
+        const dataArr = res.map((x) => x.data)
+        void dataArr
+
+        const batchReader = await RecordBatchReader.from(dataCol[0].dataBody)
+        // console.log(batchReader)
+        // console.log(`Schema: ${batchReader.schema}`)
+
+        let recordBatch: IteratorResult<any, any> // = batchReader.next()
+        recordBatch = batchReader.next()
+        while (!recordBatch.done) {
+          console.log(recordBatch)
+          recordBatch = batchReader.next()
+        }
+        // console.log(`Batch: ${recordBatch}`)
       })
       .addListener('error', (e) => {
         console.error(e)
