@@ -14,11 +14,10 @@ import {isDefined} from './util/common'
 import * as grpc from '@grpc/grpc-js'
 import {FlightServiceClient} from './generated/Flight.grpc-client'
 import {FlightData, Ticket} from './generated/Flight'
-import {MessageReader, RecordBatchReader} from 'apache-arrow'
+import {Message, Schema} from 'apache-arrow'
 import {tableFromIPC} from 'apache-arrow'
-import {Message} from './generated/flatc/org/apache/arrow/flatbuf/message'
-import * as flatbuffers from 'flatbuffers'
-import {RecordBatch} from './generated/flatc/org/apache/arrow/flatbuf/record-batch'
+import {toUint8Array} from 'apache-arrow/util/buffer'
+import { RecordBatch } from "apache-arrow/ipc/metadata/message"
 
 function concatenateUint8Arrays(arrays: Uint8Array[]) {
   // Calculate the total length of the concatenated array
@@ -122,6 +121,9 @@ export default class InfluxDBClient {
       grpc.credentials.createSsl()
     )
 
+    void tableFromIPC
+    void toUint8Array
+
     const ticketData = {
       database: database,
       sql_query: query,
@@ -153,43 +155,24 @@ export default class InfluxDBClient {
         const data = concatenateUint8Arrays(dataCol.map((x) => x.dataBody))
         void data
 
-        const headerBuffer = new flatbuffers.ByteBuffer(dataCol[0].dataHeader)
-        void headerBuffer
-        const bodyBuffer = new flatbuffers.ByteBuffer(dataCol[0].dataBody)
-        void bodyBuffer
+        dataCol.forEach((x, i) => {
+          const message = Message.decode(dataCol[i].dataHeader)
+          void message
 
-        // Message.from()
-        const msg = Message.getRootAsMessage(headerBuffer)
-        void msg
+          const messageType = message.header()
+          void messageType
 
-        const bodyBatch = RecordBatch.getRootAsRecordBatch(bodyBuffer)
-        void bodyBatch
+          if (messageType instanceof Schema) {
+            const fields = messageType.fields
+            void fields
+          }
 
-        const reader = new MessageReader([
-          dataCol[0].dataHeader,
-          dataCol[0].dataBody,
-        ])
-        void reader
-        // const table = tableFromIPC([dataCol[0].appMetadata, dataCol[0].dataBody])
-        // void table
-        const res = dataCol.map((x) =>
-          tableFromIPC([Buffer.from(x.dataHeader), Buffer.from(x.dataBody)])
-        )
-        void res
-        const dataArr = res.map((x) => x.data)
-        void dataArr
-
-        const batchReader = await RecordBatchReader.from(dataCol[0].dataBody)
-        // console.log(batchReader)
-        // console.log(`Schema: ${batchReader.schema}`)
-
-        let recordBatch: IteratorResult<any, any> // = batchReader.next()
-        recordBatch = batchReader.next()
-        while (!recordBatch.done) {
-          console.log(recordBatch)
-          recordBatch = batchReader.next()
-        }
-        // console.log(`Batch: ${recordBatch}`)
+          if (message.isRecordBatch()) {
+            const messageType = message.header() as any as RecordBatch
+            const buffers = messageType.buffers
+            void buffers
+          }
+        })
       })
       .addListener('error', (e) => {
         console.error(e)
