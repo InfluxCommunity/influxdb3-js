@@ -14,10 +14,25 @@ import {isDefined} from './util/common'
 import * as grpc from '@grpc/grpc-js'
 import {FlightServiceClient} from './generated/Flight.grpc-client'
 import {FlightData, Ticket} from './generated/Flight'
-import {Message, Schema} from 'apache-arrow'
+import {
+  Message,
+  MessageReader,
+  RecordBatchFileReader,
+  RecordBatchReader,
+  Schema,
+} from 'apache-arrow'
 import {tableFromIPC} from 'apache-arrow'
 import {toUint8Array} from 'apache-arrow/util/buffer'
-import { RecordBatch } from "apache-arrow/ipc/metadata/message"
+import {RecordBatch} from 'apache-arrow/ipc/metadata/message'
+
+const createInt32Uint8Array = (value: number) => {
+  const bytes = new Uint8Array(4)
+  bytes[0] = value
+  bytes[1] = value >> 8
+  bytes[2] = value >> 16
+  bytes[3] = value >> 24
+  return bytes
+}
 
 function concatenateUint8Arrays(arrays: Uint8Array[]) {
   // Calculate the total length of the concatenated array
@@ -121,8 +136,15 @@ export default class InfluxDBClient {
       grpc.credentials.createSsl()
     )
 
+    // TODO: remove (suppress unused variable)
     void tableFromIPC
     void toUint8Array
+    void RecordBatchReader
+    void RecordBatchFileReader
+    void RecordBatch
+    void Message
+    void MessageReader
+    void Schema
 
     const ticketData = {
       database: database,
@@ -151,28 +173,30 @@ export default class InfluxDBClient {
         console.log()
       })
       .addListener('end', async () => {
+        const rawData = concatenateUint8Arrays(
+          dataCol.flatMap((data) => [
+            createInt32Uint8Array(data.dataHeader.length),
+            data.dataHeader,
+            data.dataBody,
+          ])
+        )
+        void rawData
+
+        const reader = RecordBatchReader.from(rawData)
+
+        const batches = reader.readAll()
+        const range = (n: number) => new Array(n).fill(0).map((_, i) => i)
+
+        const data = batches.flatMap((batch) =>
+          range(batch.numRows).map((rowIndex) => batch.get(rowIndex))
+        )
+
+        console.log(
+          JSON.stringify(data, (_, value) =>
+            typeof value === 'bigint' ? value.toString() : value
+          )
+        )
         console.log('end')
-        const data = concatenateUint8Arrays(dataCol.map((x) => x.dataBody))
-        void data
-
-        dataCol.forEach((x, i) => {
-          const message = Message.decode(dataCol[i].dataHeader)
-          void message
-
-          const messageType = message.header()
-          void messageType
-
-          if (messageType instanceof Schema) {
-            const fields = messageType.fields
-            void fields
-          }
-
-          if (message.isRecordBatch()) {
-            const messageType = message.header() as any as RecordBatch
-            const buffers = messageType.buffers
-            void buffers
-          }
-        })
       })
       .addListener('error', (e) => {
         console.error(e)
