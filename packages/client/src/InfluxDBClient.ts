@@ -13,45 +13,16 @@ import {isDefined} from './util/common'
  */
 import * as grpc from '@grpc/grpc-js'
 import {FlightServiceClient} from './generated/Flight.grpc-client'
-import {FlightData, Ticket} from './generated/Flight'
-import {
-  Message,
-  MessageReader,
-  RecordBatchFileReader,
-  RecordBatchReader,
-  Schema,
-} from 'apache-arrow'
-import {tableFromIPC} from 'apache-arrow'
-import {toUint8Array} from 'apache-arrow/util/buffer'
-import {RecordBatch} from 'apache-arrow/ipc/metadata/message'
+import {Ticket} from './generated/Flight'
+import {RecordBatchReader} from 'apache-arrow'
 
 const createInt32Uint8Array = (value: number) => {
   const bytes = new Uint8Array(4)
-  bytes[0] = value
-  bytes[1] = value >> 8
-  bytes[2] = value >> 16
-  bytes[3] = value >> 24
+  bytes[0] = value >> (8 * 0)
+  bytes[1] = value >> (8 * 1)
+  bytes[2] = value >> (8 * 2)
+  bytes[3] = value >> (8 * 3)
   return bytes
-}
-
-function concatenateUint8Arrays(arrays: Uint8Array[]) {
-  // Calculate the total length of the concatenated array
-  let totalLength = 0
-  for (let i = 0; i < arrays.length; i++) {
-    totalLength += arrays[i].length
-  }
-
-  // Create a new Uint8Array with the total length
-  const concatenatedArray = new Uint8Array(totalLength)
-
-  // Copy each array into the concatenated array
-  let offset = 0
-  for (let i = 0; i < arrays.length; i++) {
-    concatenatedArray.set(arrays[i], offset)
-    offset += arrays[i].length
-  }
-
-  return concatenatedArray
 }
 
 export default class InfluxDBClient {
@@ -131,20 +102,11 @@ export default class InfluxDBClient {
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Map<string, any>, void, void> {
     const client = new FlightServiceClient(
+      // TODO: options
       'us-east-1-1.aws.cloud2.influxdata.com:443',
       // grpc.credentials.createInsecure()
       grpc.credentials.createSsl()
     )
-
-    // TODO: remove (suppress unused variable)
-    void tableFromIPC
-    void toUint8Array
-    void RecordBatchReader
-    void RecordBatchFileReader
-    void RecordBatch
-    void Message
-    void MessageReader
-    void Schema
 
     const ticketData = {
       database: database,
@@ -155,67 +117,38 @@ export default class InfluxDBClient {
       ticket: new TextEncoder().encode(JSON.stringify(ticketData)),
     })
 
-    // console.log(ticketData)
-    // const ticket = Ticket.create({
-    //   ticket: Uint8Array.from([]),
-    // })
-
     const metadata = new grpc.Metadata()
     const token = this._options.token
     if (token) metadata.set('authorization', 'Bearer ' + token)
 
-    const dataCol: FlightData[] = []
+    const flightDataStream = client.doGet(ticket, metadata)
 
-    client
-      .doGet(ticket, metadata)
-      .addListener('data', async (data: FlightData) => {
-        dataCol.push(data)
-        console.log()
-      })
-      .addListener('end', async () => {
-        const rawData = concatenateUint8Arrays(
-          dataCol.flatMap((data) => [
-            createInt32Uint8Array(data.dataHeader.length),
-            data.dataHeader,
-            data.dataBody,
-          ])
-        )
-        void rawData
+    const binaryStream = (async function* () {
+      for await (const flightData of flightDataStream) {
+        // Include the length of dataHeader for the reader.
+        yield createInt32Uint8Array(flightData.dataHeader.length)
+        yield flightData.dataHeader
+        // Length of dataBody is already included in dataHeader.
+        yield flightData.dataBody
+      }
+    })()
 
-        const reader = RecordBatchReader.from(rawData)
+    const reader = await RecordBatchReader.from(binaryStream)
 
-        const batches = reader.readAll()
-        const range = (n: number) => new Array(n).fill(0).map((_, i) => i)
+    for await (const batch of reader) {
+      for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
+        const row: Map<string, any> = new Map()
+        for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
+          const name = batch.schema.fields[columnIndex].name
+          const value = batch.getChildAt(columnIndex)?.get(rowIndex)
+          row.set(name, value)
+        }
 
-        const data = batches.flatMap((batch) =>
-          range(batch.numRows).map((rowIndex) => batch.get(rowIndex))
-        )
-
-        console.log(
-          JSON.stringify(data, (_, value) =>
-            typeof value === 'bigint' ? value.toString() : value
-          )
-        )
-        console.log('end')
-      })
-      .addListener('error', (e) => {
-        console.error(e)
-      })
-      .read()
-
-    const mockData: Map<string, any>[] = [
-      new Map(
-        Object.entries({
-          unit: 'temperature',
-          avg: 23.2,
-          max: 45.0,
-        })
-      ),
-    ]
-
-    for (const row of mockData) {
-      yield row
+        yield row
+      }
     }
+
+    flightDataStream.cancel()
   }
 
   get convertTime() {

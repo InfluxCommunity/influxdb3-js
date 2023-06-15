@@ -1,4 +1,4 @@
-import { InfluxDB, Point } from ".";
+import {InfluxDB, Point} from '.'
 
 const getEnvVariables = () => {
   const {
@@ -21,6 +21,12 @@ const getEnvVariables = () => {
   }
 }
 
+function getRandomInt(min: number, max: number): number {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 ;(async () => {
   const {database, token, url} = getEnvVariables()
 
@@ -29,12 +35,12 @@ const getEnvVariables = () => {
     token,
   })
 
-  const hrtime = process.hrtime()
-  const timeInNs = hrtime[0] * 1e9 + hrtime[1]
+  // const hrtime = process.hrtime()
+  // const timeInNs = hrtime[0] * 1e9 + hrtime[1]
 
-  const testId = timeInNs
-  const avg1 = 23.2
-  const max1 = 45.0
+  const testId = getRandomInt(0, 100000000)
+  const avg1 = getRandomInt(110, 500)
+  const max1 = getRandomInt(900, 1000)
 
   const point = new Point('stat')
     .tag('unit', 'temperature')
@@ -43,7 +49,7 @@ const getEnvVariables = () => {
     .intField('testId', testId)
   // TODO:
   // .timestamp(Date.now())
-  client.writePoints([point], database)
+  await client.writePoints([point], database)
 
   const query = `
   SELECT *
@@ -54,5 +60,7 @@ const getEnvVariables = () => {
 
   const queryType = 'sql'
 
-  client.query(query, database, queryType).next()
+  for await (const row of await client.query(query, database, queryType)) {
+    console.log('Row:', row)
+  }
 })()
