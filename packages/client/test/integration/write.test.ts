@@ -22,6 +22,12 @@ const getEnvVariables = () => {
   }
 }
 
+function getRandomInt(min: number, max: number): number {
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
 describe('my test', () => {
   it('write data', async () => {
     const {database, token, url} = getEnvVariables()
@@ -31,12 +37,9 @@ describe('my test', () => {
       token,
     })
 
-    const hrtime = process.hrtime()
-    const timeInNs = hrtime[0] * 1e9 + hrtime[1]
-
-    const testId = timeInNs
-    const avg1 = 23.2
-    const max1 = 45.0
+    const testId = getRandomInt(0, 100000000)
+    const avg1 = getRandomInt(110, 500)
+    const max1 = getRandomInt(900, 1000)
 
     const point = new Point('stat')
       .tag('unit', 'temperature')
@@ -45,13 +48,16 @@ describe('my test', () => {
       .intField('testId', testId)
     // TODO:
     // .timestamp(Date.now())
-    client.writePoints([point], database)
+    await client.writePoints([point], database)
 
     const query = `
-    SELECT *
-      FROM "stat"
-      WHERE
-      time >= now() - interval '10 minute'
+      SELECT *
+        FROM "stat"
+        WHERE
+        time >= now() - interval '10 minute'
+        AND
+        "testId" = ${testId}
+        ORDER BY time
     `
 
     const queryType = 'sql'
@@ -63,8 +69,8 @@ describe('my test', () => {
 
     expect(row.done).to.equal(false)
     expect(row.value?.get('unit')).to.equal('temperature')
-    expect(row.value?.get('avg')).to.equal(23.2)
-    expect(row.value?.get('max')).to.equal(45.0)
+    expect(row.value?.get('avg')).to.equal(avg1)
+    expect(row.value?.get('max')).to.equal(max1)
 
     row = await data.next()
     expect(row.done).to.equal(true)
