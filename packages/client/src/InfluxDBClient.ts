@@ -8,26 +8,13 @@ import {IllegalArgumentError} from './errors'
 import {Point} from './Point'
 import {convertTime} from './util/time'
 import {isDefined} from './util/common'
-/**
- * InfluxDB's entry point that configures communication with InfluxDB 3 server and provide APIs to write and query data.
- */
-import * as grpc from '@grpc/grpc-js'
-import {FlightServiceClient} from './generated/Flight.grpc-client'
-import {Ticket} from './generated/Flight'
-import {RecordBatchReader} from 'apache-arrow'
-
-const createInt32Uint8Array = (value: number) => {
-  const bytes = new Uint8Array(4)
-  bytes[0] = value >> (8 * 0)
-  bytes[1] = value >> (8 * 1)
-  bytes[2] = value >> (8 * 2)
-  bytes[3] = value >> (8 * 3)
-  return bytes
-}
+import QueryApi from './QueryApi'
+import QueryApiImpl from './impl/QueryApiImpl'
 
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
   private readonly _writeApi: WriteApi
+  private readonly _queryApi: QueryApi
   readonly transport: Transport
 
   /**
@@ -46,6 +33,7 @@ export default class InfluxDBClient {
     if (typeof url !== 'string')
       throw new IllegalArgumentError('No url specified!')
     if (url.endsWith('/')) this._options.url = url.substring(0, url.length - 1)
+    this._queryApi = new QueryApiImpl(this._options)
     this.transport = this._options.transport ?? new TransportImpl(this._options)
     this._writeApi = new WriteApiImpl(this.transport)
   }
@@ -96,59 +84,12 @@ export default class InfluxDBClient {
     )
   }
 
-  async *query(
+  query(
     query: string,
     database: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Map<string, any>, void, void> {
-    const client = new FlightServiceClient(
-      // TODO: options
-      'us-east-1-1.aws.cloud2.influxdata.com:443',
-      // grpc.credentials.createInsecure()
-      grpc.credentials.createSsl()
-    )
-
-    const ticketData = {
-      database: database,
-      sql_query: query,
-      query_type: queryType,
-    }
-    const ticket = Ticket.create({
-      ticket: new TextEncoder().encode(JSON.stringify(ticketData)),
-    })
-
-    const metadata = new grpc.Metadata()
-    const token = this._options.token
-    if (token) metadata.set('authorization', 'Bearer ' + token)
-
-    const flightDataStream = client.doGet(ticket, metadata)
-
-    const binaryStream = (async function* () {
-      for await (const flightData of flightDataStream) {
-        // Include the length of dataHeader for the reader.
-        yield createInt32Uint8Array(flightData.dataHeader.length)
-        yield flightData.dataHeader
-        // Length of dataBody is already included in dataHeader.
-        yield flightData.dataBody
-      }
-    })()
-
-    const reader = await RecordBatchReader.from(binaryStream)
-
-    for await (const batch of reader) {
-      for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
-        const row: Map<string, any> = new Map()
-        for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
-          const name = batch.schema.fields[columnIndex].name
-          const value = batch.getChildAt(columnIndex)?.get(rowIndex)
-          row.set(name, value)
-        }
-
-        yield row
-      }
-    }
-
-    flightDataStream.cancel()
+    return this._queryApi.query(query, database, queryType)
   }
 
   get convertTime() {

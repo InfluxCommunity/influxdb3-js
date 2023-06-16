@@ -28,8 +28,8 @@ function getRandomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-describe('my test', () => {
-  it('write data', async () => {
+describe('e2e test', () => {
+  it('write and query data', async () => {
     const {database, token, url} = getEnvVariables()
 
     const client = new InfluxDB({
@@ -46,8 +46,6 @@ describe('my test', () => {
       .floatField('avg', avg1)
       .floatField('max', max1)
       .intField('testId', testId)
-    // TODO:
-    // .timestamp(Date.now())
     await client.writePoints([point], database)
 
     const query = `
