@@ -4,7 +4,9 @@
   "description": "InfluxDB 4 client",
   "scripts": {
     "apidoc:extract": "api-extractor run",
-    "build": "yarn run clean && yarn tsup --config ./tsup.config.browser.ts && yarn tsup",
+    "build": "yarn run clean && yarn run build:browser && yarn run build:node",
+    "build:node": "yarn tsup",
+    "build:browser": "node ../../scripts/browser-not-supported.js",
     "clean": "rimraf --glob dist build coverage .nyc_output doc *.lcov reports",
     "coverage": "nyc mocha --require ts-node/register 'test/**/*.test.ts' --exit",
     "coverage:ci": "yarn run coverage && yarn run coverage:lcov",

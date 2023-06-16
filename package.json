@@ -3,8 +3,7 @@
   "description": "InfluxDB 3 client",
   "workspaces": {
     "packages": [
-      "packages/client",
-      "packages/client-browser"
+      "packages/client"
     ]
   },
   "scripts": {
