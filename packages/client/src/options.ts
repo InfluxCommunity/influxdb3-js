@@ -42,7 +42,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options used by {@link WriteApi} .
+ * Options used by {@link InfluxDB.write} .
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */

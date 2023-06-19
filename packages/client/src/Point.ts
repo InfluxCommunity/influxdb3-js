@@ -160,7 +160,7 @@ export class Point {
    * or an undefined value. An undefined value instructs to assign a local timestamp using
    * the client's clock. An empty string can be used to let the server assign
    * the timestamp. A number value represents time as a count of time units since epoch, the
-   * exact time unit then depends on the {@link InfluxDB.getWriteApi | precision} of the API
+   * exact time unit then depends on the {@link InfluxDB.write | precision} of the API
    * that writes the point.
    *
    * Beware that the current time in nanoseconds can't precisely fit into a JS number,
