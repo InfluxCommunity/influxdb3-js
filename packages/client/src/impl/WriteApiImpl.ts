@@ -34,10 +34,10 @@ export default class WriteApiImpl implements WriteApi {
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
-    if (this.closed) {
-      throw new Error('writeApi: already closed!')
+    if (self.closed) {
+      return Promise.reject(new Error('writeApi: already closed!'))
     }
-    if (this.closed || lines.length <= 0) return Promise.resolve()
+    if (lines.length <= 0) return Promise.resolve()
 
     let resolve: (value: void | PromiseLike<void>) => void
     let reject: (reason?: any) => void
@@ -63,15 +63,6 @@ export default class WriteApiImpl implements WriteApi {
           Log.warn('Write to InfluxDB returns: ' + error.json.error)
           responseStatusCode = 204
           callbacks.complete()
-          return
-        }
-        if (
-          !self.closed &&
-          (!(error instanceof HttpError) ||
-            (error as HttpError).statusCode >= 429)
-        ) {
-          Log.warn(`Write to InfluxDB failed.`, error)
-          reject(error)
           return
         }
         Log.error(`Write to InfluxDB failed.`, error)
