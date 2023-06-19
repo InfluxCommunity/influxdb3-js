@@ -82,13 +82,8 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.8.14",
-    "@grpc/proto-loader": "^0.7.7",
+    "@grpc/grpc-js": "^1.8.15",
     "@protobuf-ts/runtime-rpc": "^2.9.0",
-    "@types/long": "^5.0.0",
-    "apache-arrow": "^12.0.0",
-    "long": "^5.2.3",
-    "protobufjs": "^7.2.3",
-    "rxjs": "^7.8.1"
+    "apache-arrow": "^12.0.1"
   }
 }
