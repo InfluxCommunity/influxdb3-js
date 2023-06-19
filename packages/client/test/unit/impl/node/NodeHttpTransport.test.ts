@@ -375,11 +375,7 @@ describe('NodeHttpTransport', () => {
             throw new Error('must not succeed')
           },
           (e: any) => {
-            expect(e).property('body').to.length(bigMessage.length)
-            // TODO:
-            // expect(e).property('json').deep.equals(JSON.parse(bigMessage))
-            // expect(e).property('code').equals('mc')
-            // expect(e).property('message').equals('mymsg')
+            expect(e).property('body').to.be.equal(bigMessage)
           }
         )
       })
@@ -876,11 +872,7 @@ describe('NodeHttpTransport', () => {
             throw new Error('must not succeed')
           },
           (e: any) => {
-            expect(e).property('body').to.length(bigMessage.length)
-            // TODO:
-            // expect(e).property('json').deep.equals(JSON.parse(bigMessage))
-            // expect(e).property('code').equals('mc')
-            // expect(e).property('message').equals('mymsg')
+            expect(e).property('body').to.be.equal(bigMessage)
           }
         )
       })

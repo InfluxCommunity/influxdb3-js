@@ -37,7 +37,8 @@ export default class WriteApiImpl implements WriteApi {
     if (self.closed) {
       return Promise.reject(new Error('writeApi: already closed!'))
     }
-    if (lines.length <= 0) return Promise.resolve()
+    if (lines.length <= 0 || (lines.length === 1 && lines[0] === ''))
+      return Promise.resolve()
 
     let resolve: (value: void | PromiseLike<void>) => void
     let reject: (reason?: any) => void

@@ -9,45 +9,24 @@ import {
   WritePrecision,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
-import {waitForCondition} from './util/waitForCondition'
 import zlib from 'zlib'
 import {rejects} from 'assert'
+import {isDefined} from '../../src/util/common'
 
 const clientOptions: ClientOptions = {
   url: 'http://fake:8086',
   token: 'a',
 }
-const ORG = 'my-org'
 const BUCKET = 'bucket'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v2/write?org=${ORG}&bucket=${BUCKET}&precision=ns`
+const WRITE_PATH_NS = `/api/v2/write?bucket=${BUCKET}&precision=ns`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
     ...clientOptions,
     ...{writeOptions: options},
   })
-}
-
-interface WriteListeners {
-  successLineCount: number
-  failedLineCount: number
-  writeFailed(error: Error, lines: string[]): void
-  writeSuccess(lines: string[]): void
-}
-function createWriteCounters(): WriteListeners {
-  const retVal = {
-    successLineCount: 0,
-    failedLineCount: 0,
-    writeFailed(_error: Error, lines: string[]): void {
-      retVal.failedLineCount += lines.length
-    },
-    writeSuccess(lines: string[]): void {
-      retVal.successLineCount += lines.length
-    },
-  }
-  return retVal
 }
 
 describe('Write', () => {
@@ -67,7 +46,6 @@ describe('Write', () => {
       subject = createApi({
         precision: PRECISION,
       })
-      // logs = collectLogging.decorate()
       logs = collectLogging.replace()
     })
     afterEach(async () => {
@@ -78,11 +56,9 @@ describe('Write', () => {
     it('can be closed without any data', async () => {
       await subject.close().catch((e) => expect.fail('should not happen', e))
     })
-    it.skip('fails on close without server connection', async () => {
-      subject.write('test value=1', BUCKET)
-      subject.write(['test value=2', 'test value=3'], BUCKET)
+    it('fails to write without server connection', async () => {
       await subject
-        .close()
+        .write('test value=1', BUCKET)
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
           expect(logs.error).length.greaterThan(0)
@@ -100,27 +76,6 @@ describe('Write', () => {
       await rejects(
         subject.writePoints([new Point('test').floatField('value', 1)], BUCKET)
       )
-    })
-  })
-  describe('configuration', () => {
-    let subject: InfluxDBClient
-    function useSubject(): void {
-      subject = new InfluxDBClient({
-        ...clientOptions,
-      })
-    }
-    afterEach(async () => {
-      await subject.close()
-      collectLogging.after()
-    })
-    it.skip('implementation uses expected defaults', () => {
-      useSubject()
-      // const writeOptions = (subject as any).writeOptions as WriteOptions
-      // expect(writeOptions.writeSuccess).equals(
-      //   DEFAULT_WriteOptions.writeSuccess
-      // )
-      // expect(writeOptions.writeSuccess).to.not.throw()
-      // expect(writeOptions.writeFailed).to.not.throw()
     })
   })
   describe('convert point time to line protocol', () => {
@@ -161,148 +116,104 @@ describe('Write', () => {
       })
     }
     beforeEach(() => {
-      // logs = collectLogging.decorate()
       logs = collectLogging.replace()
     })
     afterEach(async () => {
       subject.close()
       collectLogging.after()
     })
-    it.skip('writes records without errors', async () => {
-      const writeCounters = createWriteCounters()
-      useSubject({})
-      let requests = 0
-      const messages: string[] = []
-      nock(clientOptions.url)
-        .post(WRITE_PATH_NS)
-        .reply((_uri, _requestBody) => {
-          requests++
-          if (requests % 2) {
-            return [429, '', {'retry-after': '1'}]
-          } else {
-            messages.push(_requestBody.toString())
-            return [204, '', {'retry-after': '1'}]
-          }
-        })
-        .persist()
-      subject.writePoint(
-        new Point('test').tag('t', ' ').floatField('value', 1).timestamp(''),
-        BUCKET
+    ;[false, true].map((useGZip) => {
+      it(
+        useGZip
+          ? 'writes records without errors'
+          : 'writes gziped records without errors',
+        async () => {
+          useSubject(
+            useGZip
+              ? {
+                  gzipThreshold: 0,
+                }
+              : {}
+          )
+          let requests = 0
+          let failNextRequest = false
+          const messages: string[] = []
+          nock(clientOptions.url)
+            .post(WRITE_PATH_NS)
+            .reply(function (_uri, requestBody) {
+              requests++
+              if (failNextRequest) {
+                failNextRequest = false
+                return [429, '', {'retry-after': '1'}]
+              } else {
+                let plain = requestBody.toString()
+                if (this.req.headers['content-encoding'] == 'gzip') {
+                  plain = zlib
+                    .gunzipSync(Buffer.from(requestBody.toString(), 'hex'))
+                    .toString()
+                }
+                messages.push(plain.toString())
+                return [204, '', {'retry-after': '1'}]
+              }
+            })
+            .persist()
+          const point = new Point('test')
+            .tag('t', ' ')
+            .floatField('value', 1)
+            .timestamp('')
+
+          failNextRequest = true
+          await subject
+            .writePoint(point, BUCKET)
+            .then(() => expect.fail('failure expected'))
+            .catch((e) => {
+              expect(e).to.be.ok
+            })
+          expect(logs.error).has.length(1)
+          expect(logs.warn).has.length(0)
+          logs.reset()
+
+          await subject.writePoint(point, BUCKET)
+          expect(logs.error).has.length(0)
+          expect(logs.warn).has.length(0)
+          expect(messages).to.have.length(1)
+          expect(messages[0]).to.equal('test,t=\\  value=1')
+          expect(requests).to.equal(2)
+          messages.splice(0)
+          requests = 0
+
+          // generates no lines, no requests done
+          await subject.writePoint(new Point(), BUCKET)
+          await subject.writePoints([], BUCKET)
+          await subject.write('', BUCKET)
+          expect(requests).to.equal(0)
+          expect(logs.error).has.length(0)
+          expect(logs.warn).has.length(0)
+
+          const points = [
+            new Point('test').floatField('value', 1).timestamp('1'),
+            new Point('test').floatField('value', 2).timestamp(2.1),
+            new Point('test').floatField('value', 3).timestamp(new Date(3)),
+            new Point('test')
+              .floatField('value', 4)
+              .timestamp(false as any as string), // server decides what to do with such values
+          ]
+          await subject.writePoints(points, BUCKET)
+          expect(logs.error).to.length(0)
+          expect(logs.warn).to.length(0)
+          expect(messages).to.have.length(1)
+          const lines = messages[0].split('\n')
+          expect(lines).has.length(4)
+          expect(messages[0]).to.equal(
+            points
+              .map((x) => x.toLineProtocol())
+              .filter(isDefined)
+              .join('\n')
+          )
+        }
       )
-      await waitForCondition(() => writeCounters.successLineCount == 1)
-      expect(logs.error).has.length(0)
-      expect(logs.warn).has.length(1) // request was retried once
-      subject.writePoint(new Point(), BUCKET) // ignored, since it generates no line
-      subject.writePoints(
-        [
-          new Point('test'), // will be ignored + warning
-          new Point('test').floatField('value', 2),
-          new Point('test').floatField('value', 3),
-          new Point('test').floatField('value', 4).timestamp('1'),
-          new Point('test').floatField('value', 5).timestamp(2.1),
-          new Point('test').floatField('value', 6).timestamp(new Date(3)),
-          new Point('test')
-            .floatField('value', 7)
-            .timestamp(false as any as string), // server decides what to do with such values
-        ],
-        BUCKET
-      )
-      await waitForCondition(() => writeCounters.successLineCount == 7)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(2)
-      expect(messages).to.have.length(2)
-      expect(messages[0]).to.equal('test,t=\\ ,xtra=1 value=1')
-      const lines = messages[1].split('\n')
-      expect(lines).has.length(6)
-      expect(lines[0]).to.satisfy((line: string) =>
-        line.startsWith('test,xtra=1 value=2')
-      )
-      expect(lines[0].substring(lines[0].lastIndexOf(' ') + 1)).to.have.length(
-        String(Date.now()).length + 6 // nanosecond precision
-      )
-      expect(lines[1]).to.satisfy((line: string) =>
-        line.startsWith('test,xtra=1 value=3')
-      )
-      expect(lines[0].substring(lines[0].lastIndexOf(' ') + 1)).to.have.length(
-        String(Date.now()).length + 6 // nanosecond precision
-      )
-      expect(lines[2]).to.be.equal('test,xtra=1 value=4 1')
-      expect(lines[3]).to.be.equal('test,xtra=1 value=5 2')
-      expect(lines[4]).to.be.equal('test,xtra=1 value=6 3000000')
-      expect(lines[5]).to.be.equal('test,xtra=1 value=7 false')
     })
-    it.skip('writes gzipped line protocol', async () => {
-      const writeCounters = createWriteCounters()
-      useSubject({
-        gzipThreshold: 0,
-      })
-      let requests = 0
-      const messages: string[] = []
-      nock(clientOptions.url)
-        .post(WRITE_PATH_NS)
-        .reply(function (_uri, _requestBody) {
-          requests++
-          if (requests % 2) {
-            return [429, '', {'retry-after': '1'}]
-          } else {
-            if (this.req.headers['content-encoding'] == 'gzip') {
-              const plain = zlib.gunzipSync(
-                Buffer.from(_requestBody as string, 'hex')
-              )
-              messages.push(plain.toString())
-            }
-            return [204, '', {'retry-after': '1'}]
-          }
-        })
-        .persist()
-      subject.writePoint(
-        new Point('test').tag('t', ' ').floatField('value', 1).timestamp(''),
-        BUCKET
-      )
-      await waitForCondition(() => writeCounters.successLineCount == 1)
-      expect(logs.error).has.length(0)
-      expect(logs.warn).has.length(1) // request was retried once
-      subject.writePoint(new Point(), BUCKET) // ignored, since it generates no line
-      subject.writePoints(
-        [
-          new Point('test'), // will be ignored + warning
-          new Point('test').floatField('value', 2),
-          new Point('test').floatField('value', 3),
-          new Point('test').floatField('value', 4).timestamp('1'),
-          new Point('test').floatField('value', 5).timestamp(2.1),
-          new Point('test').floatField('value', 6).timestamp(new Date(3)),
-          new Point('test')
-            .floatField('value', 7)
-            .timestamp(false as any as string), // server decides what to do with such values
-        ],
-        BUCKET
-      )
-      await waitForCondition(() => writeCounters.successLineCount == 7)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(2)
-      expect(messages).to.have.length(2)
-      expect(messages[0]).to.equal('test,t=\\ ,xtra=1 value=1')
-      const lines = messages[1].split('\n')
-      expect(lines).has.length(6)
-      expect(lines[0]).to.satisfy((line: string) =>
-        line.startsWith('test,xtra=1 value=2')
-      )
-      expect(lines[0].substring(lines[0].lastIndexOf(' ') + 1)).to.have.length(
-        String(Date.now()).length + 6 // nanosecond precision
-      )
-      expect(lines[1]).to.satisfy((line: string) =>
-        line.startsWith('test,xtra=1 value=3')
-      )
-      expect(lines[0].substring(lines[0].lastIndexOf(' ') + 1)).to.have.length(
-        String(Date.now()).length + 6 // nanosecond precision
-      )
-      expect(lines[2]).to.be.equal('test,xtra=1 value=4 1')
-      expect(lines[3]).to.be.equal('test,xtra=1 value=5 2')
-      expect(lines[4]).to.be.equal('test,xtra=1 value=6 3000000')
-      expect(lines[5]).to.be.equal('test,xtra=1 value=7 false')
-    })
-    it.skip('fails on write response status not being exactly 204', async () => {
-      const writeCounters = createWriteCounters()
+    it('fails on write response status not being exactly 204', async () => {
       // required because of https://github.com/influxdata/influxdb-client-js/issues/263
       useSubject({})
       let authorization: any
@@ -313,9 +224,12 @@ describe('Write', () => {
           return [200, '', {}]
         })
         .persist()
-      subject.write('test value=1', BUCKET)
-      subject.write('test value=2', BUCKET)
-      await waitForCondition(() => writeCounters.failedLineCount == 1)
+      await subject
+        .write('test value=1', BUCKET)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).to.be.ok
+        })
       expect(logs.error).has.length(1)
       expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
       expect(logs.error[0][1]).instanceOf(HttpError)
@@ -326,7 +240,7 @@ describe('Write', () => {
       expect(logs.warn).deep.equals([])
       expect(authorization).equals(`Token ${clientOptions.token}`)
     })
-    it.skip('sends custom http header', async () => {
+    it('sends custom http header', async () => {
       useSubject({
         headers: {authorization: 'Token customToken'},
       })
@@ -338,10 +252,9 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
-      await subject.close()
+      await subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
       expect(logs.error).has.length(0)
-      expect(logs.warn).deep.equals([])
+      expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
     })
     it('sends consistency param when specified', async () => {
@@ -361,51 +274,6 @@ describe('Write', () => {
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])
       expect(uri).match(/.*&consistency=quorum$/)
-    })
-    // TODO:
-    // it('allows to overwrite httpPath', async () => {
-    //   useSubject({})
-    //   expect(subject.path).match(/api\/v2\/write\?.*$/)
-    //   const customPath = '/custom/path?whathever=itis'
-    //   subject.path = customPath
-    //   let uri: any
-    //   nock(clientOptions.url)
-    //     .post(/.*/)
-    //     .reply(function (_uri, _requestBody) {
-    //       uri = this.req.path
-    //       return [204, '', {}]
-    //     })
-    //     .persist()
-    //   await subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
-    //   await subject.close()
-    //   expect(logs.error).has.length(0)
-    //   expect(logs.warn).deep.equals([])
-    //   expect(uri).equals(customPath)
-    // })
-    // TODO: test default write options
-    it.skip('swallows hinted handoff queue not empty', async () => {
-      useSubject({
-        consistency: 'quorum',
-      })
-      nock(clientOptions.url)
-        .post(/.*/)
-        .reply(function (_uri, _requestBody) {
-          return [
-            500,
-            '{"error": "write: hinted handoff queue not empty"}',
-            {'content-type': 'application/json'},
-          ]
-        })
-        .persist()
-      await subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
-      await subject.close()
-      expect(logs.error).has.length(0)
-      expect(logs.warn).deep.equals([
-        [
-          'Write to InfluxDB returns: write: hinted handoff queue not empty',
-          undefined,
-        ],
-      ])
     })
   })
 })

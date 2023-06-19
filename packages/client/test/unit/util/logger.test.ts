@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {Log, setLogger, consoleLogger} from '../../../src'
 
-describe.skip('Logger', () => {
+describe('Logger', () => {
   ;[{message: '    hey', error: 'you'}, {message: '    hey'}].forEach(
     (data) => {
       it(`uses custom logger's error (${Object.keys(data).length})`, () => {
