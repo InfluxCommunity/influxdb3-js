@@ -99,5 +99,6 @@ export default class InfluxDBClient {
 
   async close(): Promise<void> {
     await this._writeApi.close()
+    await this._queryApi.close()
   }
 }
