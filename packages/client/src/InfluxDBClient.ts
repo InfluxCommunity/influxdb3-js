@@ -5,9 +5,9 @@ import WriteApiImpl from './impl/WriteApiImpl'
 import TransportImpl from './impl/node/NodeHttpTransport'
 import {ClientOptions, QueryType, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
-import {Point} from './Point'
+import {Point, PointRecord} from './Point'
 import {convertTime} from './util/time'
-import {isDefined} from './util/common'
+import {isArrayLike, isDefined} from './util/common'
 import QueryApi from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
 
@@ -46,11 +46,36 @@ export default class InfluxDBClient {
   }
 
   async write(
-    lines: string | ArrayLike<string>,
+    data:
+      | ArrayLike<string>
+      | ArrayLike<Point>
+      | ArrayLike<PointRecord>
+      | string
+      | Point
+      | PointRecord,
     database: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
+    const arrayData: ArrayLike<any> = (
+      isArrayLike(data) && typeof data !== 'string' ? data : [data]
+    ) as any[]
+    if (arrayData.length === 0) return
+    if (typeof arrayData[0] === 'string') {
+      await this.writeLines(arrayData as any, database, org, writeOptions)
+    } else if (arrayData[0] instanceof Point) {
+      await this.writePoints(arrayData as any, database, org, writeOptions)
+    } else {
+      await this.writeRecords(arrayData as any, database, org, writeOptions)
+    }
+  }
+
+  async writeLines(
+    lines: string | ArrayLike<string>,
+    database: string,
+    org?: string,
+    writeOptions?: Partial<WriteOptions>
+  ) {
     await this._writeApi.doWrite(
       typeof lines === 'string' ? [lines] : Array.from(lines),
       database,
@@ -81,6 +106,20 @@ export default class InfluxDBClient {
       database,
       org,
       this._mergeWriteOptions(writeOptions)
+    )
+  }
+
+  async writeRecords(
+    records: ArrayLike<PointRecord>,
+    database: string,
+    org?: string,
+    writeOptions?: Partial<WriteOptions>
+  ): Promise<void> {
+    await this.writePoints(
+      Array.from(records).map((record) => Point.fromRecord(record)),
+      database,
+      org,
+      writeOptions
     )
   }
 

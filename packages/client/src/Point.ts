@@ -2,6 +2,10 @@ import {TimeConverter} from './WriteApi'
 import {convertTimeToNanos} from './util/time'
 import {escape} from './util/escape'
 
+export type PointRecord = Record<string, number | string> & {
+  measurement: string
+}
+
 /**
  * Point defines values of a single measurement.
  */
@@ -225,5 +229,16 @@ export class Point {
   toString(): string {
     const line = this.toLineProtocol(undefined)
     return line ? line : `invalid point: ${JSON.stringify(this, undefined)}`
+  }
+
+  static fromRecord(record: PointRecord): Point {
+    const point = new Point(record.measurement)
+    Object.entries(point).map(([key, value]) => {
+      if (key === 'measurement') return
+      if (key === 'timestamp') point.timestamp(value)
+      if (typeof value === 'number') point.floatField(key, value)
+      if (typeof value === 'string') point.stringField(key, value)
+    })
+    return point
   }
 }
