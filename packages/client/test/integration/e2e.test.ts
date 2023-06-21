@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {InfluxDB, Point} from '../../src'
+import {InfluxDBClient, Point} from '../../src'
 
 const getEnvVariables = () => {
   const {
@@ -32,7 +32,7 @@ describe('e2e test', () => {
   it('write and query data', async () => {
     const {database, token, url} = getEnvVariables()
 
-    const client = new InfluxDB({
+    const client = new InfluxDBClient({
       url,
       token,
     })
@@ -46,7 +46,7 @@ describe('e2e test', () => {
       .floatField('avg', avg1)
       .floatField('max', max1)
       .intField('testId', testId)
-    await client.writePoints([point], database)
+    await client.writePoints(database, [point])
 
     const query = `
       SELECT *
@@ -60,7 +60,7 @@ describe('e2e test', () => {
 
     const queryType = 'sql'
 
-    const data = client.query(query, database, queryType)
+    const data = client.query(database, query, queryType)
 
     let row: IteratorResult<Map<string, any>, void>
     row = await data.next()

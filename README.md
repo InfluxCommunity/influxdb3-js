@@ -41,33 +41,93 @@ pnpm add @influxdata/influxdb3-client
 If you target Node.js, use [@influxdata/influxdb3-client](./packages/client/README.md).
 It provides main (CJS), module (ESM), and browser (UMD) exports.
 
-If you target browsers (including [Deno](https://deno.land/) and [Ionic](https://ionic.io/)), use [@influxdata/influxdb3-client-browser](./packages/client-browser/README.md) in place of `@influxdata/influxdb3-client`. It provides main (UMD) and module (ESM) exports.
+**Currently not supported**:
+> *If you target browsers (including [Deno](https://deno.land/) and [Ionic](https://ionic.io/)), use [@influxdata/influxdb3-client-browser](./packages/client-browser/README.md) in place of `@influxdata/influxdb3-client`. It provides main (UMD) and module (ESM) exports.*
 
 ## Usage
 
-To start with the client, import the `InfluxDB` type and create a `InfluxDB` by constructor initializer:
+set environment variables:
 
-```javascript
-import {InfluxDB} from '@influxdata/influxdb3-client/src'
+- `INFLUXDB_URL` region of your influxdb cloud e.g. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
+- `INFLUXDB_TOKEN` read/write token generated in cloud
+- `INFLUXDB_DATABASE` name of database e.g .*`my-database`*
 
-let url = 'https://eu-central-1-1.aws.cloud2.influxdata.com/';
-let database = 'my-database';
-let token = 'my-token';
+<details>
+  <summary>linux/macos</summary>
 
-let client = new InfluxDB({url: url, database: database, token: token});
+```sh
+export INFLUXDB_URL="<url>"
+export INFLUXDB_DATABASE="<database>"
+export INFLUXDB_TOKEN="<token>"
 ```
 
-to insert data, you can use code like this:
+</details>
 
-```javascript
-// TBD
+<details>
+  <summary>windows</summary>
+
+```powershell
+setx INFLUXDB_URL "<url>"
+setx INFLUXDB_DATABASE "<database>"
+setx INFLUXDB_TOKEN "<token>"
 ```
 
-to query your data, you can use code like this:
+</details>
 
-```javascript
-// TBD
+To get started with influxdb client import `@influxdata/influxdb3-client` package.
+
+```ts
+import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 ```
+
+Prepare environmnet variables and instanciate `InfluxDBClient` in asynchronous function. Make sure to `close` client after.
+
+```ts
+const url = process.env.INFLUXDB_URL
+const token = process.env.INFLUXDB_TOKEN
+const database = process.env.INFLUXDB_DATABASE
+
+async function main() {
+    const client = new InfluxDBClient({url, token})
+
+    // following code goes here
+
+    client.close()
+}
+
+main()
+```
+
+The `client` can be now used to insert data using [line-protocol](https://docs.influxdata.com/influxdb/cloud-serverless/reference/syntax/line-protocol/).
+
+```ts
+const line = `stat,unit=temperature avg=20.5,max=45.0`
+await client.write(database, line)
+```
+
+Fetch data using FlightSQL query and print result.
+
+```ts
+// Execute query
+const query = `
+    SELECT *
+    FROM "stat"
+    WHERE
+    time >= now() - interval '5 minute'
+    AND
+    "unit" IN ('temperature')
+`
+const queryResult = await client.query(database, query)
+
+for await (const row of queryResult) {
+    console.log(`avg is ${row.get('avg')}`)
+    console.log(`max is ${row.get('max')}`)
+}
+```
+
+## Example
+
+Prepare environment like in [Usage](#usage) and run `npx ts-node ./packages/client/src/example/main.ts`.
 
 ## Feedback
 

@@ -19,8 +19,8 @@ export default class QueryApiImpl implements QueryApi {
   }
 
   async *query(
-    query: string,
     database: string,
+    query: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Map<string, any>, void, void> {
     if (this.closed) {

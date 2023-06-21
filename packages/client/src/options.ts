@@ -42,7 +42,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options used by {@link InfluxDB.write} .
+ * Options used by {@link InfluxDBClient.write} .
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
@@ -64,7 +64,7 @@ export const DEFAULT_WriteOptions: WriteOptions = {
 export type QueryType = 'sql' | 'influxql'
 
 /**
- * Options used by {@link InfluxDB} .
+ * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
   /** supplies and overrides default writing options */

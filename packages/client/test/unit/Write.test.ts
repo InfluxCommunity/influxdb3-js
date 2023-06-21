@@ -5,7 +5,7 @@ import {
   HttpError,
   WriteOptions,
   Point,
-  InfluxDB as InfluxDBClient,
+  InfluxDBClient,
   WritePrecision,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
@@ -58,7 +58,7 @@ describe('Write', () => {
     })
     it('fails to write without server connection', async () => {
       await subject
-        .write('test value=1', BUCKET)
+        .write(BUCKET, 'test value=1')
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
           expect(logs.error).length.greaterThan(0)
@@ -68,13 +68,13 @@ describe('Write', () => {
     it('fails on write if it is closed already', async () => {
       await subject.close()
 
-      await rejects(subject.write('text value=1', BUCKET))
-      await rejects(subject.write(['text value=1', 'text value=2'], BUCKET))
+      await rejects(subject.write(BUCKET, 'text value=1'))
+      await rejects(subject.write(BUCKET, ['text value=1', 'text value=2']))
       await rejects(
-        subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
+        subject.writePoints(BUCKET, new Point('test').floatField('value', 1))
       )
       await rejects(
-        subject.writePoints([new Point('test').floatField('value', 1)], BUCKET)
+        subject.writePoints(BUCKET, [new Point('test').floatField('value', 1)])
       )
     })
   })
@@ -164,7 +164,7 @@ describe('Write', () => {
 
           failNextRequest = true
           await subject
-            .writePoint(point, BUCKET)
+            .writePoints(BUCKET, point)
             .then(() => expect.fail('failure expected'))
             .catch((e) => {
               expect(e).to.be.ok
@@ -173,7 +173,7 @@ describe('Write', () => {
           expect(logs.warn).has.length(0)
           logs.reset()
 
-          await subject.writePoint(point, BUCKET)
+          await subject.writePoints(BUCKET, point)
           expect(logs.error).has.length(0)
           expect(logs.warn).has.length(0)
           expect(messages).to.have.length(1)
@@ -183,9 +183,9 @@ describe('Write', () => {
           requests = 0
 
           // generates no lines, no requests done
-          await subject.writePoint(new Point(), BUCKET)
-          await subject.writePoints([], BUCKET)
-          await subject.write('', BUCKET)
+          await subject.writePoints(BUCKET, new Point())
+          await subject.writePoints(BUCKET, [])
+          await subject.write(BUCKET, '')
           expect(requests).to.equal(0)
           expect(logs.error).has.length(0)
           expect(logs.warn).has.length(0)
@@ -198,7 +198,7 @@ describe('Write', () => {
               .floatField('value', 4)
               .timestamp(false as any as string), // server decides what to do with such values
           ]
-          await subject.writePoints(points, BUCKET)
+          await subject.writePoints(BUCKET, points)
           expect(logs.error).to.length(0)
           expect(logs.warn).to.length(0)
           expect(messages).to.have.length(1)
@@ -225,7 +225,7 @@ describe('Write', () => {
         })
         .persist()
       await subject
-        .write('test value=1', BUCKET)
+        .write(BUCKET, 'test value=1')
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
           expect(e).to.be.ok
@@ -252,7 +252,10 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
+      await subject.writePoints(
+        BUCKET,
+        new Point('test').floatField('value', 1)
+      )
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
@@ -269,7 +272,10 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.writePoint(new Point('test').floatField('value', 1), BUCKET)
+      await subject.writePoints(
+        BUCKET,
+        new Point('test').floatField('value', 1)
+      )
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])

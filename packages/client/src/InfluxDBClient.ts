@@ -5,7 +5,7 @@ import WriteApiImpl from './impl/WriteApiImpl'
 import TransportImpl from './impl/node/NodeHttpTransport'
 import {ClientOptions, QueryType, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
-import {Point, PointRecord} from './Point'
+import {NotArrayLike, NotPointRecord, Point, PointRecord} from './Point'
 import {convertTime} from './util/time'
 import {isArrayLike, isDefined} from './util/common'
 import QueryApi from './QueryApi'
@@ -46,14 +46,14 @@ export default class InfluxDBClient {
   }
 
   async write(
-    data:
-      | ArrayLike<string>
-      | ArrayLike<Point>
-      | ArrayLike<PointRecord>
-      | string
-      | Point
-      | PointRecord,
     database: string,
+    data: // The 'ArrayLike' and 'PointRecord' types must be marked with 'Not' types to avoid type confusion
+    | NotPointRecord<
+          ArrayLike<string> | ArrayLike<Point> | ArrayLike<PointRecord>
+        >
+      | NotArrayLike<PointRecord>
+      | string
+      | Point,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
@@ -62,73 +62,64 @@ export default class InfluxDBClient {
     ) as any[]
     if (arrayData.length === 0) return
     if (typeof arrayData[0] === 'string') {
-      await this.writeLines(arrayData as any, database, org, writeOptions)
+      await this.writeLines(database, arrayData as any, org, writeOptions)
     } else if (arrayData[0] instanceof Point) {
-      await this.writePoints(arrayData as any, database, org, writeOptions)
+      await this.writePoints(database, arrayData as any, org, writeOptions)
     } else {
-      await this.writeRecords(arrayData as any, database, org, writeOptions)
+      await this.writeRecords(database, arrayData as any, org, writeOptions)
     }
   }
 
   async writeLines(
-    lines: string | ArrayLike<string>,
     database: string,
+    lines: string | ArrayLike<string>,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ) {
     await this._writeApi.doWrite(
-      typeof lines === 'string' ? [lines] : Array.from(lines),
       database,
+      typeof lines === 'string' ? [lines] : Array.from(lines),
       org,
       this._mergeWriteOptions(writeOptions)
     )
   }
 
-  async writePoint(
-    point: Point,
-    database: string,
-    org?: string,
-    writeOptions?: Partial<WriteOptions>
-  ): Promise<void> {
-    await this.writePoints([point], database, org, writeOptions)
-  }
-
   async writePoints(
-    points: ArrayLike<Point>,
     database: string,
+    points: ArrayLike<Point> | Point,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
+    const pointsArr = points instanceof Point ? [points] : Array.from(points)
+
     await this._writeApi.doWrite(
-      Array.from(points)
-        .map((p) => p.toLineProtocol())
-        .filter(isDefined),
       database,
+      pointsArr.map((p) => p.toLineProtocol()).filter(isDefined),
       org,
       this._mergeWriteOptions(writeOptions)
     )
   }
 
   async writeRecords(
-    records: ArrayLike<PointRecord>,
     database: string,
+    records: ArrayLike<PointRecord>,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
     await this.writePoints(
-      Array.from(records).map((record) => Point.fromRecord(record)),
       database,
+      Array.from(records).map((record) => Point.fromRecord(record)),
       org,
       writeOptions
     )
   }
 
   query(
-    query: string,
     database: string,
+    query: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Map<string, any>, void, void> {
-    return this._queryApi.query(query, database, queryType)
+    return this._queryApi.query(database, query, queryType)
   }
 
   get convertTime() {

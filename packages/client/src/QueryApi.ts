@@ -13,8 +13,8 @@ export default interface QueryApi {
    * @returns An async generator that yields maps of string keys to any values.
    */
   query(
-    query: string,
     database: string,
+    query: string,
     queryType: QueryType
   ): AsyncGenerator<Map<string, any>, void, void>
 

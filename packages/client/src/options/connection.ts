@@ -44,7 +44,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options used by {@link InfluxDB} .
+ * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
   /** specifies custom transport */

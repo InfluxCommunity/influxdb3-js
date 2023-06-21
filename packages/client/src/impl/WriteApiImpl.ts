@@ -27,8 +27,8 @@ export default class WriteApiImpl implements WriteApi {
   }
 
   doWrite(
-    lines: string[],
     bucket: string,
+    lines: string[],
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
