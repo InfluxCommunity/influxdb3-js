@@ -19,7 +19,8 @@
     "test": "yarn --cwd packages/client build && yarn workspaces run test",
     "test:ci": "yarn workspaces run test:ci",
     "coverage": "cd packages/client && yarn build && yarn coverage",
-    "coverage:ci": "cd packages/client && yarn build && yarn coverage:ci"
+    "coverage:ci": "cd packages/client && yarn build && yarn coverage:ci",
+    "flight": "node ./scripts/generate-flight"
   },
   "homepage": "https://github.com/bonitoo-io/influxdb3-js",
   "repository": {
