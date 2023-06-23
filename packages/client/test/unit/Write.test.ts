@@ -7,6 +7,8 @@ import {
   Point,
   InfluxDBClient,
   WritePrecision,
+  PointRecord,
+  convertTime,
 } from '../../src'
 import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
 import zlib from 'zlib'
@@ -78,31 +80,69 @@ describe('Write', () => {
       )
     })
   })
-  describe('convert point time to line protocol', () => {
-    const client = createApi({
-      precision: 'ms',
+  describe('convert record to point', () => {
+    it('should correctly convert PointRecord to Point', () => {
+      const record: PointRecord = {
+        measurement: 'testMeasurement',
+        timestamp: 1624512793,
+        text: 'testString',
+        value: 123.45,
+      }
+      const point = Point.fromRecord(record)
+      expect(point.toLineProtocol()).equals(
+        'testMeasurement text="testString",value=123.45 1624512793'
+      )
     })
+    it('should accept string as timestamp', () => {
+      const record: PointRecord = {
+        measurement: 'testMeasurement',
+        timestamp: '',
+        text: 'testString',
+        value: 123.45,
+      }
+      const point = Point.fromRecord(record)
+      expect(point.toLineProtocol()).equals(
+        'testMeasurement text="testString",value=123.45'
+      )
+    })
+    it('should accept Date as timestamp', () => {
+      const date = new Date()
+      const record: PointRecord = {
+        measurement: 'testMeasurement',
+        timestamp: date,
+        text: 'testString',
+        value: 123.45,
+      }
+      const point = Point.fromRecord(record)
+      expect(point.toLineProtocol()).equals(
+        `testMeasurement text="testString",value=123.45 ${convertTime(date)}`
+      )
+    })
+  })
+  describe('convert point time to line protocol', () => {
+    const precision = 'ms'
+    const clinetConvertTime = (value: Parameters<typeof convertTime>[0]) =>
+      convertTime(value, precision)
+
     it('converts empty string to no timestamp', () => {
       const p = new Point('a').floatField('b', 1).timestamp('')
-      expect(p.toLineProtocol(client.convertTime)).equals('a b=1')
+      expect(p.toLineProtocol(clinetConvertTime)).equals('a b=1')
     })
     it('converts number to timestamp', () => {
       const p = new Point('a').floatField('b', 1).timestamp(1.2)
-      expect(p.toLineProtocol(client.convertTime)).equals('a b=1 1')
+      expect(p.toLineProtocol(clinetConvertTime)).equals('a b=1 1')
     })
     it('converts Date to timestamp', () => {
       const d = new Date()
       const p = new Point('a').floatField('b', 1).timestamp(d)
-      expect(p.toLineProtocol(client.convertTime)).equals(
-        `a b=1 ${d.getTime()}`
-      )
+      expect(p.toLineProtocol(clinetConvertTime)).equals(`a b=1 ${d.getTime()}`)
     })
     it('converts undefined to local timestamp', () => {
       const p = new Point('a').floatField('b', 1)
-      expect(p.toLineProtocol(client.convertTime)).satisfies((x: string) => {
+      expect(p.toLineProtocol(clinetConvertTime)).satisfies((x: string) => {
         return x.startsWith('a b=1')
       }, `does not start with 'a b=1'`)
-      expect(p.toLineProtocol(client.convertTime)).satisfies((x: string) => {
+      expect(p.toLineProtocol(clinetConvertTime)).satisfies((x: string) => {
         return Date.now() - Number.parseInt(x.substring('a b=1 '.length)) < 1000
       })
     })

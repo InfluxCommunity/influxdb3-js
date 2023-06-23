@@ -7,12 +7,6 @@ export type PointRecord = {
   timestamp?: string | number | Date
 } & (Record<'timestamp', Date> | Record<string, number | string>)
 
-/** Prevents confusion with the ArrayLike type. Use with PointRecord */
-export type NotArrayLike<T> = T & {length?: string}
-
-/** Prevents confusion with the PointRecord type. */
-export type NotPointRecord<T> = T & {measurement?: void}
-
 /**
  * Point defines values of a single measurement.
  */
@@ -240,11 +234,11 @@ export class Point {
 
   static fromRecord(record: PointRecord): Point {
     const point = new Point(record.measurement)
-    Object.entries(point).map(([key, value]) => {
+    Object.entries(record).forEach(([key, value]) => {
       if (key === 'measurement') return
-      if (key === 'timestamp') point.timestamp(value)
-      if (typeof value === 'number') point.floatField(key, value)
-      if (typeof value === 'string') point.stringField(key, value)
+      else if (key === 'timestamp') point.timestamp(value)
+      else if (typeof value === 'number') point.floatField(key, value)
+      else if (typeof value === 'string') point.stringField(key, value)
     })
     return point
   }
