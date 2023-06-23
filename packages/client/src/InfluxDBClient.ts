@@ -18,17 +18,13 @@ export default class InfluxDBClient {
   readonly transport: Transport
 
   /**
-   * Creates influxdb client options from an options object or url.
+   * Creates a new instance of the `InfluxDBClient` for interacting with an InfluxDB server, simplifying common operations such as writing, querying.
    * @param options - client options
    */
-  constructor(options: ClientOptions | string) {
-    if (typeof options === 'string') {
-      this._options = {url: options}
-    } else if (options !== null && typeof options === 'object') {
-      this._options = options
-    } else {
-      throw new IllegalArgumentError('No url or configuration specified!')
-    }
+  constructor(options: ClientOptions) {
+    if (options === undefined || options === null)
+      throw new IllegalArgumentError('No configuration specified!')
+    this._options = options
     const url = this._options.url
     if (typeof url !== 'string')
       throw new IllegalArgumentError('No url specified!')
@@ -46,7 +42,6 @@ export default class InfluxDBClient {
   }
 
   async write(
-    database: string,
     data: // The 'ArrayLike' and 'PointRecord' types must be marked with 'Not' types to avoid type confusion
     | NotPointRecord<
           ArrayLike<string> | ArrayLike<Point> | ArrayLike<PointRecord>
@@ -54,6 +49,7 @@ export default class InfluxDBClient {
       | NotArrayLike<PointRecord>
       | string
       | Point,
+    database: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
@@ -62,53 +58,53 @@ export default class InfluxDBClient {
     ) as any[]
     if (arrayData.length === 0) return
     if (typeof arrayData[0] === 'string') {
-      await this.writeLines(database, arrayData as any, org, writeOptions)
+      await this.writeLines(arrayData as any, database, org, writeOptions)
     } else if (arrayData[0] instanceof Point) {
-      await this.writePoints(database, arrayData as any, org, writeOptions)
+      await this.writePoints(arrayData as any, database, org, writeOptions)
     } else {
-      await this.writeRecords(database, arrayData as any, org, writeOptions)
+      await this.writeRecords(arrayData as any, database, org, writeOptions)
     }
   }
 
   async writeLines(
-    database: string,
     lines: string | ArrayLike<string>,
+    database: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ) {
     await this._writeApi.doWrite(
-      database,
       typeof lines === 'string' ? [lines] : Array.from(lines),
+      database,
       org,
       this._mergeWriteOptions(writeOptions)
     )
   }
 
-  async writePoints(
-    database: string,
+  private async writePoints(
     points: ArrayLike<Point> | Point,
+    database: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
     const pointsArr = points instanceof Point ? [points] : Array.from(points)
 
     await this._writeApi.doWrite(
-      database,
       pointsArr.map((p) => p.toLineProtocol()).filter(isDefined),
+      database,
       org,
       this._mergeWriteOptions(writeOptions)
     )
   }
 
-  async writeRecords(
-    database: string,
+  private async writeRecords(
     records: ArrayLike<PointRecord>,
+    database: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
     await this.writePoints(
-      database,
       Array.from(records).map((record) => Point.fromRecord(record)),
+      database,
       org,
       writeOptions
     )
@@ -118,7 +114,7 @@ export default class InfluxDBClient {
     database: string,
     query: string,
     queryType: QueryType = 'sql'
-  ): AsyncGenerator<Map<string, any>, void, void> {
+  ): AsyncGenerator<Record<string, any>, void, void> {
     return this._queryApi.query(database, query, queryType)
   }
 

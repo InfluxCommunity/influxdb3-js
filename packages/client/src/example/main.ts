@@ -29,7 +29,7 @@ async function main() {
       .floatField('avg', 24.5)
       .floatField('max', 45.0)
       .timestamp(new Date())
-    await client.write(database, p)
+    await client.write(p, database)
 
     // Write record
     const sensorData = {
@@ -39,11 +39,11 @@ async function main() {
       max: 40.3,
       timestamp: new Date(),
     }
-    await client.write(database, sensorData)
+    await client.write(sensorData, database)
 
     // Or write directly line protocol
     const line = `stat,unit=temperature avg=20.5,max=43.0`
-    await client.write(database, line)
+    await client.write(line, database)
 
     // Prepare flightsql query
     const query = `
@@ -57,11 +57,11 @@ async function main() {
     const queryType = 'sql'
 
     // Execute query
-    const queryResult = await client.query(database, query, queryType)
+    const queryResult = client.query(query, database, queryType)
 
     for await (const row of queryResult) {
-      console.log(`avg is ${row.get('avg')}`)
-      console.log(`max is ${row.get('max')}`)
+      console.log(`avg is ${row.avg}`)
+      console.log(`max is ${row.max}`)
     }
   } catch (err) {
     console.error(err)

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "description": "InfluxDB 3 client",
+  "description": "The Client that provides a simple and convenient way to interact with InfluxDB 3.",
   "workspaces": {
     "packages": [
       "packages/client"

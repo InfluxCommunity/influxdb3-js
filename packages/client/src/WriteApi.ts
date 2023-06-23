@@ -15,8 +15,8 @@ export default interface WriteApi {
    * @param lines - InfluxDB Line Protocol
    */
   doWrite(
-    bucket: string,
     lines: string[],
+    bucket: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void>

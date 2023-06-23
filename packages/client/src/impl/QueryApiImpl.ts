@@ -19,10 +19,10 @@ export default class QueryApiImpl implements QueryApi {
   }
 
   async *query(
-    database: string,
     query: string,
+    database: string,
     queryType: QueryType = 'sql'
-  ): AsyncGenerator<Map<string, any>, void, void> {
+  ): AsyncGenerator<Record<string, any>, void, void> {
     if (this.closed) {
       throw new Error('queryApi: already closed!')
     }
@@ -57,11 +57,11 @@ export default class QueryApiImpl implements QueryApi {
 
     for await (const batch of reader) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
-        const row: Map<string, any> = new Map()
+        const row: Record<string, any> = Object.create(null)
         for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
           const name = batch.schema.fields[columnIndex].name
           const value = batch.getChildAt(columnIndex)?.get(rowIndex)
-          row.set(name, value)
+          row[name] = value
         }
 
         yield row

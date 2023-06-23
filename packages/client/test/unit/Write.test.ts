@@ -17,10 +17,10 @@ const clientOptions: ClientOptions = {
   url: 'http://fake:8086',
   token: 'a',
 }
-const BUCKET = 'bucket'
+const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v2/write?bucket=${BUCKET}&precision=ns`
+const WRITE_PATH_NS = `/api/v2/write?bucket=${DATABASE}&precision=ns`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
@@ -58,7 +58,7 @@ describe('Write', () => {
     })
     it('fails to write without server connection', async () => {
       await subject
-        .write(BUCKET, 'test value=1')
+        .write('test value=1', DATABASE)
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
           expect(logs.error).length.greaterThan(0)
@@ -68,13 +68,13 @@ describe('Write', () => {
     it('fails on write if it is closed already', async () => {
       await subject.close()
 
-      await rejects(subject.write(BUCKET, 'text value=1'))
-      await rejects(subject.write(BUCKET, ['text value=1', 'text value=2']))
+      await rejects(subject.write('text value=1', DATABASE))
+      await rejects(subject.write(['text value=1', 'text value=2'], DATABASE))
       await rejects(
-        subject.writePoints(BUCKET, new Point('test').floatField('value', 1))
+        subject.write(new Point('test').floatField('value', 1), DATABASE)
       )
       await rejects(
-        subject.writePoints(BUCKET, [new Point('test').floatField('value', 1)])
+        subject.write([new Point('test').floatField('value', 1)], DATABASE)
       )
     })
   })
@@ -164,7 +164,7 @@ describe('Write', () => {
 
           failNextRequest = true
           await subject
-            .writePoints(BUCKET, point)
+            .write(point, DATABASE)
             .then(() => expect.fail('failure expected'))
             .catch((e) => {
               expect(e).to.be.ok
@@ -173,7 +173,7 @@ describe('Write', () => {
           expect(logs.warn).has.length(0)
           logs.reset()
 
-          await subject.writePoints(BUCKET, point)
+          await subject.write(point, DATABASE)
           expect(logs.error).has.length(0)
           expect(logs.warn).has.length(0)
           expect(messages).to.have.length(1)
@@ -183,9 +183,9 @@ describe('Write', () => {
           requests = 0
 
           // generates no lines, no requests done
-          await subject.writePoints(BUCKET, new Point())
-          await subject.writePoints(BUCKET, [])
-          await subject.write(BUCKET, '')
+          await subject.write(new Point(), DATABASE)
+          await subject.write([], DATABASE)
+          await subject.write('', DATABASE)
           expect(requests).to.equal(0)
           expect(logs.error).has.length(0)
           expect(logs.warn).has.length(0)
@@ -198,7 +198,7 @@ describe('Write', () => {
               .floatField('value', 4)
               .timestamp(false as any as string), // server decides what to do with such values
           ]
-          await subject.writePoints(BUCKET, points)
+          await subject.write(points, DATABASE)
           expect(logs.error).to.length(0)
           expect(logs.warn).to.length(0)
           expect(messages).to.have.length(1)
@@ -225,7 +225,7 @@ describe('Write', () => {
         })
         .persist()
       await subject
-        .write(BUCKET, 'test value=1')
+        .write('test value=1', DATABASE)
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
           expect(e).to.be.ok
@@ -252,10 +252,7 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.writePoints(
-        BUCKET,
-        new Point('test').floatField('value', 1)
-      )
+      await subject.write(new Point('test').floatField('value', 1), DATABASE)
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
@@ -272,10 +269,7 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.writePoints(
-        BUCKET,
-        new Point('test').floatField('value', 1)
-      )
+      await subject.write(new Point('test').floatField('value', 1), DATABASE)
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])

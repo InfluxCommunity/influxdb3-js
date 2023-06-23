@@ -3,13 +3,6 @@ import {InfluxDBClient, ClientOptions, Transport} from '../../src'
 
 describe('InfluxDB', () => {
   describe('constructor', () => {
-    it('is created from string url', () => {
-      expect(
-        (new InfluxDBClient('http://localhost:8086') as any)._options
-      ).to.deep.equal({
-        url: 'http://localhost:8086',
-      })
-    })
     it('is created from configuration with url', () => {
       expect(
         (new InfluxDBClient({url: 'http://localhost:8086'}) as any)._options
@@ -30,13 +23,6 @@ describe('InfluxDB', () => {
         token: 'b',
       })
     })
-    it('is created from string url with trailing slash', () => {
-      expect(
-        (new InfluxDBClient('http://localhost:8086/') as any)._options
-      ).to.deep.equal({
-        url: 'http://localhost:8086',
-      })
-    })
     it('is created from configuration with url with trailing slash', () => {
       expect(
         (new InfluxDBClient({url: 'http://localhost:8086/'}) as any)._options
@@ -47,12 +33,12 @@ describe('InfluxDB', () => {
     it('fails on null arg', () => {
       expect(
         () => new InfluxDBClient(null as unknown as ClientOptions)
-      ).to.throw('No url or configuration specified!')
+      ).to.throw('No configuration specified!')
     })
     it('fails on undefined arg', () => {
       expect(
         () => new InfluxDBClient(undefined as unknown as ClientOptions)
-      ).to.throw('No url or configuration specified!')
+      ).to.throw('No configuration specified!')
     })
     it('fails on missing url', () => {
       expect(

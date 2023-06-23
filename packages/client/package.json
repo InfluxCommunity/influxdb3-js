@@ -1,7 +1,7 @@
 {
   "name": "@influxdata/influxdb3-client",
   "version": "0.1.0",
-  "description": "InfluxDB 4 client",
+  "description": "The Client that provides a simple and convenient way to interact with InfluxDB 3.",
   "scripts": {
     "apidoc:extract": "api-extractor run",
     "build": "yarn run clean && yarn run build:browser && yarn run build:node",

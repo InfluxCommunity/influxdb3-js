@@ -46,7 +46,7 @@ describe('e2e test', () => {
       .floatField('avg', avg1)
       .floatField('max', max1)
       .intField('testId', testId)
-    await client.writePoints(database, [point])
+    await client.write(point, database)
 
     const query = `
       SELECT *
@@ -60,15 +60,15 @@ describe('e2e test', () => {
 
     const queryType = 'sql'
 
-    const data = client.query(database, query, queryType)
+    const data = client.query(query, database, queryType)
 
-    let row: IteratorResult<Map<string, any>, void>
+    let row: IteratorResult<Record<string, any>, void>
     row = await data.next()
 
     expect(row.done).to.equal(false)
-    expect(row.value?.get('unit')).to.equal('temperature')
-    expect(row.value?.get('avg')).to.equal(avg1)
-    expect(row.value?.get('max')).to.equal(max1)
+    expect(row.value?.unit).to.equal('temperature')
+    expect(row.value?.avg).to.equal(avg1)
+    expect(row.value?.max).to.equal(max1)
 
     row = await data.next()
     expect(row.done).to.equal(true)

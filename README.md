@@ -41,8 +41,7 @@ pnpm add @influxdata/influxdb3-client
 If you target Node.js, use [@influxdata/influxdb3-client](./packages/client/README.md).
 It provides main (CJS), module (ESM), and browser (UMD) exports.
 
-**Currently not supported**:
-> *If you target browsers (including [Deno](https://deno.land/) and [Ionic](https://ionic.io/)), use [@influxdata/influxdb3-client-browser](./packages/client-browser/README.md) in place of `@influxdata/influxdb3-client`. It provides main (UMD) and module (ESM) exports.*
+** ⚠️ The browser target is not currently supported.**.
 
 ## Usage
 
@@ -98,14 +97,14 @@ async function main() {
 main()
 ```
 
-The `client` can be now used to insert data using [line-protocol](https://docs.influxdata.com/influxdb/cloud-serverless/reference/syntax/line-protocol/).
+The `client` can be now used to insert data using [line-protocol](https://docs.influxdata.com/influxdb/cloud-serverless/reference/syntax/line-protocol/):
 
 ```ts
 const line = `stat,unit=temperature avg=20.5,max=45.0`
-await client.write(database, line)
+await client.write(line, database)
 ```
 
-Fetch data using FlightSQL query and print result.
+Fetch data using `SQL` query and print result.
 
 ```ts
 // Execute query
@@ -117,11 +116,11 @@ const query = `
     AND
     "unit" IN ('temperature')
 `
-const queryResult = await client.query(database, query)
+const queryResult = await client.query(query, database)
 
 for await (const row of queryResult) {
-    console.log(`avg is ${row.get('avg')}`)
-    console.log(`max is ${row.get('max')}`)
+    console.log(`avg is ${row.avg}`)
+    console.log(`max is ${row.max}`)
 }
 ```
 
