@@ -47,6 +47,7 @@ let packageJsonContent = {
     protoc: '^1.1.3',
     'ts-proto': '^1.150.0',
   },
+  'license': 'MIT',
 }
 
 fs.writeFileSync('package.json', JSON.stringify(packageJsonContent, null, 2))
