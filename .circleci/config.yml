@@ -36,6 +36,16 @@ jobs:
       # Upload results
       - store_test_results:
           path: ./reports
+  generate-flight:
+    docker:
+      - image: *default-image
+    steps:
+      - checkout
+      - init-dependencies
+      - run:
+          name: Generate Flight Client
+          command: |
+            yarn flight
   coverage:
     parameters:
     docker:
@@ -84,6 +94,10 @@ workflows:
             branches:
               ignore: gh-pages
       - coverage:
+          filters:
+            branches:
+              ignore: gh-pages
+      - generate-flight:
           filters:
             branches:
               ignore: gh-pages
