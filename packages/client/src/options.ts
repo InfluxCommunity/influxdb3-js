@@ -14,6 +14,10 @@ export interface ConnectionOptions {
    */
   timeout?: number
   /**
+   * default database for write query if not present as argument.
+   */
+  database?: string
+  /**
    * TransportOptions supply extra options for the transport layer, they differ between node.js and browser/deno.
    * Node.js transport accepts options specified in {@link https://nodejs.org/api/http.html#http_http_request_options_callback | http.request } or
    * {@link https://nodejs.org/api/https.html#https_https_request_options_callback | https.request }. For example, an `agent` property can be set to

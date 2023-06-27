@@ -8,6 +8,12 @@ import {IllegalArgumentError} from './errors'
 import QueryApi from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
+import {throwReturn} from './util/common'
+
+const argumentErrorMessage = `\
+Please specify the 'database' as a method parameter or use default configuration \
+at 'ClientOptions.database'
+`
 
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
@@ -41,24 +47,32 @@ export default class InfluxDBClient {
 
   async write(
     data: WritableData,
-    database: string,
+    database?: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
     await this._writeApi.doWrite(
       writableDataToLineProtocol(data),
-      database,
+      database ??
+        this._options.database ??
+        throwReturn(new Error(argumentErrorMessage)),
       org,
       this._mergeWriteOptions(writeOptions)
     )
   }
 
   query(
-    database: string,
     query: string,
+    database?: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Record<string, any>, void, void> {
-    return this._queryApi.query(database, query, queryType)
+    return this._queryApi.query(
+      query,
+      database ??
+        this._options.database ??
+        throwReturn(new Error(argumentErrorMessage)),
+      queryType
+    )
   }
 
   async close(): Promise<void> {

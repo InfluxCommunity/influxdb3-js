@@ -1,4 +1,13 @@
-export const isDefined = <T>(value: T | undefined): value is T =>
+type Defined<T> = Exclude<T, undefined>
+
+/**
+ * allows to throw error as expression
+ */
+export const throwReturn = <T>(err: Error): Defined<T> => {
+  throw err
+}
+
+export const isDefined = <T>(value: T): value is Defined<T> =>
   value !== undefined
 
 export const isArrayLike = <T>(value: any): value is ArrayLike<T> =>

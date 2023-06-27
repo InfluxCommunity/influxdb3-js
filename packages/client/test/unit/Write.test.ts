@@ -135,14 +135,14 @@ describe('Write', () => {
     it('converts Date to timestamp', () => {
       const d = new Date()
       const p = new Point('a').floatField('b', 1).timestamp(d)
-      expect(p.toLineProtocol(clinetConvertTime)).equals(`a b=1 ${d.getTime()}`)
+      expect(p.toLineProtocol(precision)).equals(`a b=1 ${d.getTime()}`)
     })
     it('converts undefined to local timestamp', () => {
       const p = new Point('a').floatField('b', 1)
-      expect(p.toLineProtocol(clinetConvertTime)).satisfies((x: string) => {
+      expect(p.toLineProtocol(precision)).satisfies((x: string) => {
         return x.startsWith('a b=1')
       }, `does not start with 'a b=1'`)
-      expect(p.toLineProtocol(clinetConvertTime)).satisfies((x: string) => {
+      expect(p.toLineProtocol(precision)).satisfies((x: string) => {
         return Date.now() - Number.parseInt(x.substring('a b=1 '.length)) < 1000
       })
     })

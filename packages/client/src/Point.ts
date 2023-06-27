@@ -1,6 +1,7 @@
 import {TimeConverter} from './WriteApi'
-import {convertTimeToNanos} from './util/time'
+import {convertTimeToNanos, convertTime} from './util/time'
 import {escape} from './util/escape'
+import {WritePrecision} from './options'
 
 export type PointRecord = {
   measurement: string
@@ -189,7 +190,9 @@ export class Point {
    * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
    * @returns an InfluxDB protocol line out of this instance
    */
-  public toLineProtocol(convertTime?: TimeConverter): string | undefined {
+  public toLineProtocol(
+    convertTimePrecision?: TimeConverter | WritePrecision
+  ): string | undefined {
     if (!this.name) return undefined
     let fieldsLine = ''
     Object.keys(this.fields)
@@ -216,10 +219,13 @@ export class Point {
         }
       })
     let time = this.time
-    if (convertTime) {
-      time = convertTime(time)
-    } else {
+
+    if (!convertTimePrecision) {
       time = convertTimeToNanos(time)
+    } else if (typeof convertTimePrecision === 'string')
+      time = convertTime(time, convertTimePrecision)
+    else {
+      time = convertTimePrecision(time)
     }
 
     return `${escape.measurement(this.name)}${tagsLine} ${fieldsLine}${
