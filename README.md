@@ -41,7 +41,7 @@ pnpm add @influxdata/influxdb3-client
 If you target Node.js, use [@influxdata/influxdb3-client](./packages/client/README.md).
 It provides main (CJS), module (ESM), and browser (UMD) exports.
 
-** ⚠️ The browser target is not currently supported.**.
+**⚠️ The browser target is not currently supported.**
 
 ## Usage
 
