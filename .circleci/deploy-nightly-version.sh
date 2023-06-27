@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -e
 
 SCRIPT_PATH="$( cd "$(dirname "$0")" || exit ; pwd -P )"
@@ -16,4 +18,4 @@ yarn build
 
 # Publish
 # yarn lerna publish --canary from-package --no-git-tag-version --force-publish --preid nightly --yes
-yarn lerna publish --canary from-package --no-git-tag-version --no-push --preid nightly
+yarn lerna publish --canary from-package --no-git-tag-version --no-push --preid nightly --yes
