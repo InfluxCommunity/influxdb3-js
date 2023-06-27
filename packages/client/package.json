@@ -56,7 +56,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.31.0",
+    "@microsoft/api-extractor": "^7.36.0",
     "@types/chai": "^4.2.5",
     "@types/mocha": "^10.0.0",
     "@types/sinon": "^10.0.13",
@@ -82,7 +82,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.8.15",
+    "@grpc/grpc-js": "^1.8.16",
     "@protobuf-ts/runtime-rpc": "^2.9.0",
     "apache-arrow": "^12.0.1"
   }
