@@ -125,6 +125,6 @@ workflows:
           requires:
             - tests-node-18
             - coverage
-#          filters:
-#            branches:
-#              only: main
+          filters:
+            branches:
+              only: main
