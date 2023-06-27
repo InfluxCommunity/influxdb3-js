@@ -244,7 +244,7 @@ export class Point {
     const {measurement, fields, tags, timestamp} = record
 
     const point = new Point(measurement)
-    if (timestamp) point.timestamp(timestamp)
+    if (timestamp !== undefined) point.timestamp(timestamp)
 
     for (const [name, value] of Object.entries(fields)) {
       if (typeof value === 'number') point.floatField(name, value)
