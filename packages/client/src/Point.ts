@@ -5,8 +5,10 @@ import {WritePrecision} from './options'
 
 export type PointRecord = {
   measurement: string
+  fields: Record<string, number | string>
+  tags?: Record<string, string>
   timestamp?: string | number | Date
-} & (Record<'timestamp', Date> | Record<string, number | string>)
+}
 
 /**
  * Point defines values of a single measurement.
@@ -239,13 +241,23 @@ export class Point {
   }
 
   static fromRecord(record: PointRecord): Point {
-    const point = new Point(record.measurement)
-    Object.entries(record).forEach(([key, value]) => {
-      if (key === 'measurement') return
-      else if (key === 'timestamp') point.timestamp(value)
-      else if (typeof value === 'number') point.floatField(key, value)
-      else if (typeof value === 'string') point.stringField(key, value)
-    })
+    const {measurement, fields, tags, timestamp} = record
+
+    const point = new Point(measurement)
+    if (timestamp) point.timestamp(timestamp)
+
+    for (const [name, value] of Object.entries(fields)) {
+      if (typeof value === 'number') point.floatField(name, value)
+      else if (typeof value === 'string') point.stringField(name, value)
+      else throw new Error(`unsuported type of field ${name}: ${typeof value}`)
+    }
+
+    if (tags)
+      for (const [name, value] of Object.entries(tags)) {
+        if (typeof value === 'string') point.tag(name, value)
+        else throw new Error(`tag has to be string ${name}: ${typeof value}`)
+      }
+
     return point
   }
 }

@@ -85,8 +85,10 @@ describe('Write', () => {
       const record: PointRecord = {
         measurement: 'testMeasurement',
         timestamp: 1624512793,
-        text: 'testString',
-        value: 123.45,
+        fields: {
+          text: 'testString',
+          value: 123.45,
+        },
       }
       const point = Point.fromRecord(record)
       expect(point.toLineProtocol()).equals(
@@ -97,8 +99,10 @@ describe('Write', () => {
       const record: PointRecord = {
         measurement: 'testMeasurement',
         timestamp: '',
-        text: 'testString',
-        value: 123.45,
+        fields: {
+          text: 'testString',
+          value: 123.45,
+        },
       }
       const point = Point.fromRecord(record)
       expect(point.toLineProtocol()).equals(
@@ -110,8 +114,10 @@ describe('Write', () => {
       const record: PointRecord = {
         measurement: 'testMeasurement',
         timestamp: date,
-        text: 'testString',
-        value: 123.45,
+        fields: {
+          text: 'testString',
+          value: 123.45,
+        },
       }
       const point = Point.fromRecord(record)
       expect(point.toLineProtocol()).equals(

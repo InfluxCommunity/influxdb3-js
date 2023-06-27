@@ -1,4 +1,4 @@
-import {InfluxDBClient, Point} from '../index' // replace with @influxdata/influxdb3-client in your project
+import {InfluxDBClient, Point, PointRecord} from '@influxdata/influxdb3-client'
 
 type Defined<T> = Exclude<T, undefined>
 
@@ -32,14 +32,18 @@ async function main() {
     await client.write(p, database)
 
     // Write record
-    const sensorData = {
+    const sensorData: PointRecord = {
       measurement: 'stat',
-      unit: 'temperature',
-      avg: 28,
-      max: 40.3,
+      tags: {
+        unit: 'temperature',
+      },
+      fields: {
+        avg: 28,
+        max: 40.3,
+      },
       timestamp: new Date(),
     }
-    await client.write(sensorData, database)
+    await client.write([sensorData], database)
 
     // Or write directly line protocol
     const line = `stat,unit=temperature avg=20.5,max=43.0`

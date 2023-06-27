@@ -48,7 +48,9 @@ describe('writableDataToLineProtocol', () => {
   it('should convert PointRecord to line protocol', () => {
     const pointRecord: PointRecord = {
       measurement: 'foo',
-      bar: 3.14,
+      fields: {
+        bar: 3.14,
+      },
     }
     const output = writableDataToLineProtocol(pointRecord)
     expect(output.length).to.equal(1)
@@ -62,17 +64,23 @@ describe('writableDataToLineProtocol', () => {
     const date2 = new Date()
     const pointRecord1: PointRecord = {
       measurement: 'foo',
-      bar: 3.14,
+      fields: {
+        bar: 3.14,
+      },
       timestamp: '',
     }
     const pointRecord2: PointRecord = {
       measurement: 'baz',
-      bar: 6.28,
+      fields: {
+        bar: 6.28,
+      },
       timestamp: date,
     }
     const pointRecord3: PointRecord = {
       measurement: 'qux',
-      bar: 9.42,
+      fields: {
+        bar: 9.42,
+      },
       timestamp: date2,
     }
     const input: WritableData = [pointRecord1, pointRecord2, pointRecord3]

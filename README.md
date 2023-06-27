@@ -65,10 +65,18 @@ export INFLUXDB_TOKEN="<token>"
 <details>
   <summary>windows</summary>
 
+# powershell
+```
+set INFLUXDB_URL=<url>
+set INFLUXDB_DATABASE=<database>
+set INFLUXDB_TOKEN=<token>
+```
+
+# cmd
 ```powershell
-setx INFLUXDB_URL "<url>"
-setx INFLUXDB_DATABASE "<database>"
-setx INFLUXDB_TOKEN "<token>"
+$env:INFLUXDB_URL "<url>"
+$env:INFLUXDB_DATABASE "<database>"
+$env:INFLUXDB_TOKEN "<token>"
 ```
 
 </details>
@@ -126,7 +134,7 @@ for await (const row of queryResult) {
 
 ## Example
 
-Prepare environment like in [Usage](#usage) and run `npx ts-node ./packages/client/src/example/main.ts`.
+For more complex exmamples see [examples folder](./examples/README.md)
 
 ## Feedback
 
