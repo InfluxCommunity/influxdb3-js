@@ -1,5 +1,6 @@
 import {expect} from 'chai'
 import {InfluxDBClient, Point} from '../../src'
+import {rejects} from 'assert'
 
 const getEnvVariables = () => {
   const {
@@ -72,5 +73,8 @@ describe('e2e test', () => {
 
     row = await data.next()
     expect(row.done).to.equal(true)
+
+    await client.close()
+    await rejects(client.query(query, database, queryType).next())
   })
 })

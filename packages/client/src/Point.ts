@@ -141,7 +141,7 @@ export class Point {
       val = parseFloat(value)
     }
     if (!isFinite(val)) {
-      throw new Error(`invalid float value for field '${name}': ${value}`)
+      throw new Error(`invalid float value for field '${name}': '${value}'!`)
     }
 
     this.fields[name] = String(val)
@@ -242,6 +242,11 @@ export class Point {
 
   static fromRecord(record: PointRecord): Point {
     const {measurement, fields, tags, timestamp} = record
+
+    if (!measurement)
+      throw new Error('measurement must be defined on the Point record!')
+
+    if (!fields) throw new Error('fields must be defined on the Point record!')
 
     const point = new Point(measurement)
     if (timestamp !== undefined) point.timestamp(timestamp)
