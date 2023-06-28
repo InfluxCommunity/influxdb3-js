@@ -22,8 +22,8 @@ function createResponse({
         Object.keys(headers).forEach((key: string) => {
           fn(headers[key], key)
           if (key === 'duplicate') {
-            fn(headers[key] + '2', key)
-            fn(headers[key] + '3', key)
+            fn(`${headers[key]}2`, key)
+            fn(`${headers[key]}3`, key)
           }
         })
       },
@@ -35,7 +35,7 @@ function createResponse({
           body ? JSON.parse(body) : ''
         )
       } else {
-        return Promise.reject(new Error('String body expected, but ' + body))
+        return Promise.reject(new Error(`String body expected, but ${body}`))
       }
     },
   }
@@ -113,9 +113,7 @@ export function emulateFetchApi(
   function fetch(url: string, options: any): Promise<any> {
     if (onRequest) onRequest(options)
     return url.endsWith('error')
-      ? Promise.reject(
-          new HttpError(500, undefined, undefined, undefined, undefined, url)
-        )
+      ? Promise.reject(new HttpError(500, undefined, undefined, undefined, url))
       : Promise.resolve(createResponse(spec))
   }
   class TextEncoder {

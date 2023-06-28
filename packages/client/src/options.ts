@@ -1,13 +1,11 @@
-import {Transport} from '../transport'
+import {Transport} from './transport'
 
 /**
  * Option for the communication with InfluxDB server.
  */
 export interface ConnectionOptions {
-  /** base URL */
-  url: string
-  /** database to be used for InfluxDB operations */
-  database?: string
+  /** base host URL */
+  host: string
   /** authentication token */
   token?: string
   /**
@@ -15,6 +13,10 @@ export interface ConnectionOptions {
    * @defaultValue 10000
    */
   timeout?: number
+  /**
+   * default database for write query if not present as argument.
+   */
+  database?: string
   /**
    * TransportOptions supply extra options for the transport layer, they differ between node.js and browser/deno.
    * Node.js transport accepts options specified in {@link https://nodejs.org/api/http.html#http_http_request_options_callback | http.request } or
@@ -44,9 +46,39 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options used by {@link InfluxDB} .
+ * Options used by {@link InfluxDBClient.write} .
+ */
+export interface WriteOptions {
+  /** Precision to use in writes for timestamp. default ns */
+  precision: WritePrecision
+  /** HTTP headers that will be sent with every write request */
+  headers?: {[key: string]: string}
+  /** When specified, write bodies larger than the threshold are gzipped  */
+  gzipThreshold?: number
+  /** InfluxDB Enterprise write consistency as explained in https://docs.influxdata.com/enterprise_influxdb/v1.9/concepts/clustering/#write-consistency */
+  consistency?: 'any' | 'one' | 'quorum' | 'all'
+}
+
+/** default writeOptions */
+export const DEFAULT_WriteOptions: WriteOptions = {
+  precision: 'ns',
+  gzipThreshold: 1000,
+}
+
+export type QueryType = 'sql' | 'influxql'
+
+/**
+ * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
+  /** supplies and overrides default writing options */
+  writeOptions?: Partial<WriteOptions>
   /** specifies custom transport */
   transport?: Transport
 }
+
+/**
+ * Timestamp precision used in write operations.
+ * See {@link https://docs.influxdata.com/influxdb/latest/api/#operation/PostWrite }
+ */
+export type WritePrecision = 'ns' | 'us' | 'ms' | 's'

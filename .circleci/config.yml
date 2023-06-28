@@ -33,9 +33,19 @@ jobs:
             yarn build
             yarn test:ci
             yarn apidoc:ci
-      # Upload results
       - store_test_results:
           path: ./reports
+
+  generate-flight:
+    docker:
+      - image: *default-image
+    steps:
+      - checkout
+      - init-dependencies
+      - run:
+          name: Generate Flight Client
+          command: |
+            yarn flight
   coverage:
     parameters:
     docker:
@@ -62,6 +72,27 @@ jobs:
       - store_artifacts:
           path: ./packages/client/coverage
 
+  deploy-preview:
+    parameters:
+    docker:
+      - image: *default-image
+    steps:
+      - run:
+          name: Early return if this build is from a forked repository
+          command: |
+            if [[ $CIRCLE_PROJECT_USERNAME != "bonitoo-io" ]]; then
+              echo "Nothing to do for forked repositories, so marking this step successful"
+              circleci step halt
+            fi
+      - checkout
+      - init-dependencies
+      - run:
+          name: Setup npmjs
+          command: bash .circleci/setup-npmjs.sh
+      - run:
+          name: Build & Deploy nightly version
+          command: bash .circleci/deploy-nightly-version.sh
+
 workflows:
   build:
     jobs:
@@ -86,3 +117,14 @@ workflows:
           filters:
             branches:
               ignore: gh-pages
+      - generate-flight:
+          filters:
+            branches:
+              ignore: gh-pages
+      - deploy-preview:
+          requires:
+            - tests-node-18
+            - coverage
+          filters:
+            branches:
+              only: main

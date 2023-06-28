@@ -9,7 +9,7 @@ import {
   Headers,
   ResponseStartedFn,
 } from '../../results'
-import {ConnectionOptions} from '../../options/connection'
+import {ConnectionOptions} from '../../options'
 
 function getResponseHeaders(response: Response): Headers {
   const headers: Headers = {}
@@ -40,10 +40,11 @@ export default class FetchTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (this.connectionOptions.token) {
-      this.defaultHeaders['Authorization'] =
-        'Token ' + this.connectionOptions.token
+      this.defaultHeaders[
+        'Authorization'
+      ] = `Token ${this.connectionOptions.token}`
     }
-    this.url = String(this.connectionOptions.url)
+    this.url = String(this.connectionOptions.host)
     if (this.url.endsWith('/')) {
       this.url = this.url.substring(0, this.url.length - 1)
     }
@@ -157,7 +158,6 @@ export default class FetchTransport implements Transport {
           response.status,
           response.statusText,
           undefined,
-          response.headers.get('retry-after'),
           response.headers.get('content-type')
         )
       }
@@ -165,7 +165,6 @@ export default class FetchTransport implements Transport {
         response.status,
         response.statusText,
         text,
-        response.headers.get('retry-after'),
         response.headers.get('content-type')
       )
     }

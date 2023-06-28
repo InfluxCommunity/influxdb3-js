@@ -35,7 +35,6 @@ describe('createTextDecoderCombiner', () => {
   ]
   chunks.forEach(([str, chunk]) => {
     it(`utf-8 encodes chunk ${JSON.stringify(str)}`, () => {
-      // console.log(Buffer.from(str as string, 'utf8'))
       const encoded = pureJsChunkCombiner.toUtf8String(
         chunk as Uint8Array,
         0,

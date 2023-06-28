@@ -6,40 +6,33 @@ let previous: any
 export interface CollectedLogs {
   error: Array<Array<any>>
   warn: Array<Array<any>>
+  reset(): void
+}
+
+const createCollectedLogs = (): CollectedLogs => {
+  const collectedLogs: CollectedLogs = {
+    error: [],
+    warn: [],
+    reset() {
+      collectedLogs.error.splice(0)
+      collectedLogs.warn.splice(0)
+    },
+  }
+  return collectedLogs
 }
 
 export const collectLogging = {
   replace(): CollectedLogs {
-    const retVal: CollectedLogs = {
-      error: [],
-      warn: [],
-    }
+    const collectedLogs = createCollectedLogs()
     previous = setLogger({
       error: function (...args) {
-        retVal.error.push(args)
+        collectedLogs.error.push(args)
       },
       warn: function (...args) {
-        retVal.warn.push(args)
+        collectedLogs.warn.push(args)
       },
     })
-    return retVal
-  },
-  decorate(): CollectedLogs {
-    const retVal: CollectedLogs = {
-      error: [],
-      warn: [],
-    }
-    const previous = setLogger({
-      error: function (...args) {
-        ;(previous.error as any).apply(previous, args)
-        retVal.error.push(args)
-      },
-      warn: function (...args) {
-        ;(previous.warn as any).apply(previous, args)
-        retVal.warn.push(args)
-      },
-    })
-    return retVal
+    return collectedLogs
   },
   after(): void {
     if (previous) {
