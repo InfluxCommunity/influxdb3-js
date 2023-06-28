@@ -67,7 +67,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport from http url', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086',
+        host: 'http://test:8086',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -79,7 +79,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport from https url', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'https://test:8086',
+        host: 'https://test:8086',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -91,7 +91,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport with contextPath', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/influx',
+        host: 'http://test:8086/influx',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -103,7 +103,7 @@ describe('NodeHttpTransport', () => {
     })
     it('creates the transport with contextPath/', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/influx/',
+        host: 'http://test:8086/influx/',
       })
       expect(transport.defaultOptions).to.deep.equal({
         hostname: 'test',
@@ -117,13 +117,13 @@ describe('NodeHttpTransport', () => {
       expect(
         () =>
           new NodeHttpTransport({
-            url: 'other://test:8086',
+            host: 'other://test:8086',
           })
       ).to.throw()
     })
     it('warn about unsupported /api/v2 context path', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086/api/v2',
+        host: 'http://test:8086/api/v2',
       })
       // don;t use context path at all
       expect(transport.contextPath).equals('')
@@ -136,7 +136,7 @@ describe('NodeHttpTransport', () => {
     })
     it('ignores undefined values', () => {
       const transport: any = new NodeHttpTransport({
-        url: 'http://test:8086',
+        host: 'http://test:8086',
         timeout: undefined,
       })
       expect(transport.defaultOptions).to.deep.equal({
@@ -223,7 +223,7 @@ describe('NodeHttpTransport', () => {
             new NodeHttpTransport({
               ...extras,
               ...transportOptions,
-              url: transportOptions.url + (extras.contextPath ?? ''),
+              host: transportOptions.url + (extras.contextPath ?? ''),
             }).send(
               '/test',
               '',
@@ -267,12 +267,12 @@ describe('NodeHttpTransport', () => {
       }
     })
     describe('negative', () => {
-      const transportOptions = {
-        url: TEST_URL,
+      const transportOptions: ConnectionOptions = {
+        host: TEST_URL,
         timeout: 100,
       }
       it(`fails silently on server error`, async () => {
-        nock(transportOptions.url).get('/test').reply(500, 'not ok')
+        nock(transportOptions.host).get('/test').reply(500, 'not ok')
         expect(
           new NodeHttpTransport(transportOptions).send('/test', '', {
             method: 'GET',
@@ -280,7 +280,7 @@ describe('NodeHttpTransport', () => {
         ).to.not.throw
       })
       it(`fails on server error`, async () => {
-        nock(transportOptions.url).get('/test').reply(500, 'not ok')
+        nock(transportOptions.host).get('/test').reply(500, 'not ok')
         await sendTestData(transportOptions, {method: 'GET'})
           .then(() => {
             expect.fail('must not succeed')
@@ -291,7 +291,7 @@ describe('NodeHttpTransport', () => {
       })
       it(`fails on decoding error`, async () => {
         let responseRead = false
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -316,7 +316,7 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on socket timeout`, async () => {
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
@@ -329,7 +329,7 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on connection timeout`, async () => {
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
@@ -342,7 +342,7 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on response timeout`, async () => {
-        nock(transportOptions.url).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
           .then(() => {
             throw new Error('must not succeed')
@@ -354,7 +354,7 @@ describe('NodeHttpTransport', () => {
       it(`truncates error messages`, async () => {
         let bigMessage = 'this is a big error message'
         while (bigMessage.length < 1001) bigMessage += bigMessage
-        nock(transportOptions.url).get('/test').reply(500, bigMessage)
+        nock(transportOptions.host).get('/test').reply(500, bigMessage)
         await sendTestData(transportOptions, {method: 'GET'})
           .then(() => {
             throw new Error('must not succeed')
@@ -367,7 +367,7 @@ describe('NodeHttpTransport', () => {
         let bigMessage = ',"this is a big error message"'
         while (bigMessage.length < 1001) bigMessage += bigMessage
         bigMessage = `{"code":"mc","message":"mymsg","details":[""${bigMessage}]}`
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(400, bigMessage, {'content-type': 'application/json'})
         await sendTestData(transportOptions, {method: 'GET'}).then(
@@ -381,7 +381,7 @@ describe('NodeHttpTransport', () => {
       })
       it(`uses X-Influxdb-Error header when no body is returned`, async () => {
         const errorMessage = 'this is a header error message'
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(500, '', {'X-Influxdb-Error': errorMessage})
         await sendTestData(transportOptions, {method: 'GET'})
@@ -395,7 +395,7 @@ describe('NodeHttpTransport', () => {
       it(`is aborted before the whole response arrives`, async () => {
         let remainingChunks = 2
         let res: any
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -427,7 +427,7 @@ describe('NodeHttpTransport', () => {
       it(`is aborted by a signal before response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -453,7 +453,7 @@ describe('NodeHttpTransport', () => {
       it(`signalizes error upon request's error'`, async () => {
         let remainingChunks = 2
         let req: any
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -484,12 +484,12 @@ describe('NodeHttpTransport', () => {
       })
     })
     describe('cancelled', () => {
-      const transportOptions = {
-        url: TEST_URL,
+      const transportOptions: ConnectionOptions = {
+        host: TEST_URL,
         timeout: 100,
       }
       it(`is cancelled before the response arrives`, async () => {
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'yes')
@@ -509,7 +509,7 @@ describe('NodeHttpTransport', () => {
       it(`is canceled after reading the second chunk`, async () => {
         let cancellable: any
         let remainingChunks = 2
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(
             200,
@@ -583,7 +583,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url: url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -627,7 +627,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url: url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -672,7 +672,7 @@ describe('NodeHttpTransport', () => {
       }
       const spy = sinon.spy(observer)
 
-      new NodeHttpTransport({url: url, timeout: 10000}).send(
+      new NodeHttpTransport({host: url, timeout: 10000}).send(
         '/test',
         '',
         {
@@ -757,7 +757,7 @@ describe('NodeHttpTransport', () => {
           const transport = new NodeHttpTransport({
             ...extras,
             ...transportOptions,
-            url: transportOptions.url + (extras.contextPath ?? ''),
+            host: transportOptions.url + (extras.contextPath ?? ''),
           })
           try {
             let result = ''
@@ -779,12 +779,12 @@ describe('NodeHttpTransport', () => {
       }
     })
     describe('negative', () => {
-      const transportOptions = {
-        url: TEST_URL,
+      const transportOptions: ConnectionOptions = {
+        host: TEST_URL,
         timeout: 100,
       }
       it(`fails on server error`, async () => {
-        nock(transportOptions.url).get('/test').reply(500, 'not ok')
+        nock(transportOptions.host).get('/test').reply(500, 'not ok')
         await iterateTestData(transportOptions, {method: 'GET'})
           .then(() => {
             expect.fail('must not succeed')
@@ -795,7 +795,7 @@ describe('NodeHttpTransport', () => {
       })
       it(`fails on decoding error`, async () => {
         let responseRead = false
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -820,7 +820,7 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on connection timeout`, async () => {
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
@@ -836,7 +836,7 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on response timeout`, async () => {
-        nock(transportOptions.url).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await iterateTestData(
           {...transportOptions, timeout: 100},
           {method: 'GET'}
@@ -851,7 +851,7 @@ describe('NodeHttpTransport', () => {
       it(`truncates error messages`, async () => {
         let bigMessage = 'this is a big error message'
         while (bigMessage.length < 1001) bigMessage += bigMessage
-        nock(transportOptions.url).get('/test').reply(500, bigMessage)
+        nock(transportOptions.host).get('/test').reply(500, bigMessage)
         await iterateTestData(transportOptions, {method: 'GET'})
           .then(() => {
             throw new Error('must not succeed')
@@ -864,7 +864,7 @@ describe('NodeHttpTransport', () => {
         let bigMessage = ',"this is a big error message"'
         while (bigMessage.length < 1001) bigMessage += bigMessage
         bigMessage = `{"code":"mc","message":"mymsg","details":[""${bigMessage}]}`
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(400, bigMessage, {'content-type': 'application/json'})
         await iterateTestData(transportOptions, {method: 'GET'}).then(
@@ -878,7 +878,7 @@ describe('NodeHttpTransport', () => {
       })
       it(`uses X-Influxdb-Error header when no body is returned`, async () => {
         const errorMessage = 'this is a header error message'
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(500, '', {'X-Influxdb-Error': errorMessage})
         await iterateTestData(transportOptions, {method: 'GET'})
@@ -892,7 +892,7 @@ describe('NodeHttpTransport', () => {
       it(`is aborted before the whole response arrives`, async () => {
         let remainingChunks = 2
         let res: any
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -924,7 +924,7 @@ describe('NodeHttpTransport', () => {
       it(`is aborted by a signal before the whole response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -953,7 +953,7 @@ describe('NodeHttpTransport', () => {
       it(`signalizes error upon request's error'`, async () => {
         let remainingChunks = 2
         let req: any
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply((_uri, _requestBody) => [
             200,
@@ -993,8 +993,8 @@ describe('NodeHttpTransport', () => {
       nock.cleanAll()
       nock.enableNetConnect()
     })
-    const transportOptions = {
-      url: TEST_URL,
+    const transportOptions: ConnectionOptions = {
+      host: TEST_URL,
       timeout: 100,
     }
     ;(
@@ -1008,7 +1008,7 @@ describe('NodeHttpTransport', () => {
       it(`returns string response ${i}`, async () => {
         let remainingChunks = 2
         let body: any = undefined
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(
             200,
@@ -1045,7 +1045,7 @@ describe('NodeHttpTransport', () => {
       ] as Array<Array<any>>
     ).forEach((pair) => {
       it(`returns ${pair[2]} response`, async () => {
-        nock(transportOptions.url)
+        nock(transportOptions.host)
           .get('/test')
           .reply(
             200,
@@ -1068,7 +1068,7 @@ describe('NodeHttpTransport', () => {
       })
     })
     it(`return text even without explicit request headers `, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(200, '..', {
           'content-type': 'application/text',
@@ -1083,7 +1083,7 @@ describe('NodeHttpTransport', () => {
       expect(data).equals('..')
     })
     it(`returns response headers and status code `, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(202, '', {
           'content-type': 'application/text',
@@ -1111,7 +1111,7 @@ describe('NodeHttpTransport', () => {
       expect(responseStatus).equals(202)
     })
     it(`return text for CSV response`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(200, '..', {
           'content-type': 'application/csv',
@@ -1126,7 +1126,7 @@ describe('NodeHttpTransport', () => {
       expect(data).equals('..')
     })
     it(`fails on invalid json`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(200, '..', {
           'content-type': 'application/json',
@@ -1146,7 +1146,7 @@ describe('NodeHttpTransport', () => {
         )
     })
     it(`does not follow redirects OOTB`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(301, '..', {
           location: '/redirected',
@@ -1166,7 +1166,7 @@ describe('NodeHttpTransport', () => {
         )
     })
     it(`can be configured to follow redirects`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(301, '..', {
           location: '/redirected',
@@ -1203,7 +1203,7 @@ describe('NodeHttpTransport', () => {
         )
     })
     it(`return undefined when empty JSON message is received`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(200, '', {
           'content-type': 'application/json',
@@ -1218,7 +1218,7 @@ describe('NodeHttpTransport', () => {
       expect(data).equals(undefined)
     })
     it(`return undefined with 204 status code`, async () => {
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(204, 'whatever it is', {
           'content-type': 'text/plain',
@@ -1234,7 +1234,7 @@ describe('NodeHttpTransport', () => {
     })
     it(`uses custom headers set to transport`, async () => {
       let extra: any
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get('/test')
         .reply(
           200,
@@ -1263,7 +1263,7 @@ describe('NodeHttpTransport', () => {
       let headers: Record<string, string> = {}
       let requestPath = ''
       const targetUrl = 'http://behind.proxy.localhost:8080'
-      nock(transportOptions.url)
+      nock(transportOptions.host)
         .get(/.*/)
         .reply(
           200,
@@ -1278,8 +1278,8 @@ describe('NodeHttpTransport', () => {
         )
         .persist()
       const data = await new NodeHttpTransport({
-        url: targetUrl,
-        proxyUrl: transportOptions.url,
+        host: targetUrl,
+        proxyUrl: transportOptions.host,
       }).request('/test', '', {
         method: 'GET',
       })

@@ -12,7 +12,7 @@ export default class QueryApiImpl implements QueryApi {
   private flightClient: FlightServiceClient
 
   constructor(private _options: ConnectionOptions) {
-    const {url, safe} = replaceURLProtocolWithPort(this._options.url)
+    const {url, safe} = replaceURLProtocolWithPort(this._options.host)
     const credentials =
       grpc.credentials[safe ?? true ? 'createSsl' : 'createInsecure']()
     this.flightClient = new FlightServiceClient(url, credentials)

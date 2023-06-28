@@ -9,7 +9,7 @@ import {
   Headers,
   ResponseStartedFn,
 } from '../../results'
-import {ConnectionOptions} from '../../options/connection'
+import {ConnectionOptions} from '../../options'
 
 function getResponseHeaders(response: Response): Headers {
   const headers: Headers = {}
@@ -44,7 +44,7 @@ export default class FetchTransport implements Transport {
         'Authorization'
       ] = `Token ${this.connectionOptions.token}`
     }
-    this.url = String(this.connectionOptions.url)
+    this.url = String(this.connectionOptions.host)
     if (this.url.endsWith('/')) {
       this.url = this.url.substring(0, this.url.length - 1)
     }

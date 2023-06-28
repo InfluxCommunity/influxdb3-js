@@ -33,7 +33,7 @@ describe('e2e test', () => {
     const {database, token, url} = getEnvVariables()
 
     const client = new InfluxDBClient({
-      url,
+      host: url,
       token,
     })
 

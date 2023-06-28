@@ -16,7 +16,7 @@ import {rejects} from 'assert'
 import {isDefined} from '../../src/util/common'
 
 const clientOptions: ClientOptions = {
-  url: 'http://fake:8086',
+  host: 'http://fake:8086',
   token: 'a',
 }
 const DATABASE = 'database'
@@ -184,7 +184,7 @@ describe('Write', () => {
           let requests = 0
           let failNextRequest = false
           const messages: string[] = []
-          nock(clientOptions.url)
+          nock(clientOptions.host)
             .post(WRITE_PATH_NS)
             .reply(function (_uri, requestBody) {
               requests++
@@ -263,7 +263,7 @@ describe('Write', () => {
       // required because of https://github.com/influxdata/influxdb-client-js/issues/263
       useSubject({})
       let authorization: any
-      nock(clientOptions.url)
+      nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
@@ -291,7 +291,7 @@ describe('Write', () => {
         headers: {authorization: 'Token customToken'},
       })
       let authorization: any
-      nock(clientOptions.url)
+      nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
@@ -308,7 +308,7 @@ describe('Write', () => {
         consistency: 'quorum',
       })
       let uri: any
-      nock(clientOptions.url)
+      nock(clientOptions.host)
         .post(/.*/)
         .reply(function (_uri, _requestBody) {
           uri = this.req.path

@@ -29,10 +29,11 @@ export default class InfluxDBClient {
     if (options === undefined || options === null)
       throw new IllegalArgumentError('No configuration specified!')
     this._options = options
-    const url = this._options.url
-    if (typeof url !== 'string')
-      throw new IllegalArgumentError('No url specified!')
-    if (url.endsWith('/')) this._options.url = url.substring(0, url.length - 1)
+    const host = this._options.host
+    if (typeof host !== 'string')
+      throw new IllegalArgumentError('No host specified!')
+    if (host.endsWith('/'))
+      this._options.host = host.substring(0, host.length - 1)
     this._queryApi = new QueryApiImpl(this._options)
     this.transport = this._options.transport ?? new TransportImpl(this._options)
     this._writeApi = new WriteApiImpl(this.transport)

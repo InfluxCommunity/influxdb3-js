@@ -4,8 +4,8 @@ import {Transport} from './transport'
  * Option for the communication with InfluxDB server.
  */
 export interface ConnectionOptions {
-  /** base URL */
-  url: string
+  /** base host URL */
+  host: string
   /** authentication token */
   token?: string
   /**

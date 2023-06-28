@@ -3,31 +3,31 @@ import {InfluxDBClient, ClientOptions, Transport} from '../../src'
 
 describe('InfluxDB', () => {
   describe('constructor', () => {
-    it('is created from configuration with url', () => {
+    it('is created from configuration with host', () => {
       expect(
-        (new InfluxDBClient({url: 'http://localhost:8086'}) as any)._options
+        (new InfluxDBClient({host: 'http://localhost:8086'}) as any)._options
       ).to.deep.equal({
-        url: 'http://localhost:8086',
+        host: 'http://localhost:8086',
       })
     })
-    it('is created from configuration with url and token', () => {
+    it('is created from configuration with host and token', () => {
       expect(
         (
           new InfluxDBClient({
-            url: 'https://localhost:8086?token=a',
+            host: 'https://localhost:8086?token=a',
             token: 'b',
           }) as any
         )._options
       ).to.deep.equal({
-        url: 'https://localhost:8086?token=a',
+        host: 'https://localhost:8086?token=a',
         token: 'b',
       })
     })
-    it('is created from configuration with url with trailing slash', () => {
+    it('is created from configuration with host with trailing slash', () => {
       expect(
-        (new InfluxDBClient({url: 'http://localhost:8086/'}) as any)._options
+        (new InfluxDBClient({host: 'http://localhost:8086/'}) as any)._options
       ).to.deep.equal({
-        url: 'http://localhost:8086',
+        host: 'http://localhost:8086',
       })
     })
     it('fails on null arg', () => {
@@ -40,34 +40,34 @@ describe('InfluxDB', () => {
         () => new InfluxDBClient(undefined as unknown as ClientOptions)
       ).to.throw('No configuration specified!')
     })
-    it('fails on missing url', () => {
+    it('fails on missing host', () => {
       expect(
         () => new InfluxDBClient({} as ClientOptions as ClientOptions)
-      ).to.throw('No url specified!')
+      ).to.throw('No host specified!')
     })
     it('fails on unsupported protocol', () => {
       expect(
         () =>
           new InfluxDBClient({
-            url: 'ws://localhost:8086?token=b',
+            host: 'ws://localhost:8086?token=b',
           })
       ).to.throw('Unsupported')
     })
     it('creates instance with transport initialized', () => {
       expect(
         new InfluxDBClient({
-          url: 'http://localhost:8086',
+          host: 'http://localhost:8086',
         })
       ).has.property('transport')
       expect(
         new InfluxDBClient({
-          url: 'http://localhost:8086',
+          host: 'http://localhost:8086',
           transport: null,
         } as any as ClientOptions)
       ).has.property('transport')
       expect(
         new InfluxDBClient({
-          url: 'http://localhost:8086',
+          host: 'http://localhost:8086',
           transport: {} as Transport,
         } as any as ClientOptions)
       ).has.property('transport')
@@ -79,7 +79,7 @@ describe('InfluxDB', () => {
       }
       expect(
         new InfluxDBClient({
-          url: 'https://localhost:8086',
+          host: 'https://localhost:8086',
           transportOptions: {
             'follow-redirects': followRedirects,
           },
