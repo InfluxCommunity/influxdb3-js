@@ -148,7 +148,9 @@ New features and bugs can be reported on GitHub: <https://github.com/bonitoo-io/
 If you would like to contribute code you can do through GitHub by forking the repository and sending a pull request into
 the `main` branch.
 
-## Update the Flight Client
+## Development
+
+### Update the Flight Client
 
 As of now, we're responsible for generating the Flight Client by ourself. However, its Protobuf interfaces may undergo changes over time. To re-generate the Flight Client, we have provided a script that can be executed using `yarn flight`. This script will clone the Flight Protobuf repository and generate new TypeScript files into the client.
 
