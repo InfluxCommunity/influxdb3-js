@@ -1,3 +1,8 @@
+## Examples
+
+### Basic
+
+- [IOxExample](examples/src/main.ts) - How to use write and query data from InfluxDB IOx
 
 ## Usage
 
