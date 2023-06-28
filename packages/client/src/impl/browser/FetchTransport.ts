@@ -40,8 +40,9 @@ export default class FetchTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (this.connectionOptions.token) {
-      this.defaultHeaders['Authorization'] =
-        'Token ' + this.connectionOptions.token
+      this.defaultHeaders[
+        'Authorization'
+      ] = `Token ${this.connectionOptions.token}`
     }
     this.url = String(this.connectionOptions.url)
     if (this.url.endsWith('/')) {

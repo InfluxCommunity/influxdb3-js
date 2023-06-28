@@ -28,7 +28,7 @@ function createQuotedEscaper(
   replacements: string[]
 ): (value: string) => string {
   const escaper = createEscaper(characters, replacements)
-  return (value: string): string => '"' + escaper(value) + '"'
+  return (value: string): string => `"${escaper(value)}"`
 }
 
 /**

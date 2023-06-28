@@ -186,7 +186,7 @@ describe('NodeHttpTransport', () => {
             )
             let responseRead = false
             const context = nock(transportOptions.url)
-              .post((extras.contextPath ?? '') + '/test')
+              .post(`${extras.contextPath ?? ''}/test`)
               .reply((_uri, _requestBody) => [
                 200,
                 new Readable({
@@ -213,7 +213,7 @@ describe('NodeHttpTransport', () => {
               ])
               .persist()
             if (extras.token) {
-              context.matchHeader('authorization', 'Token ' + extras.token)
+              context.matchHeader('authorization', `Token ${extras.token}`)
             }
             context.matchHeader(
               'User-Agent',
@@ -233,7 +233,7 @@ describe('NodeHttpTransport', () => {
                 next: nextFn,
                 error(error: any) {
                   clearTimeout(timeout)
-                  reject(new Error('No error expected!, but: ' + error))
+                  reject(new Error(`No error expected!, but: ${error}`))
                 },
                 complete(): void {
                   clearTimeout(timeout)
@@ -723,7 +723,7 @@ describe('NodeHttpTransport', () => {
         it(`works with options ${JSON.stringify(extras)}`, async () => {
           let responseRead = false
           const context = nock(transportOptions.url)
-            .post((extras.contextPath ?? '') + '/test')
+            .post(`${extras.contextPath ?? ''}/test`)
             .reply((_uri, _requestBody) => [
               200,
               new Readable({
@@ -748,7 +748,7 @@ describe('NodeHttpTransport', () => {
             ])
             .persist()
           if (extras.token) {
-            context.matchHeader('authorization', 'Token ' + extras.token)
+            context.matchHeader('authorization', `Token ${extras.token}`)
           }
           context.matchHeader(
             'User-Agent',
@@ -1284,7 +1284,7 @@ describe('NodeHttpTransport', () => {
         method: 'GET',
       })
       expect(data).equals('..')
-      expect(requestPath).equals(targetUrl + '/test')
+      expect(requestPath).equals(`${targetUrl}/test`)
       expect(headers?.host).equals('behind.proxy.localhost:8080')
     })
   })

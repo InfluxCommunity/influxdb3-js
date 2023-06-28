@@ -39,7 +39,7 @@ export default class QueryApiImpl implements QueryApi {
 
     const metadata = new grpc.Metadata()
     const token = this._options.token
-    if (token) metadata.set('authorization', 'Bearer ' + token)
+    if (token) metadata.set('authorization', `Bearer ${token}`)
 
     const flightDataStream = client.doGet(ticket, metadata)
 

@@ -279,7 +279,7 @@ export class NodeHttpTransport implements Transport {
       ...this.headers,
     }
     if (this.token) {
-      headers.authorization = 'Token ' + this.token
+      headers.authorization = `Token ${this.token}`
     }
     const options: {[key: string]: any} = {
       ...this.defaultOptions,

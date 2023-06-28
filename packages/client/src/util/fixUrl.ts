@@ -25,14 +25,14 @@ export const replaceURLProtocolWithPort = (
     safe = false
 
     if (!url.includes(':')) {
-      url = url + ':80'
+      url = `${url}:80`
     }
   } else if (url.startsWith(HTTPS_PREFIX)) {
     url = url.slice(HTTPS_PREFIX.length)
     safe = true
 
     if (!url.includes(':')) {
-      url = url + ':443'
+      url = `${url}:443`
     }
   }
 

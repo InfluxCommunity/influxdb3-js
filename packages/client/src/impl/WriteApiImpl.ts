@@ -61,7 +61,7 @@ export default class WriteApiImpl implements WriteApi {
           typeof error.json.error === 'string' &&
           error.json.error.includes('hinted handoff queue not empty')
         ) {
-          Log.warn('Write to InfluxDB returns: ' + error.json.error)
+          Log.warn(`Write to InfluxDB returns: ${error.json.error}`)
           responseStatusCode = 204
           callbacks.complete()
           return

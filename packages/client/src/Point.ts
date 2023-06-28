@@ -231,7 +231,7 @@ export class Point {
     }
 
     return `${escape.measurement(this.name)}${tagsLine} ${fieldsLine}${
-      time !== undefined ? ' ' + time : ''
+      time !== undefined ? ` ${time}` : ''
     }`
   }
 
