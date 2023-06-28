@@ -37,7 +37,13 @@ process.stdout.write('Generating flight client...\n')
 const TOTAL_STEPS = 10
 let stepI = 0
 const step = (name) => {
-  drawProgressBar(stepI, TOTAL_STEPS, name)
+  if (process.env.CIRCLECI) {
+    process.stdout.write(
+      `${stepI.toString().padStart(2)}/${TOTAL_STEPS}: ${name}\n`
+    )
+  } else {
+    drawProgressBar(stepI, TOTAL_STEPS, name)
+  }
   stepI++
 }
 
