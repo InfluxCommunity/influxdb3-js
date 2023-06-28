@@ -15,6 +15,9 @@ Please specify the 'database' as a method parameter or use default configuration
 at 'ClientOptions.database'
 `
 
+/**
+ * `InfluxDBClient` for interacting with an InfluxDB server, simplifying common operations such as writing, querying.
+ */
 export default class InfluxDBClient {
   private readonly _options: ClientOptions
   private readonly _writeApi: WriteApi
