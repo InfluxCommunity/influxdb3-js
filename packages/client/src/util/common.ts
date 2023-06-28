@@ -10,7 +10,7 @@ export const throwReturn = <T>(err: Error): Defined<T> => {
 export const isDefined = <T>(value: T): value is Defined<T> =>
   value !== undefined
 
-export const isArrayLike = <T>(value: any): value is ArrayLike<T> => /* eslint-disable explicit-module-boundary-types */
+export const isArrayLike = <T>(value: any): value is ArrayLike<T> =>
   value instanceof Array ||
   (value instanceof Object &&
     typeof value.length === 'number' &&
