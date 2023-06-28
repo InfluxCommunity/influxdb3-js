@@ -136,7 +136,7 @@ for await (const row of queryResult) {
 
 ## Example
 
-For more complex exmamples see [examples folder](./examples/README.md)
+For more complex examples see [examples folder](./examples/README.md)
 
 ## Feedback
 
