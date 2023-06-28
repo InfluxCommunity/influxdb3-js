@@ -66,13 +66,15 @@ export INFLUXDB_TOKEN="<token>"
   <summary>windows</summary>
 
 # powershell
-```
+
+```console
 set INFLUXDB_URL=<url>
 set INFLUXDB_DATABASE=<database>
 set INFLUXDB_TOKEN=<token>
 ```
 
 # cmd
+
 ```powershell
 $env:INFLUXDB_URL "<url>"
 $env:INFLUXDB_DATABASE "<database>"
