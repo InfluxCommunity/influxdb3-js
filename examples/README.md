@@ -26,7 +26,7 @@ export INFLUXDB_TOKEN="<token>"
 <details>
   <summary>windows</summary>
 
-##### powershell
+### powershell
 
 ```powershell
 $env:INFLUXDB_URL="<url>"
@@ -34,7 +34,7 @@ $env:INFLUXDB_DATABASE="<database>"
 $env:INFLUXDB_TOKEN="<token>"
 ```
 
-##### cmd
+### cmd
 
 ```console
 set INFLUXDB_URL=<url>
