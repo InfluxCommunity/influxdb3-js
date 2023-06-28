@@ -1,6 +1,6 @@
 ## Examples
 
-### Basic
+## Basic
 
 - [IOxExample](examples/src/main.ts) - How to use write and query data from InfluxDB IOx
 
@@ -26,14 +26,14 @@ export INFLUXDB_TOKEN="<token>"
 <details>
   <summary>windows</summary>
 
-# powershell
+**powershell**
 ```powershell
 $env:INFLUXDB_URL="<url>"
 $env:INFLUXDB_DATABASE="<database>"
 $env:INFLUXDB_TOKEN="<token>"
 ```
 
-# cmd
+**cmd**
 ```
 set INFLUXDB_URL=<url>
 set INFLUXDB_DATABASE=<database>
@@ -44,4 +44,3 @@ set INFLUXDB_TOKEN=<token>
 
 - run `yarn install`
 - run `yarn dev`
-
