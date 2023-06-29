@@ -95,6 +95,7 @@ Prepare environmnet variables and instanciate `InfluxDBClient` in asynchronous f
 const url = process.env.INFLUXDB_URL
 const token = process.env.INFLUXDB_TOKEN
 const database = process.env.INFLUXDB_DATABASE
+const [org, bucket] = database.split('_');
 
 async function main() {
     const client = new InfluxDBClient({url, token})
@@ -111,7 +112,7 @@ The `client` can be now used to insert data using [line-protocol](https://docs.i
 
 ```ts
 const line = `stat,unit=temperature avg=20.5,max=45.0`
-await client.write(line, database)
+await client.write(line, bucket, org)
 ```
 
 Fetch data using `SQL` query and print result.
@@ -126,7 +127,8 @@ const query = `
     AND
     "unit" IN ('temperature')
 `
-const queryResult = await client.query(query, database)
+const queryType = 'sql'
+const queryResult = await client.query(query, database, queryType)
 
 for await (const row of queryResult) {
     console.log(`avg is ${row.avg}`)
