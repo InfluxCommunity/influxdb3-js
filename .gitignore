@@ -13,3 +13,4 @@ yarn-error.log
 /temp
 /docs
 flightgen
+packages/client/README.md
