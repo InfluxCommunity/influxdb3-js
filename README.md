@@ -5,17 +5,17 @@
     <a href="https://www.npmjs.com/package/@influxdata/influxdb3-client">
         <img src="https://img.shields.io/npm/v/@influxdata/influxdb3-client" alt="NuGet Badge">
     </a>
-    <a href="https://github.com/bonitoo-io/influxdb3-js/actions/workflows/codeql-analysis.yml">
-        <img src="https://github.com/bonitoo-io/influxdb3-js/actions/workflows/codeql-analysis.yml/badge.svg?branch=main" alt="CodeQL analysis">
+    <a href="https://github.com/InfluxCommunity/influxdb3-js/actions/workflows/codeql-analysis.yml">
+        <img src="https://github.com/InfluxCommunity/influxdb3-js/actions/workflows/codeql-analysis.yml/badge.svg?branch=main" alt="CodeQL analysis">
     </a>
-    <a href="https://github.com/bonitoo-io/influxdb3-js/actions/workflows/linter.yml">
-        <img src="https://github.com/bonitoo-io/influxdb3-js/actions/workflows/linter.yml/badge.svg" alt="Lint Code Base">
+    <a href="https://github.com/InfluxCommunity/influxdb3-js/actions/workflows/linter.yml">
+        <img src="https://github.com/InfluxCommunity/influxdb3-js/actions/workflows/linter.yml/badge.svg" alt="Lint Code Base">
     </a>
-    <a href="https://dl.circleci.com/status-badge/redirect/gh/bonitoo-io/influxdb3-js/tree/main">
-        <img src="https://dl.circleci.com/status-badge/img/gh/bonitoo-io/influxdb3-js/tree/main.svg?style=svg" alt="CircleCI">
+    <a href="https://dl.circleci.com/status-badge/redirect/gh/InfluxCommunity/influxdb3-js/tree/main">
+        <img src="https://dl.circleci.com/status-badge/img/gh/InfluxCommunity/influxdb3-js/tree/main.svg?style=svg" alt="CircleCI">
     </a>
-    <a href="https://codecov.io/gh/bonitoo-io/influxdb3-js">
-        <img src="https://codecov.io/gh/bonitoo-io/influxdb3-js/branch/main/graph/badge.svg" alt="Code Cov"/>
+    <a href="https://codecov.io/gh/InfluxCommunity/influxdb3-js">
+        <img src="https://codecov.io/gh/InfluxCommunity/influxdb3-js/branch/main/graph/badge.svg" alt="Code Cov"/>
     </a>
     <a href="https://app.slack.com/huddle/TH8RGQX5Z/C02UDUPLQKA">
         <img src="https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social" alt="Community Slack">
@@ -143,7 +143,7 @@ For more complex examples see [examples folder](./examples/README.md).
 If you need help, please use our [Community Slack](https://app.slack.com/huddle/TH8RGQX5Z/C02UDUPLQKA)
 or [Community Page](https://community.influxdata.com/).
 
-New features and bugs can be reported on GitHub: <https://github.com/bonitoo-io/influxdb3-js>
+New features and bugs can be reported on GitHub: <https://github.com/InfluxCommunity/influxdb3-js>
 
 ## Contribution
 
