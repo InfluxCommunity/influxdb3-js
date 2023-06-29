@@ -55,6 +55,9 @@
     "name": "InfluxData"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@microsoft/api-extractor": "^7.36.0",
     "@types/chai": "^4.2.5",
