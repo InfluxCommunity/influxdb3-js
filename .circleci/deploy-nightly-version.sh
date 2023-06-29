@@ -17,4 +17,4 @@ cd "${SCRIPT_PATH}"/..
 yarn build
 
 # Publish
-# yarn lerna publish --canary from-package --no-git-tag-version --force-publish --preid nightly --yes
+yarn lerna publish --canary from-package --no-git-tag-version --force-publish --preid nightly --yes
