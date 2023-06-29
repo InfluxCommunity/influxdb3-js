@@ -5,6 +5,7 @@
   "scripts": {
     "apidoc:extract": "echo \"Nothing to do\"",
     "test": "echo \"Nothing to do\"",
+    "test:unit": "echo \"Nothing to do\"",
     "test:ci": "echo \"Nothing to do\"",
     "build": "yarn run clean && cpr ../client/dist ./dist",
     "clean": "rimraf dist"
