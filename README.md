@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="js_logo.png" alt="JavaScript Logo" width="150px">
+    <img src="https://raw.githubusercontent.com/InfluxCommunity/influxdb3-js/HEAD/js_logo.png" alt="JavaScript Logo" width="150px">
 </p>
 <p align="center">
     <a href="https://www.npmjs.com/package/@influxdata/influxdb3-client">
@@ -136,7 +136,7 @@ for await (const row of queryResult) {
 
 ## Example
 
-For more complex examples see [examples folder](/examples/README.md).
+For more complex examples see [examples folder](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/README.md).
 
 ## Feedback
 
