@@ -78,12 +78,6 @@ execSync('yarn install', {stdio: []})
 step('Generating TypeScript files from proto files')
 execSync('yarn generate-protoc', {stdio: []})
 
-step('Correcting BigInt initialization syntax')
-const flitghtTsFullPath = `./${OUTPUT_DIR}/${FLIGHT_TS_FILE}`
-const flightTsData = fs.readFileSync(flitghtTsFullPath, 'utf8')
-const flightTsDataBigInt = flightTsData.replace(/ 0n/g, ' BigInt(0)')
-fs.writeFileSync(flitghtTsFullPath, flightTsDataBigInt, 'utf8')
-
 process.chdir('..')
 // ./
 
@@ -91,12 +85,28 @@ step('Copying generated files to client implementation')
 fs.rmSync(CLIENT_GENERATED_FLIGHT_DIR, {recursive: true, force: true})
 
 fs.mkdirSync(CLIENT_GENERATED_FLIGHT_DIR, {recursive: true})
-fs.readdirSync(`${FLIGHTGEN_DIR}/${OUTPUT_DIR}`).forEach((file) => {
-  fs.copyFileSync(
-    `${FLIGHTGEN_DIR}/${OUTPUT_DIR}/${file}`,
-    `${CLIENT_GENERATED_FLIGHT_DIR}${file}`
-  )
-})
+
+function copyDirRecursively(srcDir, destDir) {
+  fs.readdirSync(`${srcDir}`).forEach((file) => {
+    if (fs.statSync(`${srcDir}/${file}`).isDirectory()) {
+      if (!fs.existsSync(`${destDir}/${file}`)) {
+        fs.mkdirSync(`${destDir}/${file}`, {recursive: true});
+        copyDirRecursively(`${srcDir}/${file}`, `${destDir}/${file}`)
+      }
+    } else {
+      const destinationFile = `${destDir}/${file}`;
+      fs.copyFileSync(
+          `${srcDir}/${file}`,
+          destinationFile
+      )
+      step(`Correcting BigInt initialization syntax: ${destinationFile}`)
+      const fixed = fs.readFileSync(destinationFile, 'utf8').replace(/ 0n/g, ' BigInt(0)')
+      fs.writeFileSync(destinationFile, fixed, 'utf8')
+    }
+  })
+}
+
+copyDirRecursively(`${FLIGHTGEN_DIR}/${OUTPUT_DIR}`, `${CLIENT_GENERATED_FLIGHT_DIR}`)
 
 step('Final cleanup of temporary working directory')
 fs.rmSync(FLIGHTGEN_DIR, {recursive: true, force: true})

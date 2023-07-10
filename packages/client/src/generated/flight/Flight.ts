@@ -30,6 +30,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { reflectionMergePartial } from "@protobuf-ts/runtime";
 import { MESSAGE_TYPE } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Timestamp } from "./google/protobuf/timestamp";
 /**
  *
  * The request that a client provides to a server on handshake.
@@ -140,6 +141,34 @@ export interface Action {
 }
 /**
  *
+ * The request of the CancelFlightInfo action.
+ *
+ * The request should be stored in Action.body.
+ *
+ * @generated from protobuf message arrow.flight.protocol.CancelFlightInfoRequest
+ */
+export interface CancelFlightInfoRequest {
+    /**
+     * @generated from protobuf field: arrow.flight.protocol.FlightInfo info = 1;
+     */
+    info?: FlightInfo;
+}
+/**
+ *
+ * The request of the RenewFlightEndpoint action.
+ *
+ * The request should be stored in Action.body.
+ *
+ * @generated from protobuf message arrow.flight.protocol.RenewFlightEndpointRequest
+ */
+export interface RenewFlightEndpointRequest {
+    /**
+     * @generated from protobuf field: arrow.flight.protocol.FlightEndpoint endpoint = 1;
+     */
+    endpoint?: FlightEndpoint;
+}
+/**
+ *
  * An opaque result returned after executing an action.
  *
  * @generated from protobuf message arrow.flight.protocol.Result
@@ -149,6 +178,20 @@ export interface Result {
      * @generated from protobuf field: bytes body = 1;
      */
     body: Uint8Array;
+}
+/**
+ *
+ * The result of the CancelFlightInfo action.
+ *
+ * The result should be stored in Result.body.
+ *
+ * @generated from protobuf message arrow.flight.protocol.CancelFlightInfoResult
+ */
+export interface CancelFlightInfoResult {
+    /**
+     * @generated from protobuf field: arrow.flight.protocol.CancelStatus status = 1;
+     */
+    status: CancelStatus;
 }
 /**
  *
@@ -330,6 +373,15 @@ export interface FlightEndpoint {
      * @generated from protobuf field: repeated arrow.flight.protocol.Location location = 2;
      */
     location: Location[];
+    /**
+     *
+     * Expiration time of this stream. If present, clients may assume
+     * they can retry DoGet requests. Otherwise, it is
+     * application-defined whether DoGet requests may be retried.
+     *
+     * @generated from protobuf field: google.protobuf.Timestamp expiration_time = 3;
+     */
+    expirationTime?: Timestamp;
 }
 /**
  *
@@ -411,6 +463,45 @@ export interface PutResult {
      * @generated from protobuf field: bytes app_metadata = 1;
      */
     appMetadata: Uint8Array;
+}
+/**
+ *
+ * The result of a cancel operation.
+ *
+ * This is used by CancelFlightInfoResult.status.
+ *
+ * @generated from protobuf enum arrow.flight.protocol.CancelStatus
+ */
+export enum CancelStatus {
+    /**
+     * The cancellation status is unknown. Servers should avoid using
+     * this value (send a NOT_FOUND error if the requested query is
+     * not known). Clients can retry the request.
+     *
+     * @generated from protobuf enum value: CANCEL_STATUS_UNSPECIFIED = 0;
+     */
+    UNSPECIFIED = 0,
+    /**
+     * The cancellation request is complete. Subsequent requests with
+     * the same payload may return CANCELLED or a NOT_FOUND error.
+     *
+     * @generated from protobuf enum value: CANCEL_STATUS_CANCELLED = 1;
+     */
+    CANCELLED = 1,
+    /**
+     * The cancellation request is in progress. The client may retry
+     * the cancellation request.
+     *
+     * @generated from protobuf enum value: CANCEL_STATUS_CANCELLING = 2;
+     */
+    CANCELLING = 2,
+    /**
+     * The query is not cancellable. The client should not retry the
+     * cancellation request.
+     *
+     * @generated from protobuf enum value: CANCEL_STATUS_NOT_CANCELLABLE = 3;
+     */
+    NOT_CANCELLABLE = 3
 }
 // @generated message type with reflection information, may provide speed optimized methods
 class HandshakeRequest$Type extends MessageType<HandshakeRequest> {
@@ -756,6 +847,100 @@ class Action$Type extends MessageType<Action> {
  */
 export const Action = new Action$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class CancelFlightInfoRequest$Type extends MessageType<CancelFlightInfoRequest> {
+    constructor() {
+        super("arrow.flight.protocol.CancelFlightInfoRequest", [
+            { no: 1, name: "info", kind: "message", T: () => FlightInfo }
+        ]);
+    }
+    create(value?: PartialMessage<CancelFlightInfoRequest>): CancelFlightInfoRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CancelFlightInfoRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CancelFlightInfoRequest): CancelFlightInfoRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* arrow.flight.protocol.FlightInfo info */ 1:
+                    message.info = FlightInfo.internalBinaryRead(reader, reader.uint32(), options, message.info);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CancelFlightInfoRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* arrow.flight.protocol.FlightInfo info = 1; */
+        if (message.info)
+            FlightInfo.internalBinaryWrite(message.info, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message arrow.flight.protocol.CancelFlightInfoRequest
+ */
+export const CancelFlightInfoRequest = new CancelFlightInfoRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RenewFlightEndpointRequest$Type extends MessageType<RenewFlightEndpointRequest> {
+    constructor() {
+        super("arrow.flight.protocol.RenewFlightEndpointRequest", [
+            { no: 1, name: "endpoint", kind: "message", T: () => FlightEndpoint }
+        ]);
+    }
+    create(value?: PartialMessage<RenewFlightEndpointRequest>): RenewFlightEndpointRequest {
+        const message = {};
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<RenewFlightEndpointRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RenewFlightEndpointRequest): RenewFlightEndpointRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* arrow.flight.protocol.FlightEndpoint endpoint */ 1:
+                    message.endpoint = FlightEndpoint.internalBinaryRead(reader, reader.uint32(), options, message.endpoint);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: RenewFlightEndpointRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* arrow.flight.protocol.FlightEndpoint endpoint = 1; */
+        if (message.endpoint)
+            FlightEndpoint.internalBinaryWrite(message.endpoint, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message arrow.flight.protocol.RenewFlightEndpointRequest
+ */
+export const RenewFlightEndpointRequest = new RenewFlightEndpointRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class Result$Type extends MessageType<Result> {
     constructor() {
         super("arrow.flight.protocol.Result", [
@@ -802,6 +987,53 @@ class Result$Type extends MessageType<Result> {
  * @generated MessageType for protobuf message arrow.flight.protocol.Result
  */
 export const Result = new Result$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class CancelFlightInfoResult$Type extends MessageType<CancelFlightInfoResult> {
+    constructor() {
+        super("arrow.flight.protocol.CancelFlightInfoResult", [
+            { no: 1, name: "status", kind: "enum", T: () => ["arrow.flight.protocol.CancelStatus", CancelStatus, "CANCEL_STATUS_"] }
+        ]);
+    }
+    create(value?: PartialMessage<CancelFlightInfoResult>): CancelFlightInfoResult {
+        const message = { status: 0 };
+        globalThis.Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial<CancelFlightInfoResult>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CancelFlightInfoResult): CancelFlightInfoResult {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* arrow.flight.protocol.CancelStatus status */ 1:
+                    message.status = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: CancelFlightInfoResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* arrow.flight.protocol.CancelStatus status = 1; */
+        if (message.status !== 0)
+            writer.tag(1, WireType.Varint).int32(message.status);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message arrow.flight.protocol.CancelFlightInfoResult
+ */
+export const CancelFlightInfoResult = new CancelFlightInfoResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class SchemaResult$Type extends MessageType<SchemaResult> {
     constructor() {
@@ -997,7 +1229,8 @@ class FlightEndpoint$Type extends MessageType<FlightEndpoint> {
     constructor() {
         super("arrow.flight.protocol.FlightEndpoint", [
             { no: 1, name: "ticket", kind: "message", T: () => Ticket },
-            { no: 2, name: "location", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Location }
+            { no: 2, name: "location", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Location },
+            { no: 3, name: "expiration_time", kind: "message", T: () => Timestamp }
         ]);
     }
     create(value?: PartialMessage<FlightEndpoint>): FlightEndpoint {
@@ -1018,6 +1251,9 @@ class FlightEndpoint$Type extends MessageType<FlightEndpoint> {
                 case /* repeated arrow.flight.protocol.Location location */ 2:
                     message.location.push(Location.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* google.protobuf.Timestamp expiration_time */ 3:
+                    message.expirationTime = Timestamp.internalBinaryRead(reader, reader.uint32(), options, message.expirationTime);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1036,6 +1272,9 @@ class FlightEndpoint$Type extends MessageType<FlightEndpoint> {
         /* repeated arrow.flight.protocol.Location location = 2; */
         for (let i = 0; i < message.location.length; i++)
             Location.internalBinaryWrite(message.location[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* google.protobuf.Timestamp expiration_time = 3; */
+        if (message.expirationTime)
+            Timestamp.internalBinaryWrite(message.expirationTime, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
