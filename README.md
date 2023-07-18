@@ -65,7 +65,7 @@ export INFLUXDB_TOKEN="<token>"
 <details>
   <summary>windows</summary>
 
-# powershell
+### powershell
 
 ```console
 set INFLUXDB_URL=<url>
@@ -73,7 +73,7 @@ set INFLUXDB_DATABASE=<database>
 set INFLUXDB_TOKEN=<token>
 ```
 
-# cmd
+### cmd
 
 ```powershell
 $env:INFLUXDB_URL "<url>"
@@ -83,21 +83,23 @@ $env:INFLUXDB_TOKEN "<token>"
 
 </details>
 
+### Create a client
+
 To get started with influxdb client import `@influxdata/influxdb3-client` package.
 
 ```ts
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 ```
 
-Prepare environmnet variables and instanciate `InfluxDBClient` in asynchronous function. Make sure to `close` client after.
+Assign constants for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function. Make sure to `close` the client when it's no longer needed for writing or querying.
 
 ```ts
-const url = process.env.INFLUXDB_URL
+const host = process.env.INFLUXDB_URL
 const token = process.env.INFLUXDB_TOKEN
 const database = process.env.INFLUXDB_DATABASE
 
 async function main() {
-    const client = new InfluxDBClient({url, token})
+    const client = new InfluxDBClient({host, token})
 
     // following code goes here
 
@@ -107,14 +109,18 @@ async function main() {
 main()
 ```
 
-The `client` can be now used to insert data using [line-protocol](https://docs.influxdata.com/influxdb/cloud-serverless/reference/syntax/line-protocol/):
+### Write data
+
+To write data to InfluxDB, call `client.write` with data in [line-protocol](https://docs.influxdata.com/influxdb/cloud-serverless/reference/syntax/line-protocol/) format and the database (or bucket) name.
 
 ```ts
 const line = `stat,unit=temperature avg=20.5,max=45.0`
 await client.write(line, database)
 ```
 
-Fetch data using `SQL` query and print result.
+### Query data
+
+To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name.
 
 ```ts
 // Execute query
@@ -134,9 +140,9 @@ for await (const row of queryResult) {
 }
 ```
 
-## Example
+## Examples
 
-For more complex examples see [examples folder](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/README.md).
+For more advanced usage, see [examples](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/README.md).
 
 ## Feedback
 
@@ -147,14 +153,15 @@ New features and bugs can be reported on GitHub: <https://github.com/InfluxCommu
 
 ## Contribution
 
-If you would like to contribute code you can do through GitHub by forking the repository and sending a pull request into
-the `main` branch.
+To contribute to this project, fork the GitHub repository and send a pull request based on the `main` branch.
 
 ## Development
 
 ### Update the Flight Client
 
-As of now, we're responsible for generating the Flight Client by ourself. However, its Protobuf interfaces may undergo changes over time. To re-generate the Flight Client, we have provided a script that can be executed using `yarn flight`. This script will clone the Flight Protobuf repository and generate new TypeScript files into the client.
+For now, we're responsible for generating the Flight client. However, its Protobuf interfaces may undergo changes over time.
+
+To regenerate the Flight client, use the `yarn flight` command to execute the provided script. The script will clone the Flight Protobuf repository and generate new TypeScript files in `./src/generated/flight`.
 
 ## License
 
