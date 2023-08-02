@@ -6,7 +6,7 @@
     "apidoc:extract": "api-extractor run",
     "build": "yarn cp ../../README.md ./README.md && yarn run clean && yarn run build:browser && yarn run build:node",
     "build:node": "yarn tsup",
-    "build:browser": "node ../../scripts/browser-not-supported.js",
+    "build:browser": "yarn tsup --config ./tsup.config.browser.ts",
     "clean": "rimraf --glob dist build coverage .nyc_output doc *.lcov reports",
     "coverage": "nyc mocha --require ts-node/register 'test/**/*.test.ts' --exit",
     "coverage:ci": "yarn run coverage && yarn run coverage:lcov",
@@ -87,7 +87,10 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.8.16",
+    "@protobuf-ts/grpc-transport": "^2.9.0",
+    "@protobuf-ts/grpcweb-transport": "^2.9.0",
     "@protobuf-ts/runtime-rpc": "^2.9.0",
-    "apache-arrow": "^12.0.1"
+    "apache-arrow": "^12.0.1",
+    "grpc-web": "^1.4.2"
   }
 }

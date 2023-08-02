@@ -58,19 +58,25 @@ describe('InfluxDB', () => {
         new InfluxDBClient({
           host: 'http://localhost:8086',
         })
-      ).has.property('transport')
+      )
+        .property('_writeApi')
+        .has.property('_transport')
       expect(
         new InfluxDBClient({
           host: 'http://localhost:8086',
           transport: null,
         } as any as ClientOptions)
-      ).has.property('transport')
+      )
+        .property('_writeApi')
+        .has.property('_transport')
       expect(
         new InfluxDBClient({
           host: 'http://localhost:8086',
           transport: {} as Transport,
         } as any as ClientOptions)
-      ).has.property('transport')
+      )
+        .property('_writeApi')
+        .has.property('_transport')
     })
     it('creates instance with follow-redirects', () => {
       const request = (): void => {}
@@ -85,7 +91,8 @@ describe('InfluxDB', () => {
           },
         })
       )
-        .has.property('transport')
+        .property('_writeApi')
+        .has.property('_transport')
         .has.property('requestApi')
         .is.equal(request)
     })

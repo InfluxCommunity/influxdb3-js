@@ -1,12 +1,9 @@
 import WriteApi from './WriteApi'
-import {Transport} from './transport'
 import WriteApiImpl from './impl/WriteApiImpl'
-// replaced by ./impl/browser/FetchTransport in browser builds
-import TransportImpl from './impl/node/NodeHttpTransport'
-import {ClientOptions, QueryType, WriteOptions} from './options'
-import {IllegalArgumentError} from './errors'
 import QueryApi from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
+import {ClientOptions, QueryType, WriteOptions} from './options'
+import {IllegalArgumentError} from './errors'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
 import {throwReturn} from './util/common'
 
@@ -22,7 +19,6 @@ export default class InfluxDBClient {
   private readonly _options: ClientOptions
   private readonly _writeApi: WriteApi
   private readonly _queryApi: QueryApi
-  readonly transport: Transport
 
   /**
    * Creates a new instance of the `InfluxDBClient` for interacting with an InfluxDB server, simplifying common operations such as writing, querying.
@@ -38,8 +34,7 @@ export default class InfluxDBClient {
     if (host.endsWith('/'))
       this._options.host = host.substring(0, host.length - 1)
     this._queryApi = new QueryApiImpl(this._options)
-    this.transport = this._options.transport ?? new TransportImpl(this._options)
-    this._writeApi = new WriteApiImpl(this.transport)
+    this._writeApi = new WriteApiImpl(this._options)
   }
 
   private _mergeWriteOptions = (writeOptions?: Partial<WriteOptions>) => {
