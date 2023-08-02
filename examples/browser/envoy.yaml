@@ -54,8 +54,12 @@ static_resources:
         cluster_name: influxdb_grpc
         endpoints:
           - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: https://us-east-1-1.aws.cloud2.influxdata.com
-                      port_value: 443
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 54.174.236.48
+                    port_value: 443
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
