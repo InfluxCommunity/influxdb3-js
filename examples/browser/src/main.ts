@@ -1,13 +1,11 @@
 import './style.css'
 
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client-browser'
+
 ;(async () => {
-  // Paste your database
-  const database = ''
-  // Paste your token
-  const token = ''
-  // Keep, will be proxied to influx cloud based on your INFLUXDB_URL environment variable
-  const host = '/influx'
+  const database = import.meta.env.VITE_INFLUXDB_DATABASE
+  const token = import.meta.env.VITE_INFLUXDB_TOKEN
+  const host = '/influx' // vite proxy
 
   const client = new InfluxDBClient({host, token})
 
