@@ -58,7 +58,7 @@ export default class QueryApiImpl implements QueryApi {
 
     for await (const batch of reader) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
-        const row: Record<string, any> = Object.create(null)
+        const row: Record<string, any> = {}
         for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
           const name = batch.schema.fields[columnIndex].name
           const value = batch.getChildAt(columnIndex)?.get(rowIndex)

@@ -46,3 +46,7 @@ set INFLUXDB_TOKEN=<token>
 
 - run `yarn install`
 - run `yarn dev`
+
+### Using with third party libraries
+
+Prepare same way as normal example, instead of last command run `yarn danfo`. Example is in **src/danfo.ts** file
