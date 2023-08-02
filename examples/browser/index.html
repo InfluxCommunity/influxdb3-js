@@ -3,10 +3,32 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
+    <title>InfluxDB3 Browser example</title>
   </head>
   <body>
-    <div id="app"></div>
+    <h1>InfluxDB3 Browser Example</h1>
+    <fieldset>
+      <legend>Write</legend>
+      <span>unit=</span>
+      <input type="text" id="unit" />
+      <span>avg: </span>
+      <input type="number" id="avg" />
+      <span>max: </span>
+      <input type="number" id="max" />
+      <div style="float: right;">
+        <span id="writeInfo"></span>
+        <button id="writeButton">Write to InfluxDB</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Query</legend>
+      <textarea id="query" style="width:100%;resize: vertical;" rows="12"></textarea>
+      <button style="float: right;" id="queryButton">Execute FlightSQL Query</button>
+      <div style="clear: both;"></div>
+      <div id="queryResult">
+      </div>
+    </fieldset>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
