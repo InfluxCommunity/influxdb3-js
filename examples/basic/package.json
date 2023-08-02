@@ -1,0 +1,16 @@
+{
+  "name": "influxdb3-client-example-basic",
+  "main": "index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "ts-node ./src/index.ts"
+  },
+  "dependencies": {
+    "@influxdata/influxdb3-client": "link:../../packages/client"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.3"
+  }
+}

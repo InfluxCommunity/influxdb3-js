@@ -1,8 +1,12 @@
-## Examples
+## Example for danfojs
 
-## Basic
+- [IOx with danfojs example](./src/index.ts) - How to use InfluxDB IOx queried data with danfojs
 
-- [IOxExample](examples/src/main.ts) - How to use write and query data from InfluxDB IOx
+## prerequisites
+  - `node` and `yarn` installed
+  - build influxdb-client: *(in project root directory)*
+    - run `yarn install`
+    - run `yarn build`
 
 ## Usage
 
@@ -44,9 +48,8 @@ set INFLUXDB_TOKEN=<token>
 
 </details>
 
+### Run example
 - run `yarn install`
 - run `yarn dev`
 
-### Using with third party libraries
 
-Prepare same way as normal example, instead of last command run `yarn danfo`. Example is in **src/danfo.ts** file

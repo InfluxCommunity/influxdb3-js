@@ -55,7 +55,7 @@ async function main() {
 
     // Execute query
     const queryResult = client.query(query, database, queryType)
-    // create array from data
+    // Create array from data
     const data = await collectAll(queryResult)
 
     const df = new dfd.DataFrame(data)

@@ -1,14 +1,13 @@
 {
-  "name": "influxdb3-client-examples",
+  "name": "influxdb3-client-example-danfo",
   "main": "index.js",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "ts-node ./src/main.ts",
-    "danfo": "ts-node ./src/danfo.ts"
+    "dev": "ts-node ./src/index.ts"
   },
   "dependencies": {
-    "@influxdata/influxdb3-client": "link:../packages/client",
+    "@influxdata/influxdb3-client": "link:../../packages/client",
     "danfojs": "^1.1.2"
   },
   "devDependencies": {

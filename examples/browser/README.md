@@ -1,23 +1,35 @@
+## Example for browser
 
-TODO README:
+- [IOx inside browser example](./src/index.ts) - How to use InfluxDB IOx queries in the browser: The browser is a specific environment that requires an additional proxy component, which transfers our communication into a gRPC-compliant form.
 
-prerequisites
-  node
-  yarn
-  docker
+It's highly recommended to try [basic example](../basic/README.md) first
 
 
-pass your environment variables into browser through vite dotenv.
+## prerequisites
+  - To run this example, you'll need to have `Docker` installed alongside **Node** and **Yarn**. Check your installation with `docker --version` command.
 
-create file named `.env.local`, replace database and token:
+  - build influxdb-client: *(in project root directory)*
+    - run `yarn install`
+    - run `yarn build`
+
+## Usage
+
+To inject connection variables, we will use Vite's dotenv environment variables, which can pass our values into the browser.
+
+To get started, create a `.env.local` file and update the database and token values as follows:
 
 ```conf
 VITE_INFLUXDB_DATABASE=<database>
 VITE_INFLUXDB_TOKEN=<token>
 ```
 
-run `docker compose up`
+Open the `envoy.yaml` file and find the `address: "us-east-1-1.aws.cloud2.influxdata.com"` entry. Make sure to update it with your relevant cloud URL, if it differs.
 
-run `yarn dev`
+### Run example
 
+ - Start docker with envoy proxy
+   - run `docker compose up`
+ - Execute example:
+   - run `yarn dev`
+ - Example is running at `http://localhost:5173/` *(note that port can differes, look into console for exact address)*
 
