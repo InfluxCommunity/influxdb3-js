@@ -4,30 +4,47 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InfluxDB3 Browser example</title>
+    <link type="text/css" rel="stylesheet" href="/style.css">
   </head>
   <body>
-    <h1>InfluxDB3 Browser Example</h1>
-    <fieldset>
-      <legend>Write</legend>
-      <span>unit=</span>
-      <input type="text" id="unit" />
-      <span>avg: </span>
-      <input type="number" id="avg" />
-      <span>max: </span>
-      <input type="number" id="max" />
-      <div style="float: right;">
-        <span id="writeInfo"></span>
-        <button id="writeButton">Write to InfluxDB</button>
+    <div class="content-container">
+      <div>
+        <h1>
+          <img src="/src/influx-logo.png" class="influx-logo"> </img>
+          InfluxDB3 Browser Example</h1>
+        <fieldset class="write-set">
+          <legend>Write</legend>
+
+          <div class="write-inputs">
+            <label>
+              unit=
+              <input type="text" id="unit" />
+            </label>
+            <label>
+              avg: 
+              <input type="number" id="avg" />
+            </label>
+            <label>
+              max: 
+              <input type="number" id="max" />
+            </label>
+            <button id="writeButton">Write to InfluxDB</button>
+          </div>
+          
+          <span id="writeInfo">Press button to write</span>
+          
+        </fieldset>
+        <fieldset>
+          <legend>Query</legend>
+          <textarea id="query" rows="12"></textarea>
+          <div class="query-button-container">
+            <button id="queryButton">Execute FlightSQL Query</button>
+          </div>
+          <div id="queryResult">
+          </div>
+        </fieldset>
       </div>
-    </fieldset>
-    <fieldset>
-      <legend>Query</legend>
-      <textarea id="query" style="width:100%;resize: vertical;" rows="12"></textarea>
-      <button style="float: right;" id="queryButton">Execute FlightSQL Query</button>
-      <div style="clear: both;"></div>
-      <div id="queryResult">
-      </div>
-    </fieldset>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

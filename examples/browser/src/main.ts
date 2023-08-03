@@ -1,6 +1,5 @@
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client-browser'
 
-import './style.css'
 import * as view from './view'
 
 /*********** initial values ***********/

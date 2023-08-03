@@ -1,0 +1,145 @@
+* {
+  box-sizing: border-box;
+  font-family: Proxima Nova,Helvetica,Arial,Tahoma,Verdana,sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+body {
+  margin: 0;
+  background-color: rgb(7, 7, 14);
+  color: rgb(255, 255, 255);
+}
+
+input, textarea {
+  background-color: rgb(26, 26, 42);
+  color: rgb(255, 255, 255);
+}
+
+input:focus, textarea:focus {
+  border-color: rgba(0,163,255,.75);
+  box-shadow: 0 0 4px #00a3ff;
+  outline: none;
+}
+
+.content-container {
+  display: flex; 
+  justify-content: center;
+}
+
+.content-container > * {
+  max-width: 800px; width: 100%;
+}
+
+h1, fieldset, input, textarea {
+  border-color: rgb(26, 26, 42);
+  border-radius: 8px;
+}
+
+fieldset {
+  margin-top: 24px;
+}
+
+fieldset > *:nth-child(n+3) {
+  margin-top: 16px;
+}
+
+textarea {
+  padding: 8px;
+}
+
+button {
+  padding: 8px;
+  background: #333346;
+  color: #fff;
+  border-width: 0;
+  outline: none;
+  white-space: nowrap;
+}
+
+input {
+  width: 100px;
+  background-color: #07070e;
+  border: 2px solid #333346;
+  border-radius: 2px;
+  color: #fff;
+  outline: none;
+  transition: background-color .2s cubic-bezier(.18,.16,.2,1),border-color .2s cubic-bezier(.18,.16,.2,1),color .2s cubic-bezier(.18,.16,.2,1),box-shadow .2s cubic-bezier(.18,.16,.2,1),color .2s cubic-bezier(.18,.16,.2,1);
+}
+
+
+h1 {
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding: 16px;
+  background-color: #07070e;
+  background-image: linear-gradient(13.54deg,rgba(0,163,255,.1) 36.27%,rgba(0,163,255,.25) 78.76%,rgba(0,163,255,.15));
+}
+
+.influx-logo {
+  width:.8em;
+  height: .8em;
+  display: inline-block;
+}
+
+/* write */
+
+.write-inputs {
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.write-inputs * {
+  white-space: nowrap;
+  margin: 5px;
+}
+
+/* write button */
+.write-inputs *:last-child {
+  margin: 0;
+  margin-left: auto;
+}
+
+#writeInfo {
+  float: right;
+}
+
+/* query */
+
+table {
+  width: 100%;
+  border: 2px solid #333346;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color:rgba(26,26,42,.7);
+}
+
+th {
+  border-bottom: 2px solid #333346;
+  padding: 8px;
+}
+
+td {
+  padding: 8px;
+}
+
+.query-button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+textarea {
+  width:100%; 
+  resize: vertical; 
+  display: block;
+}
