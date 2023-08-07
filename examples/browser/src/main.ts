@@ -4,6 +4,8 @@ import * as view from './view'
 
 /*********** initial values ***********/
 
+view.generateWriteInput()
+
 const INITIAL_QUERY = `\
 SELECT *
   FROM "stat"
@@ -14,10 +16,6 @@ WHERE
 `
 
 view.setQuery(INITIAL_QUERY)
-
-view.setUnit('temperature')
-view.setAvg(24.5)
-view.setMax(45)
 
 /*********** helper functions ***********/
 
@@ -43,20 +41,28 @@ const client = new InfluxDBClient({host, token})
 
 /*********** Influxdb write ***********/
 
+view.setOnRandomize(()=>{
+  view.generateWriteInput()
+})
+
 view.setOnWrite(async () => {
+  const data = view.getWriteInput()
   const p = new Point('stat')
-    .tag('unit', view.getUnit())
-    .floatField('avg', view.getAvg())
-    .floatField('max', view.getMax())
+    .tag('Source', data['Source'])
+    .floatField('Temperature', data['Temperature'])
+    .floatField('Humidity', data['Humidity'])
+    .floatField('Pressure', data['Pressure'])
+    .intField('CO2', data['CO2'])
+    .intField('TVOC', data['TVOC'])
     .timestamp(new Date())
 
   try {
     view.setWriteInfo('writing')
     await client.write(p, database)
     view.setWriteInfo('success')
-  } catch (e) {
-    console.error(e)
-    view.setWriteInfo('error, more info in console')
+  } catch (e: any) {
+    view.setWriteInfo(e?.message ?? e?.toString?.() ?? "error! more info in console")
+    throw e
   }
 })
 

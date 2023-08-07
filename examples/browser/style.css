@@ -27,15 +27,6 @@ input:focus, textarea:focus {
   outline: none;
 }
 
-.content-container {
-  display: flex; 
-  justify-content: center;
-}
-
-.content-container > * {
-  max-width: 800px; width: 100%;
-}
-
 h1, fieldset, input, textarea {
   border-color: rgb(26, 26, 42);
   border-radius: 8px;
@@ -51,6 +42,9 @@ fieldset > *:nth-child(n+3) {
 
 textarea {
   padding: 8px;
+  width:100%; 
+  resize: vertical; 
+  display: block;
 }
 
 button {
@@ -62,7 +56,11 @@ button {
   white-space: nowrap;
 }
 
-input {
+button:hover {
+  background: #3c3c53;
+}
+
+input, select {
   width: 100px;
   background-color: #07070e;
   border: 2px solid #333346;
@@ -72,13 +70,55 @@ input {
   transition: background-color .2s cubic-bezier(.18,.16,.2,1),border-color .2s cubic-bezier(.18,.16,.2,1),color .2s cubic-bezier(.18,.16,.2,1),box-shadow .2s cubic-bezier(.18,.16,.2,1),color .2s cubic-bezier(.18,.16,.2,1);
 }
 
-
 h1 {
   margin-top: 16px;
   margin-bottom: 0;
   padding: 16px;
   background-color: #07070e;
   background-image: linear-gradient(13.54deg,rgba(0,163,255,.1) 36.27%,rgba(0,163,255,.25) 78.76%,rgba(0,163,255,.15));
+}
+
+:root {
+  --scrollbar-width: 10px;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+::-webkit-scrollbar-track {
+  background: #00000044;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff40;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff55; 
+}
+
+.container-flex-end {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.content-container {
+  display: flex; 
+  justify-content: center;
+}
+
+.content-container > * {
+  --scrollbar-margin: 8px;
+  max-width: calc(800px + 2 * (var(--scrollbar-margin) + var(--scrollbar-width))); 
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: scroll;
+  padding: 0 var(--scrollbar-margin) 0 calc(var(--scrollbar-margin) + var(--scrollbar-width));
+}
+
+.content-container > *::-webkit-scrollbar-track {
+  background-color: unset;
 }
 
 .influx-logo {
@@ -89,26 +129,19 @@ h1 {
 
 /* write */
 
-.write-inputs {
-  display: flex;
-  align-items: center;
-  max-width: 100%;
-  flex-wrap: wrap;
-}
-
-.write-inputs * {
-  white-space: nowrap;
-  margin: 5px;
-}
-
-/* write button */
-.write-inputs *:last-child {
-  margin: 0;
-  margin-left: auto;
+.write-set tbody td input {
+  width: 100%
 }
 
 #writeInfo {
-  float: right;
+  overflow: auto;
+}
+
+.write-set textarea {
+  text-align: end;
+  white-space: nowrap;
+  resize: none; 
+
 }
 
 /* query */
@@ -127,19 +160,9 @@ table tbody tr:nth-child(odd) {
 th {
   border-bottom: 2px solid #333346;
   padding: 8px;
+  text-align: left;
 }
 
 td {
   padding: 8px;
-}
-
-.query-button-container {
-  display: flex;
-  justify-content: flex-end;
-}
-
-textarea {
-  width:100%; 
-  resize: vertical; 
-  display: block;
 }
