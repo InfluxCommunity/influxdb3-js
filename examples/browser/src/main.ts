@@ -25,7 +25,11 @@ const getTableHeaders = (values: Record<string, any>): string[] =>
     .map((x) => x[0])
 
 const getRowValues = (headers: string[], values: Record<string, any>): any[] =>
-  headers.map((x) => JSON.stringify(values[x]))
+  headers.map((x) =>
+    JSON.stringify(values[x], (_key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+  )
 
 /*********** Influxdb client setup ***********/
 

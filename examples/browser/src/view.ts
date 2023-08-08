@@ -134,7 +134,6 @@ export const setSelectQueryOptions = (options: string[]) => {
 
 export const onSelectQueryOption = (callback: (value: string) => void) => {
   querySelectElement.addEventListener("change", (e) => {
-    console.log("aaaaaa")
     const selectedOption = (e.target as HTMLSelectElement).value;
     callback(selectedOption);
   })
