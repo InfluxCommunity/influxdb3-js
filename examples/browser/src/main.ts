@@ -1,15 +1,17 @@
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client-browser'
 
 import * as view from './view'
-import { EXAMPLE_QUERIES } from "./exampleQueries";
+import {EXAMPLE_QUERIES} from './exampleQueries'
 
 /*********** initial values ***********/
 
 view.generateWriteInput()
 
-view.setSelectQueryOptions(EXAMPLE_QUERIES.map(x=>x.name))
+view.setSelectQueryOptions(EXAMPLE_QUERIES.map((x) => x.name))
 view.onSelectQueryOption((exampleQueryName) => {
-  const {desc, query} = EXAMPLE_QUERIES.find(x=>x.name === exampleQueryName)!;
+  const {desc, query} = EXAMPLE_QUERIES.find(
+    (x) => x.name === exampleQueryName
+  )!
   view.setQueryDesc(desc)
   view.setQuery(query)
 })
@@ -43,7 +45,7 @@ const client = new InfluxDBClient({host, token})
 
 /*********** Influxdb write ***********/
 
-view.setOnRandomize(()=>{
+view.setOnRandomize(() => {
   view.generateWriteInput()
 })
 
@@ -63,7 +65,9 @@ view.setOnWrite(async () => {
     await client.write(p, database)
     view.setWriteInfo('success')
   } catch (e: any) {
-    view.setWriteInfo(e?.message ?? e?.toString?.() ?? "error! more info in console")
+    view.setWriteInfo(
+      e?.message ?? e?.toString?.() ?? 'error! more info in console'
+    )
     throw e
   }
 })
@@ -79,18 +83,20 @@ view.setOnQuery(async () => {
     if (firstRow) {
       const headers = getTableHeaders(firstRow)
       const getValues = getRowValues.bind(undefined, headers)
-  
+
       view.createTable(headers)
       view.pushTableRow(getValues(firstRow))
-  
+
       for await (const row of queryResult) {
         await sleep(50) // simulate throttling
         view.pushTableRow(getValues(row))
       }
     }
-  }catch(e: any) {
-    view.createTable(["error"])
-    view.pushTableRow([e?.message ?? e?.toString?.() ?? "error! more info in console"])
+  } catch (e: any) {
+    view.createTable(['error'])
+    view.pushTableRow([
+      e?.message ?? e?.toString?.() ?? 'error! more info in console',
+    ])
     throw e
   }
 })
