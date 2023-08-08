@@ -1,65 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>InfluxDB3 Browser example</title>
-    <link type="text/css" rel="stylesheet" href="/style.css">
-  </head>
-  <body>
-    <div class="content-container">
-      <div>
-        <h1>
-          <img src="/src/influx-logo.png" class="influx-logo"> </img>
-          InfluxDB3 Browser Example</h1>
-        <fieldset class="write-set">
-          <legend>Write</legend>
 
-          <table>
-            <thead>
-              <tr>
-                <td><label for="Source">Source<span style="opacity: .3;">(tag)</span></label></td>
-                <td><label for="Temperature">Temperature</label></td>
-                <td><label for="Humidity">Humidity</label></td>
-                <td><label for="Pressure">Pressure</label></td>
-                <td><label for="CO2">CO2</label></td>
-                <td><label for="TVOC">TVOC</label></td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr id="writeInputsRow">
-                <td><input id="Source" type="text"></input></td>
-                <td><input id="Temperature" type="number"></input></td>
-                <td><input id="Humidity" type="number"></input></td>
-                <td><input id="Pressure" type="number"></input></td>
-                <td><input id="CO2" type="number"></input></td>
-                <td><input id="TVOC" type="number"></input></td>
-              </tr>
-            </tbody>
-          </table>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InfluxDB3 Browser example</title>
+  <link type="text/css" rel="stylesheet" href="/style.css">
+</head>
 
-          <div class="container-flex-end">
-            <button id="randomizeButton">Randomize data</button>
-            <button id="writeButton">Write to InfluxDB</button>
+<body>
+  <div class="content-container">
+    <div>
+      <h1>
+        <img src="/src/influx-logo.png" class="influx-logo"></img>
+        InfluxDB3 Browser Example
+      </h1>
+
+      <fieldset class="write-set">
+        <legend>Write</legend>
+
+        <table>
+          <thead>
+            <tr>
+              <td><label for="Device">Device<span class="dimm">(tag)</span></label></td>
+              <td><label for="Temperature">Temperature</label></td>
+              <td><label for="Humidity">Humidity</label></td>
+              <td><label for="Pressure">Pressure</label></td>
+              <td><label for="CO2">CO2</label></td>
+              <td><label for="TVOC">TVOC</label></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr id="writeInputsRow">
+              <td><input id="Device" type="text"></input></td>
+              <td><input id="Temperature" type="number"></input></td>
+              <td><input id="Humidity" type="number"></input></td>
+              <td><input id="Pressure" type="number"></input></td>
+              <td><input id="CO2" type="number"></input></td>
+              <td><input id="TVOC" type="number"></input></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="container-flex-end">
+          <button id="randomizeButton">Randomize data</button>
+          <button id="writeButton">Write to InfluxDB</button>
+        </div>
+        <textarea id="writeInfo" rows="2" disabled>Press write button ↑</textarea>
+      </fieldset>
+
+      <fieldset class="query-set">
+        <legend>Query</legend>
+        <div class="query-entry-container">
+          <div class="query-example-container">
+            <label>Example query:
+              <select id="querySelect"></select>
+            </label>
+            <textarea id="queryDesc" disabled>query info:</textarea>
           </div>
-          
-          <div class="container-flex-end">
-            <textarea id="writeInfo" rows="2" disabled>Press write button ↑</textarea>
-          </div>
 
-        </fieldset>
-        <fieldset>
-          <legend>Query</legend>
           <textarea id="query" rows="12"></textarea>
-          <div class="container-flex-end">
-            <button id="queryButton">Execute FlightSQL Query</button>
-          </div>
-          <div id="queryResult">
-          </div>
-        </fieldset>
-      </div>
+        </div>
+        <div class="container-flex-end">
+          <button id="queryButton">Execute FlightSQL Query</button>
+        </div>
+        <div id="queryResult">
+        </div>
+      </fieldset>
     </div>
+  </div>
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

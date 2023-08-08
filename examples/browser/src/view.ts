@@ -41,7 +41,7 @@ export const setWriteInfo = (message: string) =>
 /*********** WriteData ***********/
 
 export type WriteData = {
-  Source: string
+  Device: string
   Temperature: number
   Humidity: number
   Pressure: number
@@ -57,7 +57,7 @@ export const getWriteInput = (): WriteData => {
     const name = input.id as keyof WriteData;
     const value = input.value;
 
-    if (name === "Source") {
+    if (name === "Device") {
       res[name] = value;
     } else {
       res[name] = parseFloat(value);
@@ -87,19 +87,22 @@ const generateValue = (period: number, min: number, max: number, time: number): 
   )
 }
 
+const getRandomChar = (value: number, letters: number) =>
+  String.fromCharCode(65 + Math.floor(value % letters));
+
 const generateData = (time: number): WriteData =>
-  ({
-    "Source": "browser-example",
-    "Temperature": generateValue(30, 0, 40, time),
-    "Humidity": generateValue(90, 0, 99, time),
-    "Pressure": generateValue(20, 970, 1050, time),
-    "CO2": Math.trunc(generateValue(1, 400, 3000, time)),
-    "TVOC": Math.trunc(generateValue(1, 250, 2000, time)),
-  })
-;
+({
+  "Device": `browser-${getRandomChar(time, 7)}`,
+  "Temperature": generateValue(30, 0, 40, time),
+  "Humidity": generateValue(90, 0, 99, time),
+  "Pressure": generateValue(20, 970, 1050, time),
+  "CO2": Math.trunc(generateValue(1, 400, 3000, time)),
+  "TVOC": Math.trunc(generateValue(1, 250, 2000, time)),
+})
+  ;
 
 export const generateWriteInput = (time?: number): void => {
-  const data = generateData(time ?? Date.now())
+  const data = generateData((time ?? Date.now()) * 10_000)
 
   for (const input of writeInputElements) {
     const name = input.id as keyof WriteData;
@@ -110,7 +113,36 @@ export const generateWriteInput = (time?: number): void => {
 /*********** query ***********/
 
 const queryElement: HTMLTextAreaElement = document.querySelector('#query')!
-const queryButton: HTMLButtonElement = document.querySelector('#queryButton')!
+const queryButtonElement: HTMLButtonElement = document.querySelector('#queryButton')!
+const querySelectElement: HTMLSelectElement = document.querySelector('#querySelect')!
+const queryDescElement: HTMLTextAreaElement = document.querySelector('#queryDesc')!
+
+export const selectQueryOption = (option: string) => {
+  querySelectElement.value = option
+  const e = new Event("change");
+  querySelectElement.dispatchEvent(e);
+}
+
+export const setSelectQueryOptions = (options: string[]) => {
+  for (const option of options) {
+    const optionElement = document.createElement("option");
+    optionElement.value = option
+    optionElement.innerText = option
+    querySelectElement.appendChild(optionElement);
+  }
+}
+
+export const onSelectQueryOption = (callback: (value: string) => void) => {
+  querySelectElement.addEventListener("change", (e) => {
+    console.log("aaaaaa")
+    const selectedOption = (e.target as HTMLSelectElement).value;
+    callback(selectedOption);
+  })
+}
+
+export const setQueryDesc = (desc: string) => {
+  queryDescElement.value = desc
+}
 
 export const setQuery = (query: string) => {
   queryElement.value = query
@@ -119,7 +151,7 @@ export const setQuery = (query: string) => {
 export const getQuery = (): string => queryElement.value
 
 export const setOnQuery = (callback: () => void) => {
-  queryButton.addEventListener('click', callback)
+  queryButtonElement.addEventListener('click', callback)
 }
 
 /*********** query result table ***********/

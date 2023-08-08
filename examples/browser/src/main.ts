@@ -1,21 +1,19 @@
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client-browser'
 
 import * as view from './view'
+import { EXAMPLE_QUERIES } from "./exampleQueries";
 
 /*********** initial values ***********/
 
 view.generateWriteInput()
 
-const INITIAL_QUERY = `\
-SELECT *
-  FROM "stat"
-WHERE
-    time >= now() - interval '5 minute'
-  AND
-    "unit" IN ('temperature')
-`
-
-view.setQuery(INITIAL_QUERY)
+view.setSelectQueryOptions(EXAMPLE_QUERIES.map(x=>x.name))
+view.onSelectQueryOption((exampleQueryName) => {
+  const {desc, query} = EXAMPLE_QUERIES.find(x=>x.name === exampleQueryName)!;
+  view.setQueryDesc(desc)
+  view.setQuery(query)
+})
+view.selectQueryOption(EXAMPLE_QUERIES[0].name)
 
 /*********** helper functions ***********/
 
@@ -48,7 +46,7 @@ view.setOnRandomize(()=>{
 view.setOnWrite(async () => {
   const data = view.getWriteInput()
   const p = new Point('stat')
-    .tag('Source', data['Source'])
+    .tag('Device', data['Device'])
     .floatField('Temperature', data['Temperature'])
     .floatField('Humidity', data['Humidity'])
     .floatField('Pressure', data['Pressure'])
