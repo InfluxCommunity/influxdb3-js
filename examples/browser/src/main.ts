@@ -74,17 +74,23 @@ view.setOnQuery(async () => {
   const query = view.getQuery()
   const queryResult = client.query(query, database, queryType)
 
-  const firstRow = (await queryResult.next()).value
-  if (firstRow) {
-    const headers = getTableHeaders(firstRow)
-    const getValues = getRowValues.bind(undefined, headers)
-
-    view.createTable(headers)
-    view.pushTableRow(getValues(firstRow))
-
-    for await (const row of queryResult) {
-      await sleep(50) // simulate throttling
-      view.pushTableRow(getValues(row))
+  try {
+    const firstRow = (await queryResult.next()).value
+    if (firstRow) {
+      const headers = getTableHeaders(firstRow)
+      const getValues = getRowValues.bind(undefined, headers)
+  
+      view.createTable(headers)
+      view.pushTableRow(getValues(firstRow))
+  
+      for await (const row of queryResult) {
+        await sleep(50) // simulate throttling
+        view.pushTableRow(getValues(row))
+      }
     }
+  }catch(e: any) {
+    view.createTable(["error"])
+    view.pushTableRow([e?.message ?? e?.toString?.() ?? "error! more info in console"])
+    throw e
   }
 })
