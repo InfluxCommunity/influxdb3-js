@@ -1,22 +1,3 @@
-const queryResultElement = document.querySelector('#queryResult')!
-
-/** helper function to easier manipulate DOM */
-const el = <K extends keyof HTMLElementTagNameMap>(
-  tag: K,
-  children?: string | HTMLElement | HTMLElement[]
-): HTMLElementTagNameMap[K] => {
-  const element: HTMLElementTagNameMap[K] = document.createElement(tag)
-  if (children)
-    if (typeof children === 'string') {
-      element.innerText = children
-    } else if (Array.isArray(children)) {
-      children.forEach((c) => element.appendChild(c))
-    } else {
-      element.appendChild(children)
-    }
-  return element
-}
-
 /*********** write ***********/
 
 const writeButtonElement: HTMLButtonElement =
@@ -162,6 +143,8 @@ export const setOnQuery = (callback: () => void) => {
 
 /*********** query result table ***********/
 
+const queryResultElement = document.querySelector('#queryResult')!
+
 let tableBody: HTMLTableSectionElement | undefined
 
 export const cleanTable = () => {
@@ -172,27 +155,32 @@ export const cleanTable = () => {
 export const createTable = (headers: string[]) => {
   cleanTable()
 
-  const tableHead = el(
-    'thead',
-    el(
-      'tr',
-      headers.map((header) => el('th', header))
-    )
-  )
+  const tableHead = document.createElement('thead')
+  const tableHeaderRow = document.createElement('tr')
+  tableBody = document.createElement('tbody')
 
-  tableBody = el('tbody')
+  for (const header of headers) {
+    const headerElement = document.createElement('th')
+    headerElement.innerText = header
+    tableHeaderRow.appendChild(headerElement)
+  }
+  tableHead.appendChild(tableHeaderRow)
 
-  const table = el('table', [tableHead, tableBody])
+  const table = document.createElement('table')
+  table.appendChild(tableHead)
+  table.appendChild(tableBody)
 
   queryResultElement.appendChild(table)
 }
 
 export const pushTableRow = (row: string[]) => {
   if (!tableBody) throw Error('create table first!')
-  tableBody.appendChild(
-    el(
-      'tr',
-      row.map((value) => el('td', value))
-    )
-  )
+  const tableRow = document.createElement('tr')
+  for (const value of row) {
+    const cell = document.createElement('td')
+    cell.innerHTML = value
+    tableRow.appendChild(cell)
+  }
+
+  tableBody.appendChild(tableRow)
 }
