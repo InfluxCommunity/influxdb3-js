@@ -3,10 +3,12 @@
 - [IOxExample](./src/index.ts) - How to use write and query data from InfluxDB IOx
 
 ## prerequisites
-  - `node` and `yarn` installed
-  - build influxdb-client: *(in project root directory)*
-    - run `yarn install`
-    - run `yarn build`
+
+- `node` and `yarn` installed
+
+- build influxdb-client: *(in project root directory)*
+  - run `yarn install`
+  - run `yarn build`
 
 ## Usage
 
@@ -25,6 +27,6 @@ INFLUXDB_TOKEN="<token>"
 ```
 
 ### Run example
+
 - run `yarn install`
 - run `yarn dev`
-

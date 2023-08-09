@@ -4,13 +4,13 @@
 
 It's highly recommended to try [basic example](../basic/README.md) first
 
-
 ## prerequisites
-  - To run this example, you'll need to have `Docker` installed alongside **Node** and **Yarn**. Check your installation with `docker --version` command.
 
-  - build influxdb-client: *(in project root directory)*
-    - run `yarn install`
-    - run `yarn build`
+- To run this example, you'll need to have `Docker` installed alongside **Node** and **Yarn**. Check your installation with `docker --version` command.
+
+- build influxdb-client: *(in project root directory)*
+  - run `yarn install`
+  - run `yarn build`
 
 ## Usage
 
@@ -27,9 +27,8 @@ Open the `envoy.yaml` file and find the `address: "us-east-1-1.aws.cloud2.influx
 
 ### Run example
 
- - Start docker with envoy proxy
-   - run `docker compose up`
- - Execute example:
-   - run `yarn dev`
- - Example is running at `http://localhost:5173/` *(note that port can differes, look into console for exact address)*
-
+- Start docker with envoy proxy
+  - run `docker compose up`
+- Execute example:
+  - run `yarn dev`
+- Example is running at `http://localhost:5173/` *(note that port can differes, look into console for exact address)*

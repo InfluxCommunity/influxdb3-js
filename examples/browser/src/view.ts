@@ -1,23 +1,26 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 /*********** write ***********/
 
 const writeButtonElement: HTMLButtonElement =
   document.querySelector('#writeButton')!
 
-export const setOnWrite = (callback: () => void) => {
+export const setOnWrite = (callback: () => void): void => {
   writeButtonElement.addEventListener('click', callback)
 }
 
 const randomizeButtonElement: HTMLButtonElement =
   document.querySelector('#randomizeButton')!
 
-export const setOnRandomize = (callback: () => void) => {
+export const setOnRandomize = (callback: () => void): void => {
   randomizeButtonElement.addEventListener('click', callback)
 }
 
 const writeInfoElement: HTMLSpanElement = document.querySelector('#writeInfo')!
 
-export const setWriteInfo = (message: string) =>
-  (writeInfoElement.textContent = message)
+export const setWriteInfo = (message: string): void => {
+  writeInfoElement.textContent = message
+}
 
 /*********** WriteData ***********/
 
@@ -105,13 +108,13 @@ const querySelectElement: HTMLSelectElement =
 const queryDescElement: HTMLTextAreaElement =
   document.querySelector('#queryDesc')!
 
-export const selectQueryOption = (option: string) => {
+export const selectQueryOption = (option: string): void => {
   querySelectElement.value = option
   const e = new Event('change')
   querySelectElement.dispatchEvent(e)
 }
 
-export const setSelectQueryOptions = (options: string[]) => {
+export const setSelectQueryOptions = (options: string[]): void => {
   for (const option of options) {
     const optionElement = document.createElement('option')
     optionElement.value = option
@@ -120,24 +123,26 @@ export const setSelectQueryOptions = (options: string[]) => {
   }
 }
 
-export const onSelectQueryOption = (callback: (value: string) => void) => {
+export const onSelectQueryOption = (
+  callback: (value: string) => void
+): void => {
   querySelectElement.addEventListener('change', (e) => {
     const selectedOption = (e.target as HTMLSelectElement).value
     callback(selectedOption)
   })
 }
 
-export const setQueryDesc = (desc: string) => {
+export const setQueryDesc = (desc: string): void => {
   queryDescElement.value = desc
 }
 
-export const setQuery = (query: string) => {
+export const setQuery = (query: string): void => {
   queryElement.value = query
 }
 
 export const getQuery = (): string => queryElement.value
 
-export const setOnQuery = (callback: () => void) => {
+export const setOnQuery = (callback: () => void): void => {
   queryButtonElement.addEventListener('click', callback)
 }
 
@@ -147,12 +152,12 @@ const queryResultElement = document.querySelector('#queryResult')!
 
 let tableBody: HTMLTableSectionElement | undefined
 
-export const cleanTable = () => {
+export const cleanTable = (): void => {
   queryResultElement.innerHTML = ''
   tableBody = undefined
 }
 
-export const createTable = (headers: string[]) => {
+export const createTable = (headers: string[]): void => {
   cleanTable()
 
   const tableHead = document.createElement('thead')
@@ -173,7 +178,7 @@ export const createTable = (headers: string[]) => {
   queryResultElement.appendChild(table)
 }
 
-export const pushTableRow = (row: string[]) => {
+export const pushTableRow = (row: string[]): void => {
   if (!tableBody) throw Error('create table first!')
   const tableRow = document.createElement('tr')
   for (const value of row) {

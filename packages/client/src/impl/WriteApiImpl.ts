@@ -16,7 +16,11 @@ export default class WriteApiImpl implements WriteApi {
     this.doWrite = this.doWrite.bind(this)
   }
 
-  _createWritePath(bucket: string, writeOptions: WriteOptions, org?: string) {
+  private _createWritePath(
+    bucket: string,
+    writeOptions: WriteOptions,
+    org?: string
+  ) {
     const query: string[] = [
       `bucket=${encodeURIComponent(bucket)}`,
       `precision=${writeOptions.precision}`,
