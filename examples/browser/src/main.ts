@@ -9,9 +9,14 @@ view.generateWriteInput()
 
 view.setSelectQueryOptions(EXAMPLE_QUERIES.map((x) => x.name))
 view.onSelectQueryOption((exampleQueryName) => {
-  const {desc, query} = EXAMPLE_QUERIES.find(
-    (x) => x.name === exampleQueryName
-  )!
+  const found = EXAMPLE_QUERIES.find((x) => x.name === exampleQueryName)
+  if (!found)
+    throw new Error(
+      `Query with name "${exampleQueryName}" not found. Available queries were: ${EXAMPLE_QUERIES.map(
+        (query) => `"${query.name}"`
+      ).join(', ')}`
+    )
+  const {desc, query} = found
   view.setQueryDesc(desc)
   view.setQuery(query)
 })
