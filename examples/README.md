@@ -7,4 +7,3 @@
 ### Browser
 
 - [Browser](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/browser/README.md) - Try influxdb in browser with example queries
-

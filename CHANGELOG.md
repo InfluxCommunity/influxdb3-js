@@ -2,7 +2,7 @@
 
 ### Features
 
-1. [#52](https://github.com/InfluxCommunity/influxdb3-js/pull/52): Add support for browser environment 
+1. [#52](https://github.com/InfluxCommunity/influxdb3-js/pull/52): Add support for browser environment
 
 ### Docs
 

@@ -100,7 +100,8 @@ export class NodeHttpTransport implements Transport {
         this._defaultOptions['follow-redirects']?.http?.request ?? http.request
     } else if (url.protocol === 'https:') {
       this._requestApi =
-        this._defaultOptions['follow-redirects']?.https?.request ?? https.request
+        this._defaultOptions['follow-redirects']?.https?.request ??
+        https.request
     } else {
       throw new Error(
         `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.host}"`
@@ -375,45 +376,48 @@ export class NodeHttpTransport implements Transport {
         listeners.error(new AbortError())
       })
     }
-    const req = this._requestApi(requestMessage, (res: http.IncomingMessage) => {
-      /* istanbul ignore next - hard to simulate failure, manually reviewed */
-      if (cancellable.isCancelled()) {
-        res.resume()
-        listeners.complete()
-        return
-      }
-      listeners.responseStarted(res.headers, res.statusCode)
-      this._prepareResponse(
-        res,
-        (responseData) => {
-          responseData.on('data', (data) => {
-            if (cancellable.isCancelled()) {
-              res.resume()
-            } else {
-              if (listeners.next(data) === false) {
-                // pause processing, the consumer signalizes that
-                // it is not able to receive more data
-                if (!listeners.useResume) {
-                  listeners.error(
-                    new Error('Unable to pause, useResume is not configured!')
-                  )
-                  res.resume()
-                  return
+    const req = this._requestApi(
+      requestMessage,
+      (res: http.IncomingMessage) => {
+        /* istanbul ignore next - hard to simulate failure, manually reviewed */
+        if (cancellable.isCancelled()) {
+          res.resume()
+          listeners.complete()
+          return
+        }
+        listeners.responseStarted(res.headers, res.statusCode)
+        this._prepareResponse(
+          res,
+          (responseData) => {
+            responseData.on('data', (data) => {
+              if (cancellable.isCancelled()) {
+                res.resume()
+              } else {
+                if (listeners.next(data) === false) {
+                  // pause processing, the consumer signalizes that
+                  // it is not able to receive more data
+                  if (!listeners.useResume) {
+                    listeners.error(
+                      new Error('Unable to pause, useResume is not configured!')
+                    )
+                    res.resume()
+                    return
+                  }
+                  res.pause()
+                  const resume = () => {
+                    res.resume()
+                  }
+                  cancellable.resume = resume
+                  listeners.useResume(resume)
                 }
-                res.pause()
-                const resume = () => {
-                  res.resume()
-                }
-                cancellable.resume = resume
-                listeners.useResume(resume)
               }
-            }
-          })
-          responseData.on('end', listeners.complete)
-        },
-        listeners.error
-      )
-    })
+            })
+            responseData.on('end', listeners.complete)
+          },
+          listeners.error
+        )
+      }
+    )
     // Support older Nodes which don't allow `timeout` in the
     // request options
     /* istanbul ignore else support older node versions */
