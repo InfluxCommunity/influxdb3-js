@@ -14,11 +14,11 @@ export type PointRecord = {
  * Point defines values of a single measurement.
  */
 export class Point {
-  private name: string
-  private tags: {[key: string]: string} = {}
+  private _name: string
+  private _tags: {[key: string]: string} = {}
+  private _time: string | number | Date | undefined
   /** escaped field values */
   public fields: {[key: string]: string} = {}
-  private time: string | number | Date | undefined
 
   /**
    * Create a new Point with specified a measurement name.
@@ -26,7 +26,7 @@ export class Point {
    * @param measurementName - the measurement name
    */
   constructor(measurementName?: string) {
-    if (measurementName) this.name = measurementName
+    if (measurementName) this._name = measurementName
   }
 
   /**
@@ -36,7 +36,7 @@ export class Point {
    * @returns this
    */
   public measurement(name: string): Point {
-    this.name = name
+    this._name = name
     return this
   }
 
@@ -49,7 +49,7 @@ export class Point {
    * @returns this
    */
   public tag(name: string, value: string): Point {
-    this.tags[name] = value
+    this._tags[name] = value
     return this
   }
 
@@ -182,7 +182,7 @@ export class Point {
    * @returns this
    */
   public timestamp(value: Date | number | string | undefined): Point {
-    this.time = value
+    this._time = value
     return this
   }
 
@@ -195,7 +195,7 @@ export class Point {
   public toLineProtocol(
     convertTimePrecision?: TimeConverter | WritePrecision
   ): string | undefined {
-    if (!this.name) return undefined
+    if (!this._name) return undefined
     let fieldsLine = ''
     Object.keys(this.fields)
       .sort()
@@ -208,7 +208,7 @@ export class Point {
       })
     if (fieldsLine.length === 0) return undefined // no fields present
     let tagsLine = ''
-    const tags = this.tags
+    const tags = this._tags
     Object.keys(tags)
       .sort()
       .forEach((x) => {
@@ -220,7 +220,7 @@ export class Point {
           }
         }
       })
-    let time = this.time
+    let time = this._time
 
     if (!convertTimePrecision) {
       time = convertTimeToNanos(time)
@@ -230,7 +230,7 @@ export class Point {
       time = convertTimePrecision(time)
     }
 
-    return `${escape.measurement(this.name)}${tagsLine} ${fieldsLine}${
+    return `${escape.measurement(this._name)}${tagsLine} ${fieldsLine}${
       time !== undefined ? ` ${time}` : ''
     }`
   }

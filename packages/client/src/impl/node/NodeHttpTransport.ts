@@ -24,17 +24,17 @@ const zlibOptions = {
 const emptyBuffer = Buffer.allocUnsafe(0)
 
 class CancellableImpl implements Cancellable {
-  private cancelled = false
+  private _cancelled = false
   public resume?: () => void
   cancel(): void {
-    this.cancelled = true
+    this._cancelled = true
     if (this.resume) {
       this.resume()
       this.resume = undefined
     }
   }
   isCancelled(): boolean {
-    return this.cancelled
+    return this._cancelled
   }
 }
 
@@ -42,14 +42,14 @@ class CancellableImpl implements Cancellable {
  * Transport layer on top of node http or https library.
  */
 export class NodeHttpTransport implements Transport {
-  private defaultOptions: {[key: string]: any}
-  private requestApi: (
+  private _defaultOptions: {[key: string]: any}
+  private _requestApi: (
     options: http.RequestOptions,
     callback: (res: http.IncomingMessage) => void
   ) => http.ClientRequest
-  private contextPath: string
-  private token?: string
-  private headers: Record<string, string>
+  private _contextPath: string
+  private _token?: string
+  private _headers: Record<string, string>
   /**
    * Creates a node transport using for the client options supplied.
    * @param connectionOptions - connection options
@@ -63,8 +63,8 @@ export class NodeHttpTransport implements Transport {
       ...nodeSupportedOptions
     } = connectionOptions
     const url = parse(proxyUrl || _url)
-    this.token = token
-    this.defaultOptions = {
+    this._token = token
+    this._defaultOptions = {
       ...DEFAULT_ConnectionOptions,
       ...nodeSupportedOptions,
       ...transportOptions,
@@ -72,46 +72,46 @@ export class NodeHttpTransport implements Transport {
       protocol: url.protocol,
       hostname: url.hostname,
     }
-    this.contextPath = proxyUrl ? _url : url.path ?? ''
-    if (this.contextPath.endsWith('/')) {
-      this.contextPath = this.contextPath.substring(
+    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    if (this._contextPath.endsWith('/')) {
+      this._contextPath = this._contextPath.substring(
         0,
-        this.contextPath.length - 1
+        this._contextPath.length - 1
       )
     }
     // remove all undefined field to avoid node validation errors
     // https://github.com/influxdata/influxdb-client-js/issues/380
-    Object.keys(this.defaultOptions).forEach(
+    Object.keys(this._defaultOptions).forEach(
       (key) =>
-        this.defaultOptions[key] === undefined &&
-        delete this.defaultOptions[key]
+        this._defaultOptions[key] === undefined &&
+        delete this._defaultOptions[key]
     )
     // https://github.com/influxdata/influxdb-client-js/issues/263
     // don't allow /api/v2 suffix to avoid future problems
-    if (this.contextPath.endsWith('/api/v2')) {
+    if (this._contextPath.endsWith('/api/v2')) {
       Log.warn(
         `Please remove '/api/v2' context path from InfluxDB base url, using ${url.protocol}//${url.hostname}:${url.port} !`
       )
-      this.contextPath = ''
+      this._contextPath = ''
     }
 
     if (url.protocol === 'http:') {
-      this.requestApi =
-        this.defaultOptions['follow-redirects']?.http?.request ?? http.request
+      this._requestApi =
+        this._defaultOptions['follow-redirects']?.http?.request ?? http.request
     } else if (url.protocol === 'https:') {
-      this.requestApi =
-        this.defaultOptions['follow-redirects']?.https?.request ?? https.request
+      this._requestApi =
+        this._defaultOptions['follow-redirects']?.https?.request ?? https.request
     } else {
       throw new Error(
         `Unsupported protocol "${url.protocol} in URL: "${connectionOptions.host}"`
       )
     }
-    this.headers = {
+    this._headers = {
       'User-Agent': `influxdb-client-js/${CLIENT_LIB_VERSION}`,
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
-      this.headers['Host'] = parse(_url).host as string
+      this._headers['Host'] = parse(_url).host as string
     }
   }
 
@@ -133,7 +133,7 @@ export class NodeHttpTransport implements Transport {
     const cancellable = new CancellableImpl()
     if (callbacks && callbacks.useCancellable)
       callbacks.useCancellable(cancellable)
-    this.createRequestMessage(
+    this._createRequestMessage(
       path,
       body,
       options,
@@ -226,7 +226,7 @@ export class NodeHttpTransport implements Transport {
     const requestMessage = await new Promise<Record<string, any>>(
       (resolve, reject) => {
         nestedReject = reject
-        this.createRequestMessage(path, body, options, resolve, wrapReject)
+        this._createRequestMessage(path, body, options, resolve, wrapReject)
       }
     )
     if (requestMessage.signal?.addEventListener) {
@@ -237,7 +237,7 @@ export class NodeHttpTransport implements Transport {
     const response = await new Promise<http.IncomingMessage>(
       (resolve, reject) => {
         nestedReject = reject
-        const req = this.requestApi(requestMessage, resolve)
+        const req = this._requestApi(requestMessage, resolve)
         req.on('timeout', () => wrapReject(new RequestTimedOutError()))
         req.on('error', wrapReject)
 
@@ -263,7 +263,7 @@ export class NodeHttpTransport implements Transport {
    * @param body - request body, will be utf-8 encoded
    * @returns a configuration object that is suitable for making the request
    */
-  private createRequestMessage(
+  private _createRequestMessage(
     path: string,
     body: string,
     sendOptions: SendOptions,
@@ -273,14 +273,14 @@ export class NodeHttpTransport implements Transport {
     const bodyBuffer = Buffer.from(body, 'utf-8')
     const headers: {[key: string]: any} = {
       'content-type': 'application/json; charset=utf-8',
-      ...this.headers,
+      ...this._headers,
     }
-    if (this.token) {
-      headers.authorization = `Token ${this.token}`
+    if (this._token) {
+      headers.authorization = `Token ${this._token}`
     }
     const options: {[key: string]: any} = {
-      ...this.defaultOptions,
-      path: this.contextPath + path,
+      ...this._defaultOptions,
+      path: this._contextPath + path,
       method: sendOptions.method,
       headers: {
         ...headers,
@@ -375,7 +375,7 @@ export class NodeHttpTransport implements Transport {
         listeners.error(new AbortError())
       })
     }
-    const req = this.requestApi(requestMessage, (res: http.IncomingMessage) => {
+    const req = this._requestApi(requestMessage, (res: http.IncomingMessage) => {
       /* istanbul ignore next - hard to simulate failure, manually reviewed */
       if (cancellable.isCancelled()) {
         res.resume()

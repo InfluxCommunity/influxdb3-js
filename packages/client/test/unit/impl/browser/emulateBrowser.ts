@@ -86,11 +86,11 @@ let beforeEmulation:
   | undefined
 
 export class AbortController {
-  private listeners: Array<() => void> = []
+  private _listeners: Array<() => void> = []
   signal = {
     aborted: false,
     addEventListener: (type: string, listener: () => void): void => {
-      this.listeners.push(listener)
+      this._listeners.push(listener)
     },
   }
   constructor(aborted = false) {
@@ -98,7 +98,7 @@ export class AbortController {
   }
   abort(): void {
     this.signal.aborted = true
-    this.listeners.forEach((x) => x())
+    this._listeners.forEach((x) => x())
   }
 
   getSignal(): AbortSignal {

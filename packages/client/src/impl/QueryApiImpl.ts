@@ -8,13 +8,13 @@ import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 
 export default class QueryApiImpl implements QueryApi {
-  private closed = false
-  private flightClient: FlightServiceClient
-  private transport: ReturnType<typeof impl.queryTransport>
+  private _closed = false
+  private _flightClient: FlightServiceClient
+  private _transport: ReturnType<typeof impl.queryTransport>
 
   constructor(private _options: ConnectionOptions) {
-    this.transport = impl.queryTransport(this._options)
-    this.flightClient = new FlightServiceClient(this.transport)
+    this._transport = impl.queryTransport(this._options)
+    this._flightClient = new FlightServiceClient(this._transport)
   }
 
   async *query(
@@ -22,10 +22,10 @@ export default class QueryApiImpl implements QueryApi {
     database: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<Record<string, any>, void, void> {
-    if (this.closed) {
+    if (this._closed) {
       throw new Error('queryApi: already closed!')
     }
-    const client = this.flightClient
+    const client = this._flightClient
 
     const ticketData = {
       database: database,
@@ -72,7 +72,7 @@ export default class QueryApiImpl implements QueryApi {
   }
 
   async close(): Promise<void> {
-    this.closed = true
-    this.transport.close?.()
+    this._closed = true
+    this._transport.close?.()
   }
 }
