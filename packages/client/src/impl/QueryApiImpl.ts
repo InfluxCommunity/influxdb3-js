@@ -10,10 +10,11 @@ import {impl} from './implSelector'
 export default class QueryApiImpl implements QueryApi {
   private closed = false
   private flightClient: FlightServiceClient
+  private transport: ReturnType<typeof impl.queryTransport>
 
   constructor(private _options: ConnectionOptions) {
-    const transport = impl.queryTransport(this._options)
-    this.flightClient = new FlightServiceClient(transport)
+    this.transport = impl.queryTransport(this._options)
+    this.flightClient = new FlightServiceClient(this.transport)
   }
 
   async *query(
@@ -72,5 +73,6 @@ export default class QueryApiImpl implements QueryApi {
 
   async close(): Promise<void> {
     this.closed = true
+    this.transport.close?.()
   }
 }
