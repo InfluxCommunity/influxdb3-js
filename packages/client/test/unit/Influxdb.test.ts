@@ -93,7 +93,7 @@ describe('InfluxDB', () => {
       )
         .property('_writeApi')
         .has.property('_transport')
-        .has.property('requestApi')
+        .has.property('_requestApi')
         .is.equal(request)
     })
   })
