@@ -20,7 +20,7 @@ export default class QueryApiImpl implements QueryApi {
   async *query(
     query: string,
     database: string,
-    queryType: QueryType = 'sql'
+    queryType: QueryType
   ): AsyncGenerator<Record<string, any>, void, void> {
     if (this._closed) {
       throw new Error('queryApi: already closed!')
