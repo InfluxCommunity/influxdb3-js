@@ -44,6 +44,13 @@
     ],
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
-    "prefer-template": "error"
+    "prefer-template": "error",
+    "@typescript-eslint/explicit-module-boundary-types": [
+      "error",
+      {
+        "allowArgumentsExplicitlyTypedAsAny": true
+      }
+    ],
+    "@typescript-eslint/no-non-null-assertion": "error"
   }
 }

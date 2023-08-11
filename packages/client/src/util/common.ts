@@ -25,3 +25,13 @@ export const createInt32Uint8Array = (value: number): Uint8Array => {
   bytes[3] = value >> (8 * 3)
   return bytes
 }
+
+export const collectAll = async <T>(
+  generator: AsyncGenerator<T, any, any>
+): Promise<T[]> => {
+  const results: T[] = []
+  for await (const value of generator) {
+    results.push(value)
+  }
+  return results
+}

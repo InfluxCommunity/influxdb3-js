@@ -69,49 +69,49 @@ describe('NodeHttpTransport', () => {
       const transport: any = new NodeHttpTransport({
         host: 'http://test:8086',
       })
-      expect(transport.defaultOptions).to.deep.equal({
+      expect(transport._defaultOptions).to.deep.equal({
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
         timeout: 10000,
       })
-      expect(transport.requestApi).to.equal(http.request)
+      expect(transport._requestApi).to.equal(http.request)
     })
     it('creates the transport from https url', () => {
       const transport: any = new NodeHttpTransport({
         host: 'https://test:8086',
       })
-      expect(transport.defaultOptions).to.deep.equal({
+      expect(transport._defaultOptions).to.deep.equal({
         hostname: 'test',
         port: '8086',
         protocol: 'https:',
         timeout: 10000,
       })
-      expect(transport.requestApi).to.equal(https.request)
+      expect(transport._requestApi).to.equal(https.request)
     })
-    it('creates the transport with contextPath', () => {
+    it('creates the transport with _contextPath', () => {
       const transport: any = new NodeHttpTransport({
         host: 'http://test:8086/influx',
       })
-      expect(transport.defaultOptions).to.deep.equal({
+      expect(transport._defaultOptions).to.deep.equal({
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
         timeout: 10000,
       })
-      expect(transport.contextPath).equals('/influx')
+      expect(transport._contextPath).equals('/influx')
     })
-    it('creates the transport with contextPath/', () => {
+    it('creates the transport with _contextPath/', () => {
       const transport: any = new NodeHttpTransport({
         host: 'http://test:8086/influx/',
       })
-      expect(transport.defaultOptions).to.deep.equal({
+      expect(transport._defaultOptions).to.deep.equal({
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
         timeout: 10000,
       })
-      expect(transport.contextPath).equals('/influx')
+      expect(transport._contextPath).equals('/influx')
     })
     it('does not create the transport from other uri', () => {
       expect(
@@ -126,7 +126,7 @@ describe('NodeHttpTransport', () => {
         host: 'http://test:8086/api/v2',
       })
       // don;t use context path at all
-      expect(transport.contextPath).equals('')
+      expect(transport._contextPath).equals('')
       expect(logs.warn).is.deep.equal([
         [
           "Please remove '/api/v2' context path from InfluxDB base url, using http://test:8086 !",
@@ -139,12 +139,12 @@ describe('NodeHttpTransport', () => {
         host: 'http://test:8086',
         timeout: undefined,
       })
-      expect(transport.defaultOptions).to.deep.equal({
+      expect(transport._defaultOptions).to.deep.equal({
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
       })
-      expect(transport.requestApi).to.equal(http.request)
+      expect(transport._requestApi).to.equal(http.request)
     })
   })
   describe('send', () => {
@@ -171,7 +171,7 @@ describe('NodeHttpTransport', () => {
             'accept-encoding': 'gzip',
           },
         },
-        {contextPath: '/context'},
+        {_contextPath: '/context'},
       ]
       for (let i = 0; i < extraOptions.length; i++) {
         const extras = extraOptions[i]
@@ -186,7 +186,7 @@ describe('NodeHttpTransport', () => {
             )
             let responseRead = false
             const context = nock(transportOptions.url)
-              .post(`${extras.contextPath ?? ''}/test`)
+              .post(`${extras._contextPath ?? ''}/test`)
               .reply((_uri, _requestBody) => [
                 200,
                 new Readable({
@@ -223,7 +223,7 @@ describe('NodeHttpTransport', () => {
             new NodeHttpTransport({
               ...extras,
               ...transportOptions,
-              host: transportOptions.url + (extras.contextPath ?? ''),
+              host: transportOptions.url + (extras._contextPath ?? ''),
             }).send(
               '/test',
               '',
@@ -715,7 +715,7 @@ describe('NodeHttpTransport', () => {
             'accept-encoding': 'gzip',
           },
         },
-        {contextPath: '/context'},
+        {_contextPath: '/context'},
       ]
       for (let i = 0; i < extraOptions.length; i++) {
         const extras = extraOptions[i]
@@ -723,7 +723,7 @@ describe('NodeHttpTransport', () => {
         it(`works with options ${JSON.stringify(extras)}`, async () => {
           let responseRead = false
           const context = nock(transportOptions.url)
-            .post(`${extras.contextPath ?? ''}/test`)
+            .post(`${extras._contextPath ?? ''}/test`)
             .reply((_uri, _requestBody) => [
               200,
               new Readable({
@@ -757,7 +757,7 @@ describe('NodeHttpTransport', () => {
           const transport = new NodeHttpTransport({
             ...extras,
             ...transportOptions,
-            host: transportOptions.url + (extras.contextPath ?? ''),
+            host: transportOptions.url + (extras._contextPath ?? ''),
           })
           try {
             let result = ''

@@ -1,0 +1,65 @@
+static_resources:
+  listeners:
+    - name: listener_0
+      address:
+        socket_address: { address: 0.0.0.0, port_value: 10000 }
+      filter_chains:
+      - filter_chain_match:
+        filters:
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              stat_prefix: ingress_http
+              http_filters:
+                - name: envoy.filters.http.grpc_web
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
+                - name: envoy.filters.http.cors
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                - name: envoy.filters.http.router
+                  typed_config:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+              route_config:
+                name: local_route
+                virtual_hosts:
+                  - name: local_service
+                    domains: ["*"]
+                    routes:
+                      - match: { prefix: "/" }
+                        route:
+                          cluster: influxdb_cluster
+                          prefix_rewrite: "/"
+                          auto_host_rewrite: true
+                          timeout: 10s
+                    cors:
+                      allow_origin_string_match:
+                        - prefix: "*"
+                      allow_methods: GET, PUT, DELETE, POST, OPTIONS
+
+  clusters:
+    - name: influxdb_cluster
+      connect_timeout: 10s
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: influxdb_cluster
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: "us-east-1-1.aws.cloud2.influxdata.com"
+                      port_value: 443
+      typed_extension_protocol_options:
+        envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+          "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+          explicit_http_config:
+            http2_protocol_options: {}
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          common_tls_context:
+            alpn_protocols: [ "h2,http/1.1" ]
+

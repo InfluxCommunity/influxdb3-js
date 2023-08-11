@@ -48,11 +48,12 @@ export default defineConfig({
     {
       name: 'replaceTransportImport',
       setup: (build) => {
-        build.onLoad({filter: /InfluxDBClient.ts$/}, async (args) => {
+        build.onLoad({filter: /implSelector.ts$/}, async (args) => {
           const source = await readFile(args.path, 'utf8')
           const contents = (source as unknown as string).replace(
-            './impl/node/NodeHttpTransport',
-            './impl/browser/FetchTransport'
+            // replace all, ./node appears in comment too
+            /.\/node/g,
+            './browser'
           )
           return {
             contents,

@@ -1,18 +1,26 @@
 import WriteApi from '../WriteApi'
-import {DEFAULT_WriteOptions, WriteOptions} from '../options'
+import {ClientOptions, DEFAULT_WriteOptions, WriteOptions} from '../options'
 import {Transport} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
 import {HttpError} from '../errors'
+import {impl} from './implSelector'
 
 export default class WriteApiImpl implements WriteApi {
-  private closed = false
+  private _closed = false
+  private _transport: Transport
 
-  constructor(private transport: Transport) {
+  constructor(private _options: ClientOptions) {
+    this._transport =
+      this._options.transport ?? impl.writeTransport(this._options)
     this.doWrite = this.doWrite.bind(this)
   }
 
-  _createWritePath(bucket: string, writeOptions: WriteOptions, org?: string) {
+  private _createWritePath(
+    bucket: string,
+    writeOptions: WriteOptions,
+    org?: string
+  ) {
     const query: string[] = [
       `bucket=${encodeURIComponent(bucket)}`,
       `precision=${writeOptions.precision}`,
@@ -34,7 +42,7 @@ export default class WriteApiImpl implements WriteApi {
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
-    if (self.closed) {
+    if (self._closed) {
       return Promise.reject(new Error('writeApi: already closed!'))
     }
     if (lines.length <= 0 || (lines.length === 1 && lines[0] === ''))
@@ -100,7 +108,7 @@ export default class WriteApiImpl implements WriteApi {
       gzipThreshold: writeOptionsOrDefault.gzipThreshold,
     }
 
-    this.transport.send(
+    this._transport.send(
       this._createWritePath(bucket, writeOptionsOrDefault, org),
       lines.join('\n'),
       sendOptions,
@@ -111,6 +119,6 @@ export default class WriteApiImpl implements WriteApi {
   }
 
   async close(): Promise<void> {
-    this.closed = true
+    this._closed = true
   }
 }

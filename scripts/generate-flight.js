@@ -17,7 +17,7 @@ const OUTPUT_DIR = 'out/flight'
 const packageJsonContent = {
   scripts: {
     protoc: 'protoc',
-    'generate-protoc': `npx protoc --ts_out ./${OUTPUT_DIR}/ --ts_opt client_grpc1 --proto_path . *.proto`,
+    'generate-protoc': `npx protoc --ts_out ./${OUTPUT_DIR}/ --ts_opt optimize_code_size --proto_path . *.proto`,
   },
   dependencies: {
     '@protobuf-ts/plugin': '^2.9.0',

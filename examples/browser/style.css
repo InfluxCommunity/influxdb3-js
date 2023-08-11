@@ -1,0 +1,222 @@
+* {
+  box-sizing: border-box;
+  font-family: Proxima Nova, Helvetica, Arial, Tahoma, Verdana, sans-serif;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  background-color: rgb(7, 7, 14);
+  color: rgb(255, 255, 255);
+}
+
+input,
+textarea {
+  background-color: rgb(26, 26, 42);
+  color: rgb(255, 255, 255);
+}
+
+input:focus,
+textarea:focus {
+  border-color: rgba(0, 163, 255, .75);
+  box-shadow: 0 0 4px #00a3ff;
+  outline: none;
+}
+
+h1,
+fieldset,
+input,
+textarea {
+  border-color: rgb(26, 26, 42);
+  border-radius: 8px;
+}
+
+fieldset {
+  margin-top: 24px;
+}
+
+fieldset>*:nth-child(n+3) {
+  margin-top: 16px;
+}
+
+textarea {
+  padding: 8px;
+  width: 100%;
+  resize: vertical;
+  display: block;
+}
+
+button {
+  padding: 8px;
+  background: #333346;
+  color: #fff;
+  border-width: 0;
+  outline: none;
+  white-space: nowrap;
+}
+
+button:hover,
+select:hover {
+  background: #3c3c53;
+}
+
+input,
+select {
+  width: 100px;
+  background-color: #07070e;
+  border: 2px solid #333346;
+  border-radius: 2px;
+  color: #fff;
+  outline: none;
+  transition: background-color .2s cubic-bezier(.18, .16, .2, 1), border-color .2s cubic-bezier(.18, .16, .2, 1), color .2s cubic-bezier(.18, .16, .2, 1), box-shadow .2s cubic-bezier(.18, .16, .2, 1), color .2s cubic-bezier(.18, .16, .2, 1);
+}
+
+select {
+  background-color: #333346;
+}
+
+h1 {
+  margin-top: 16px;
+  margin-bottom: 0;
+  padding: 16px;
+  background-color: #07070e;
+  background-image: linear-gradient(13.54deg, rgba(0, 163, 255, .1) 36.27%, rgba(0, 163, 255, .25) 78.76%, rgba(0, 163, 255, .15));
+}
+
+table {
+  width: 100%;
+  border: 2px solid #333346;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: rgba(26, 26, 42, .7);
+}
+
+th {
+  border-bottom: 2px solid #333346;
+  padding: 8px;
+  text-align: left;
+}
+
+td {
+  padding: 8px;
+}
+
+:root {
+  --scrollbar-width: 10px;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+  background: #00000044;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ffffff40;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #ffffff55;
+}
+
+.container-flex-end {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dimm {
+  opacity: .3;
+}
+
+.content-container {
+  display: flex;
+  justify-content: center;
+}
+
+.content-container>* {
+  --scrollbar-margin: 8px;
+  max-width: calc(800px + 2 * (var(--scrollbar-margin) + var(--scrollbar-width)));
+  width: 100%;
+  max-height: 100vh;
+  overflow-y: scroll;
+  padding: 0 var(--scrollbar-margin) 0 calc(var(--scrollbar-margin) + var(--scrollbar-width));
+}
+
+.content-container>*::-webkit-scrollbar-track {
+  background-color: unset;
+}
+
+.influx-logo {
+  width: .8em;
+  height: .8em;
+  display: inline-block;
+}
+
+/* write */
+
+.write-set tbody td input {
+  width: 100%
+}
+
+#writeInfo {
+  overflow: auto;
+}
+
+.write-set textarea {
+  text-align: end;
+  white-space: nowrap;
+  resize: none;
+
+}
+
+/* query */
+
+.query-entry-container {
+  display: flex;
+  flex-flow: row;
+  gap: 8px;
+}
+
+.query-entry-container>*:nth-child(1) {
+  flex: 1;
+}
+
+.query-entry-container>*:nth-child(2) {
+  flex: 2;
+}
+
+.query-example-container {
+  display: flex;
+  gap: 8px;
+  flex-flow: column;
+  padding: 12px 8px 8px 8px;
+  background-color: #1a1a2a;
+  border-radius: 8px;
+}
+
+.query-example-container label {
+  text-align: center;
+}
+
+.query-example-container textarea {
+  flex-grow: 1;
+  margin-bottom: 8px;
+  margin-top: 8px;
+  resize: none;
+  height: 100%;
+  background-color: rgb(51, 51, 70);
+  margin-top: 8px;
+}

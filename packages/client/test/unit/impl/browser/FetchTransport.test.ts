@@ -35,10 +35,10 @@ describe('FetchTransport', () => {
         host: 'http://test:8086',
       }
       const transport: any = new FetchTransport(options)
-      expect(transport.defaultHeaders).to.deep.equal({
+      expect(transport._defaultHeaders).to.deep.equal({
         'content-type': 'application/json; charset=utf-8',
       })
-      expect(transport.connectionOptions).to.deep.equal(options)
+      expect(transport._connectionOptions).to.deep.equal(options)
     })
     it('creates the transport with url and token', () => {
       const options: ConnectionOptions = {
@@ -46,11 +46,11 @@ describe('FetchTransport', () => {
         token: 'a',
       }
       const transport: any = new FetchTransport(options)
-      expect(transport.defaultHeaders).to.deep.equal({
+      expect(transport._defaultHeaders).to.deep.equal({
         'content-type': 'application/json; charset=utf-8',
         Authorization: 'Token a',
       })
-      expect(transport.connectionOptions).to.deep.equal(options)
+      expect(transport._connectionOptions).to.deep.equal(options)
     })
     it('ignore last slash / in url', () => {
       const options: ConnectionOptions = {
@@ -58,7 +58,7 @@ describe('FetchTransport', () => {
         token: 'a',
       }
       const transport: any = new FetchTransport(options)
-      expect(transport.url).equals('http://test:8086')
+      expect(transport._url).equals('http://test:8086')
     })
     it('ignore /api/v2 suffix in url', () => {
       const options: ConnectionOptions = {
@@ -66,7 +66,7 @@ describe('FetchTransport', () => {
         token: 'a',
       }
       const transport: any = new FetchTransport(options)
-      expect(transport.url).equals('http://test:8086')
+      expect(transport._url).equals('http://test:8086')
       expect(logs.warn).is.deep.equal([
         [
           "Please remove '/api/v2' context path from InfluxDB base url, using http://test:8086 !",

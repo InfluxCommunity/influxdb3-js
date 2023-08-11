@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {throwReturn} from '../../../src/util/common'
+import {throwReturn, collectAll} from '../../../src/util/common'
 import {replaceURLProtocolWithPort} from '../../../src/util/fixUrl'
 
 describe('utils', () => {
@@ -23,5 +23,15 @@ describe('utils', () => {
     expect(
       replaceURLProtocolWithPort('https://example.com:5000')
     ).to.deep.equal({safe: true, url: 'example.com:5000'})
+  })
+
+  it('collectAll correctly iterate through the generator', async () => {
+    const generator = (async function* () {
+      yield* [4, 5, 6]
+    })()
+
+    const result = await collectAll(generator)
+
+    expect(result).to.deep.equal([4, 5, 6])
   })
 })

@@ -31,29 +31,29 @@ function getResponseHeaders(response: Response): Headers {
  */
 export default class FetchTransport implements Transport {
   chunkCombiner: ChunkCombiner = createTextDecoderCombiner()
-  private defaultHeaders: {[key: string]: string}
-  private url: string
-  constructor(private connectionOptions: ConnectionOptions) {
-    this.defaultHeaders = {
+  private _defaultHeaders: {[key: string]: string}
+  private _url: string
+  constructor(private _connectionOptions: ConnectionOptions) {
+    this._defaultHeaders = {
       'content-type': 'application/json; charset=utf-8',
       // 'User-Agent': `influxdb-client-js/${CLIENT_LIB_VERSION}`, // user-agent can hardly be customized https://github.com/influxdata/influxdb-client-js/issues/262
-      ...connectionOptions.headers,
+      ..._connectionOptions.headers,
     }
-    if (this.connectionOptions.token) {
-      this.defaultHeaders[
+    if (this._connectionOptions.token) {
+      this._defaultHeaders[
         'Authorization'
-      ] = `Token ${this.connectionOptions.token}`
+      ] = `Token ${this._connectionOptions.token}`
     }
-    this.url = String(this.connectionOptions.host)
-    if (this.url.endsWith('/')) {
-      this.url = this.url.substring(0, this.url.length - 1)
+    this._url = String(this._connectionOptions.host)
+    if (this._url.endsWith('/')) {
+      this._url = this._url.substring(0, this._url.length - 1)
     }
     // https://github.com/influxdata/influxdb-client-js/issues/263
     // don't allow /api/v2 suffix to avoid future problems
-    if (this.url.endsWith('/api/v2')) {
-      this.url = this.url.substring(0, this.url.length - '/api/v2'.length)
+    if (this._url.endsWith('/api/v2')) {
+      this._url = this._url.substring(0, this._url.length - '/api/v2'.length)
       Log.warn(
-        `Please remove '/api/v2' context path from InfluxDB base url, using ${this.url} !`
+        `Please remove '/api/v2' context path from InfluxDB base url, using ${this._url} !`
       )
     }
   }
@@ -89,7 +89,7 @@ export default class FetchTransport implements Transport {
         },
       })
     }
-    this.fetch(path, body, options)
+    this._fetch(path, body, options)
       .then(async (response) => {
         if (callbacks?.responseStarted) {
           observer.responseStarted(
@@ -97,7 +97,7 @@ export default class FetchTransport implements Transport {
             response.status
           )
         }
-        await this.throwOnErrorResponse(response)
+        await this._throwOnErrorResponse(response)
         if (response.body) {
           const reader = response.body.getReader()
           let chunk: ReadableStreamReadResult<Uint8Array>
@@ -141,7 +141,8 @@ export default class FetchTransport implements Transport {
       })
       .finally(() => observer.complete())
   }
-  private async throwOnErrorResponse(response: Response): Promise<void> {
+
+  private async _throwOnErrorResponse(response: Response): Promise<void> {
     if (response.status >= 300) {
       let text = ''
       try {
@@ -175,8 +176,8 @@ export default class FetchTransport implements Transport {
     body: string,
     options: SendOptions
   ): AsyncIterableIterator<Uint8Array> {
-    const response = await this.fetch(path, body, options)
-    await this.throwOnErrorResponse(response)
+    const response = await this._fetch(path, body, options)
+    await this._throwOnErrorResponse(response)
     if (response.body) {
       const reader = response.body.getReader()
       for (;;) {
@@ -205,14 +206,14 @@ export default class FetchTransport implements Transport {
     options: SendOptions,
     responseStarted?: ResponseStartedFn
   ): Promise<any> {
-    const response = await this.fetch(path, body, options)
+    const response = await this._fetch(path, body, options)
     const {headers} = response
     const responseContentType = headers.get('content-type') || ''
     if (responseStarted) {
       responseStarted(getResponseHeaders(response), response.status)
     }
 
-    await this.throwOnErrorResponse(response)
+    await this._throwOnErrorResponse(response)
     const responseType = options.headers?.accept ?? responseContentType
     if (responseType.includes('json')) {
       return await response.json()
@@ -224,13 +225,13 @@ export default class FetchTransport implements Transport {
     }
   }
 
-  private fetch(
+  private _fetch(
     path: string,
     body: any,
     options: SendOptions
   ): Promise<Response> {
     const {method, headers, ...other} = options
-    const url = `${this.url}${path}`
+    const url = `${this._url}${path}`
     const request: RequestInit = {
       method: method,
       body:
@@ -240,12 +241,12 @@ export default class FetchTransport implements Transport {
           ? body
           : JSON.stringify(body),
       headers: {
-        ...this.defaultHeaders,
+        ...this._defaultHeaders,
         ...headers,
       },
       credentials: 'omit' as const,
       // override with custom transport options
-      ...this.connectionOptions.transportOptions,
+      ...this._connectionOptions.transportOptions,
       // allow to specify custom options, such as signal, in SendOptions
       ...other,
     }
