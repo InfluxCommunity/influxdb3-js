@@ -18,12 +18,6 @@ declare class InfluxDBClient
 |  --- | --- | --- |
 |  [(constructor)(options)](./influxdb3-client.influxdbclient._constructor_.md) |  | Creates a new instance of the <code>InfluxDBClient</code> for interacting with an InfluxDB server, simplifying common operations such as writing, querying. |
 
-## Properties
-
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [transport](./influxdb3-client.influxdbclient.transport.md) | <code>readonly</code> | [Transport](./influxdb3-client.transport.md) |  |
-
 ## Methods
 
 |  Method | Modifiers | Description |
