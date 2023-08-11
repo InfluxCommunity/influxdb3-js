@@ -43,6 +43,9 @@
     "name": "InfluxData"
   },
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@influxdata/influxdb3-client": "^0.1.0",
     "cpr": "^3.0.1",
