@@ -891,12 +891,12 @@
     tslib "^2.6.0"
 
 "@protobuf-ts/grpc-transport@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@protobuf-ts/grpc-transport/-/grpc-transport-2.9.0.tgz#cb595b8038cc1e599f4ef269c1714e1b80918336"
-  integrity sha512-LiPZ95G9BPVgxO6tJIXjaX3hxtTPrvzi7h4ZU9ce+3Wd9/nzYkawTMtZ6CpLZCSpsk4KlFuDfNmyfJLWefSdKw==
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/grpc-transport/-/grpc-transport-2.9.1.tgz#dd6429fa35dc22c0dcc76c5e3c3c0c10ea1c5c09"
+  integrity sha512-p3o69oQUqMX1dG0QcBsnK7/2h0ReEIfJRbZykMCumTn2uAc9znTfh74xB8aH8I5Q+sWphucG8mPytJ/QIW9WSA==
   dependencies:
-    "@protobuf-ts/runtime" "^2.9.0"
-    "@protobuf-ts/runtime-rpc" "^2.9.0"
+    "@protobuf-ts/runtime" "^2.9.1"
+    "@protobuf-ts/runtime-rpc" "^2.9.1"
 
 "@protobuf-ts/grpcweb-transport@^2.9.0":
   version "2.9.0"
@@ -906,17 +906,17 @@
     "@protobuf-ts/runtime" "^2.9.0"
     "@protobuf-ts/runtime-rpc" "^2.9.0"
 
-"@protobuf-ts/runtime-rpc@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.0.tgz#9431d9dfa1f49c6787bc88c6d3b71b4392082494"
-  integrity sha512-h2S86+u2cNJACjzbBubbjKmNrnXkTmJ9yJHW4t7ZVS9xdV1C68blsVIh3Su4ghR8Nlj0459FuIUTsjWR8hA/7g==
+"@protobuf-ts/runtime-rpc@^2.9.0", "@protobuf-ts/runtime-rpc@^2.9.1":
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.1.tgz#6a1c8f189005de5dc6bce7a18751ef3fe304c8eb"
+  integrity sha512-pzO20J6s07LTWcj8hKAXh/dAacU5HIVir6SANKXXH8G0pn0VIIB4FFECq5Hbv25/8PQoOGZ7iApq/DMHaSjGhg==
   dependencies:
-    "@protobuf-ts/runtime" "^2.9.0"
+    "@protobuf-ts/runtime" "^2.9.1"
 
-"@protobuf-ts/runtime@^2.9.0":
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.0.tgz#fca33476d0fcdd8255680321df893af7ed5bab21"
-  integrity sha512-DnJtLZFMglADv9jiawBmg0RaET4a6fNSAaAHuU6Ovw2ZhJ23ehIY0NrlYLS0Lc8HRH0S5rkLI1QF1A1h8uKUnA==
+"@protobuf-ts/runtime@^2.9.0", "@protobuf-ts/runtime@^2.9.1":
+  version "2.9.1"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.1.tgz#faec7653ca9c01ced49b0ee01818d46b4b3cf2ac"
+  integrity sha512-ZTc8b+pQ6bwxZa3qg9/IO/M/brRkvr0tic9cSGgAsDByfPrtatT2300wTIRLDk8X9WTW1tT+FhyqmcrbMHTeww==
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
