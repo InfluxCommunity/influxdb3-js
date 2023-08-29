@@ -1,4 +1,4 @@
-import {RecordBatchReader} from 'apache-arrow'
+import {RecordBatchReader, Type as ArrowType} from 'apache-arrow'
 import QueryApi from '../QueryApi'
 import {Ticket} from '../generated/flight/Flight'
 import {FlightServiceClient} from '../generated/flight/Flight.client'
@@ -96,8 +96,30 @@ export default class QueryApiImpl implements QueryApi {
           const columnSchema = batch.schema.fields[columnIndex]
           const name = columnSchema.name
           const value = batch.getChildAt(columnIndex)?.get(rowIndex)
-          const type = columnSchema.metadata.get('iox::column::type') as string
-          const [, , valueType, _fieldType] = type.split('::')
+          const arrowTypeId = columnSchema.typeId
+          const metaType = columnSchema.metadata.get('iox::column::type')
+
+          if (value === undefined || value === null) continue
+
+          if (
+            (name === 'measurement' || name == 'iox::measurement') &&
+            typeof value === 'string'
+          ) {
+            point.measurement(value)
+            continue
+          }
+
+          if (!metaType) {
+            if (name === 'time' && arrowTypeId === ArrowType.Timestamp) {
+              point.timestamp(value)
+            } else {
+              point.field(name, value)
+            }
+
+            continue
+          }
+
+          const [, , valueType, _fieldType] = metaType.split('::')
 
           if (valueType === 'field') {
             if (_fieldType && value !== undefined && value !== null)
