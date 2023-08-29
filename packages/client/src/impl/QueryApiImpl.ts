@@ -18,7 +18,7 @@ export default class QueryApiImpl implements QueryApi {
     this._flightClient = new FlightServiceClient(this._transport)
   }
 
-  async *queryRawBatches(
+  private async *_queryRawBatches(
     query: string,
     database: string,
     queryType: QueryType
@@ -66,7 +66,7 @@ export default class QueryApiImpl implements QueryApi {
     database: string,
     queryType: QueryType
   ): AsyncGenerator<Record<string, any>, void, void> {
-    const batches = this.queryRawBatches(query, database, queryType)
+    const batches = this._queryRawBatches(query, database, queryType)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
@@ -87,7 +87,7 @@ export default class QueryApiImpl implements QueryApi {
     database: string,
     queryType: QueryType
   ): AsyncGenerator<Point, void, void> {
-    const batches = this.queryRawBatches(query, database, queryType)
+    const batches = this._queryRawBatches(query, database, queryType)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
@@ -96,7 +96,7 @@ export default class QueryApiImpl implements QueryApi {
           const columnSchema = batch.schema.fields[columnIndex]
           const name = columnSchema.name
           const value = batch.getChildAt(columnIndex)?.get(rowIndex)
-          const type = columnSchema.metadata.get('iox::column::type')!
+          const type = columnSchema.metadata.get('iox::column::type') as string
           const [, , valueType, _fieldType] = type.split('::')
 
           if (valueType === 'field') {
