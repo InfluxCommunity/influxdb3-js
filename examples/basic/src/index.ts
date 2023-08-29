@@ -77,7 +77,9 @@ async function main() {
     )
 
     for await (const row of queryPointsResult) {
-      console.log(row.toLineProtocol())
+      console.log(`avg is ${row.getField('avg', 'float')}`)
+      console.log(`max is ${row.getField('max', 'float')}`)
+      console.log(`lp: ${row.toLineProtocol()}`)
     }
   } catch (err) {
     console.error(err)

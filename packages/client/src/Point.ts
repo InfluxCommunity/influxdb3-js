@@ -17,6 +17,34 @@ export type PointFieldType =
   | 'string'
   | 'boolean'
 
+type FieldEntryFloat = ['float', number]
+type FieldEntryInteger = ['integer', number]
+type FieldEntryUinteger = ['uinteger', number]
+type FieldEntryString = ['string', string]
+type FieldEntryBoolean = ['boolean', boolean]
+
+type FieldEntry =
+  | FieldEntryFloat
+  | FieldEntryInteger
+  | FieldEntryUinteger
+  | FieldEntryString
+  | FieldEntryBoolean
+
+const fieldEntryToLPString = (fe: FieldEntry): string => {
+  switch (fe[0]) {
+    case 'string':
+      return escape.quoted(fe[1])
+    case 'boolean':
+      return fe[1] ? 'T' : 'F'
+    case 'float':
+      return `${fe[1]}`
+    case 'integer':
+      return `${fe[1]}i`
+    case 'uinteger':
+      return `${fe[1]}u`
+  }
+}
+
 /**
  * Point defines values of a single measurement.
  */
@@ -25,7 +53,7 @@ export class Point {
   private _tags: {[key: string]: string} = {}
   private _time: string | number | Date | undefined
   /** escaped field values */
-  public fields: {[key: string]: string} = {}
+  private _fields: {[key: string]: FieldEntry} = {}
 
   /**
    * Create a new Point with specified a measurement name.
@@ -68,7 +96,7 @@ export class Point {
    * @returns this
    */
   public booleanField(name: string, value: boolean | any): Point {
-    this.fields[name] = value ? 'T' : 'F'
+    this._fields[name] = ['boolean', !!value]
     return this
   }
 
@@ -90,7 +118,7 @@ export class Point {
     if (isNaN(val) || val <= -9223372036854776e3 || val >= 9223372036854776e3) {
       throw new Error(`invalid integer value for field '${name}': '${value}'!`)
     }
-    this.fields[name] = `${Math.floor(val)}i`
+    this._fields[name] = ['integer', Math.floor(val)]
     return this
   }
 
@@ -107,7 +135,7 @@ export class Point {
       if (isNaN(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
         throw new Error(`uint value for field '${name}' out of range: ${value}`)
       }
-      this.fields[name] = `${Math.floor(value as number)}u`
+      this._fields[name] = ['uinteger', Math.floor(value as number)]
     } else {
       const strVal = String(value)
       for (let i = 0; i < strVal.length; i++) {
@@ -127,7 +155,7 @@ export class Point {
           `uint value for field '${name}' out of range: ${strVal}`
         )
       }
-      this.fields[name] = `${strVal}u`
+      this._fields[name] = ['uinteger', +strVal]
     }
     return this
   }
@@ -151,7 +179,7 @@ export class Point {
       throw new Error(`invalid float value for field '${name}': '${value}'!`)
     }
 
-    this.fields[name] = String(val)
+    this._fields[name] = ['float', val]
     return this
   }
 
@@ -165,7 +193,7 @@ export class Point {
   public stringField(name: string, value: string | any): Point {
     if (value !== null && value !== undefined) {
       if (typeof value !== 'string') value = String(value)
-      this.fields[name] = escape.quoted(value)
+      this._fields[name] = ['string', value]
     }
     return this
   }
@@ -195,6 +223,57 @@ export class Point {
           `invalid field type for field '${name}': type -> ${type}, value -> ${value}!`
         )
     }
+  }
+
+  /**
+   * Get field of numeric type.
+   *
+   * @param name - field name
+   * @param type - field numeric type
+   * @throws Field type doesn't match actual type
+   * @returns this
+   */
+  public getField(
+    name: string,
+    type: 'float' | 'integer' | 'uinteger'
+  ): number | undefined
+  /**
+   * Get field of string type.
+   *
+   * @param name - field name
+   * @param type - field string type
+   * @throws Field type doesn't match actual type
+   * @returns this
+   */
+  public getField(name: string, type: 'string'): string | undefined
+  /**
+   * Get field of boolean type.
+   *
+   * @param name - field name
+   * @param type - field boolean type
+   * @throws Field type doesn't match actual type
+   * @returns this
+   */
+  public getField(name: string, type: 'boolean'): boolean | undefined
+  /**
+   * Get field without type check.
+   *
+   * @param name - field name
+   * @returns this
+   */
+  public getField(name: string): number | string | boolean | undefined
+  public getField(
+    name: string,
+    type?: PointFieldType
+  ): number | string | boolean | undefined {
+    const fieldEntry = this._fields[name]
+    if (!fieldEntry) return undefined
+    const [actualType, value] = fieldEntry
+    if (!type || type !== actualType)
+      throw new Error(
+        `field ${name} of type ${actualType} doesn't match expected type ${type}!`
+      )
+    return value
   }
 
   /**
@@ -231,13 +310,14 @@ export class Point {
   ): string | undefined {
     if (!this._name) return undefined
     let fieldsLine = ''
-    Object.keys(this.fields)
+    Object.keys(this._fields)
       .sort()
       .forEach((x) => {
         if (x) {
-          const val = this.fields[x]
+          const fieldEntry = this._fields[x]
+          const lpStringValue = fieldEntryToLPString(fieldEntry)
           if (fieldsLine.length > 0) fieldsLine += ','
-          fieldsLine += `${escape.tag(x)}=${val}`
+          fieldsLine += `${escape.tag(x)}=${lpStringValue}`
         }
       })
     if (fieldsLine.length === 0) return undefined // no fields present
