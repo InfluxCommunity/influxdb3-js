@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {Point, PointRecord, convertTimeToNanos} from '../../../src'
+import {Point} from '../../../src'
 import {
   WritableData,
   writableDataToLineProtocol,
@@ -43,52 +43,5 @@ describe('writableDataToLineProtocol', () => {
     }, `does not start with 'test blah=123.6'`)
     expect(output[1]).to.equal(`test blah=456.7 ${date}`)
     expect(output[2]).to.equal('test blah=789.8')
-  })
-
-  it('should convert PointRecord to line protocol', () => {
-    const pointRecord: PointRecord = {
-      measurement: 'foo',
-      fields: {
-        bar: 3.14,
-      },
-    }
-    const output = writableDataToLineProtocol(pointRecord)
-    expect(output.length).to.equal(1)
-    expect(output[0]).satisfies((x: string) => {
-      return x.startsWith('foo bar=3.14')
-    }, `does not start with 'foo bar=3.14'`)
-  })
-
-  it('should convert array-like PointRecord to line protocol', () => {
-    const date = Date.now()
-    const date2 = new Date()
-    const pointRecord1: PointRecord = {
-      measurement: 'foo',
-      fields: {
-        bar: 3.14,
-      },
-      timestamp: '',
-    }
-    const pointRecord2: PointRecord = {
-      measurement: 'baz',
-      fields: {
-        bar: 6.28,
-      },
-      timestamp: date,
-    }
-    const pointRecord3: PointRecord = {
-      measurement: 'qux',
-      fields: {
-        bar: 9.42,
-      },
-      timestamp: date2,
-    }
-    const input: WritableData = [pointRecord1, pointRecord2, pointRecord3]
-    const output = writableDataToLineProtocol(input)
-    expect(output).to.deep.equal([
-      'foo bar=3.14',
-      `baz bar=6.28 ${date}`,
-      `qux bar=9.42 ${convertTimeToNanos(date2)}`,
-    ])
   })
 })

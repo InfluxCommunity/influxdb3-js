@@ -101,7 +101,7 @@ export default class QueryApiImpl implements QueryApi {
 
           if (valueType === 'field') {
             if (_fieldType && value !== undefined && value !== null)
-              point.field(name, _fieldType as any, value)
+              point.field(_fieldType as any, name, value)
           } else if (valueType === 'tag') {
             point.tag(name, value)
           } else if (valueType === 'timestamp') {

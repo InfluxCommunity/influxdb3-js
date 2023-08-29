@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {Point, PointRecord, convertTime} from '../../../src'
+import {Point, convertTime} from '../../../src'
 
 describe('point', () => {
   it('creates point with various fields', () => {
@@ -68,80 +68,6 @@ describe('point', () => {
     expect(point.toLineProtocol()).to.equal(
       'a floored=10u,fromString=789654123u'
     )
-  })
-
-  describe('convert record to point', () => {
-    it('should correctly convert PointRecord to Point', () => {
-      const record: PointRecord = {
-        measurement: 'testMeasurement',
-        timestamp: 1624512793,
-        fields: {
-          text: 'testString',
-          value: 123.45,
-        },
-      }
-      const point = Point.fromRecord(record)
-      expect(point.toLineProtocol()).equals(
-        'testMeasurement text="testString",value=123.45 1624512793'
-      )
-    })
-    it('should accept string as timestamp', () => {
-      const record: PointRecord = {
-        measurement: 'testMeasurement',
-        timestamp: '',
-        fields: {
-          text: 'testString',
-          value: 123.45,
-        },
-      }
-      const point = Point.fromRecord(record)
-      expect(point.toLineProtocol()).equals(
-        'testMeasurement text="testString",value=123.45'
-      )
-    })
-    it('should accept Date as timestamp', () => {
-      const date = new Date()
-      const record: PointRecord = {
-        measurement: 'testMeasurement',
-        timestamp: date,
-        fields: {
-          text: 'testString',
-          value: 123.45,
-        },
-      }
-      const point = Point.fromRecord(record)
-      expect(point.toLineProtocol()).equals(
-        `testMeasurement text="testString",value=123.45 ${convertTime(date)}`
-      )
-    })
-    it('should fail on invalid record', () => {
-      expect(() => {
-        // no measurement
-        Point.fromRecord({} as PointRecord)
-      }).to.throw('measurement must be defined on the Point record!')
-
-      expect(() => {
-        // no fields prop
-        Point.fromRecord({measurement: 'a'} as PointRecord)
-      }).to.throw('fields must be defined on the Point record!')
-
-      expect(() => {
-        // invalid field type
-        Point.fromRecord({
-          measurement: 'a',
-          fields: {a: {}},
-        } as any as PointRecord)
-      }).to.throw('unsuported type of field')
-
-      expect(() => {
-        // invalid tag type
-        Point.fromRecord({
-          measurement: 'a',
-          fields: {},
-          tags: {a: 8},
-        } as any as PointRecord)
-      }).to.throw('tag has to be string')
-    })
   })
 
   describe('convert point time to line protocol', () => {

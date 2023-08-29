@@ -3,13 +3,6 @@ import {convertTimeToNanos, convertTime} from './util/time'
 import {escape} from './util/escape'
 import {WritePrecision} from './options'
 
-export type PointRecord = {
-  measurement: string
-  fields: Record<string, number | string>
-  tags?: Record<string, string>
-  timestamp?: string | number | Date
-}
-
 export type PointFieldType =
   | 'float'
   | 'integer'
@@ -45,14 +38,22 @@ const fieldEntryToLPString = (fe: FieldEntry): string => {
   }
 }
 
+const inferType = (
+  value: number | string | boolean | undefined
+): PointFieldType | undefined => {
+  if (typeof value === 'number') return 'float'
+  else if (typeof value === 'string') return 'string'
+  else if (typeof value === 'boolean') return 'boolean'
+  else return undefined
+}
+
 /**
  * Point defines values of a single measurement.
  */
 export class Point {
   private _name: string
-  private _tags: {[key: string]: string} = {}
   private _time: string | number | Date | undefined
-  /** escaped field values */
+  private _tags: {[key: string]: string} = {}
   private _fields: {[key: string]: FieldEntry} = {}
 
   /**
@@ -202,12 +203,13 @@ export class Point {
    * Adds field based on provided type.
    *
    * @param name - field name
-   * @param type - field type
    * @param value - field value
+   * @param type - field type
    * @returns this
    */
-  public field(name: string, type: PointFieldType, value: any): Point {
-    switch (type) {
+  public field(name: string, value: any, type?: PointFieldType): Point {
+    const inferedType = type ?? inferType(value)
+    switch (inferedType) {
       case 'string':
         return this.stringField(name, value)
       case 'boolean':
@@ -218,11 +220,27 @@ export class Point {
         return this.intField(name, value)
       case 'uinteger':
         return this.uintField(name, value)
+      case undefined:
+        return this
       default:
         throw new Error(
           `invalid field type for field '${name}': type -> ${type}, value -> ${value}!`
         )
     }
+  }
+
+  /**
+   * Add fields according to their type. All numeric type is considered float
+   *
+   * @param name - field name
+   * @param value - field value
+   * @returns this
+   */
+  public fields(fields: {[key: string]: number | boolean | string}): Point {
+    for (const [name, value] of Object.entries(fields)) {
+      this.field(name, value)
+    }
+    return this
   }
 
   /**
@@ -354,29 +372,14 @@ export class Point {
     return line ? line : `invalid point: ${JSON.stringify(this, undefined)}`
   }
 
-  static fromRecord(record: PointRecord): Point {
-    const {measurement, fields, tags, timestamp} = record
-
-    if (!measurement)
-      throw new Error('measurement must be defined on the Point record!')
-
-    if (!fields) throw new Error('fields must be defined on the Point record!')
-
-    const point = new Point(measurement)
-    if (timestamp !== undefined) point.timestamp(timestamp)
-
-    for (const [name, value] of Object.entries(fields)) {
-      if (typeof value === 'number') point.floatField(name, value)
-      else if (typeof value === 'string') point.stringField(name, value)
-      else throw new Error(`unsuported type of field ${name}: ${typeof value}`)
-    }
-
-    if (tags)
-      for (const [name, value] of Object.entries(tags)) {
-        if (typeof value === 'string') point.tag(name, value)
-        else throw new Error(`tag has to be string ${name}: ${typeof value}`)
-      }
-
-    return point
+  copy(): Point {
+    const copy = new Point()
+    copy._name = this._name
+    copy._time = this._time
+    copy._tags = Object.fromEntries(Object.entries(this._tags))
+    copy._fields = Object.fromEntries(
+      Object.entries(this._fields).map((entry) => [...entry])
+    )
+    return copy
   }
 }
