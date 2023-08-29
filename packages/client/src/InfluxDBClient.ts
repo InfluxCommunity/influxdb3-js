@@ -6,6 +6,7 @@ import {ClientOptions, QueryType, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
 import {throwReturn} from './util/common'
+import {Point} from './Point'
 
 const argumentErrorMessage = `\
 Please specify the 'database' as a method parameter or use default configuration \
@@ -72,6 +73,25 @@ export default class InfluxDBClient {
         throwReturn(new Error(argumentErrorMessage)),
       queryType
     )
+  }
+
+  async *queryPoints(
+    query: string,
+    database: string,
+    queryType: QueryType,
+    measurement: string
+  ): AsyncGenerator<Point, void, void> {
+    const points = this._queryApi.queryPoints(
+      query,
+      database ??
+        this._options.database ??
+        throwReturn(new Error(argumentErrorMessage)),
+      queryType
+    )
+
+    for await (const point of points) {
+      yield point.measurement(measurement)
+    }
   }
 
   async close(): Promise<void> {

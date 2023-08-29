@@ -67,6 +67,18 @@ async function main() {
       console.log(`avg is ${row.avg}`)
       console.log(`max is ${row.max}`)
     }
+
+    // Execute query again as points
+    const queryPointsResult = client.queryPoints(
+      query,
+      database,
+      queryType,
+      'stat'
+    )
+
+    for await (const row of queryPointsResult) {
+      console.log(row.toLineProtocol())
+    }
   } catch (err) {
     console.error(err)
   } finally {

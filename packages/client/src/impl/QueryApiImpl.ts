@@ -6,6 +6,7 @@ import {ConnectionOptions, QueryType} from '../options'
 import {createInt32Uint8Array} from '../util/common'
 import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
+import {Point} from '../Point'
 
 export default class QueryApiImpl implements QueryApi {
   private _closed = false
@@ -17,11 +18,11 @@ export default class QueryApiImpl implements QueryApi {
     this._flightClient = new FlightServiceClient(this._transport)
   }
 
-  async *query(
+  async *queryRawBatches(
     query: string,
     database: string,
     queryType: QueryType
-  ): AsyncGenerator<Record<string, any>, void, void> {
+  ) {
     if (this._closed) {
       throw new Error('queryApi: already closed!')
     }
@@ -57,7 +58,17 @@ export default class QueryApiImpl implements QueryApi {
 
     const reader = await RecordBatchReader.from(binaryStream)
 
-    for await (const batch of reader) {
+    yield* reader
+  }
+
+  async *query(
+    query: string,
+    database: string,
+    queryType: QueryType
+  ): AsyncGenerator<Record<string, any>, void, void> {
+    const batches = this.queryRawBatches(query, database, queryType)
+
+    for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
         const row: Record<string, any> = {}
         for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
@@ -67,6 +78,37 @@ export default class QueryApiImpl implements QueryApi {
         }
 
         yield row
+      }
+    }
+  }
+
+  async *queryPoints(
+    query: string,
+    database: string,
+    queryType: QueryType
+  ): AsyncGenerator<Point, void, void> {
+    const batches = this.queryRawBatches(query, database, queryType)
+
+    for await (const batch of batches) {
+      for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
+        const point = new Point()
+        for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
+          const columnSchema = batch.schema.fields[columnIndex]
+          const name = columnSchema.name
+          const value = batch.getChildAt(columnIndex)?.get(rowIndex)
+          const type = columnSchema.metadata.get('iox::column::type')!
+          const [, , valueType, _fieldType] = type.split('::')
+
+          if (valueType === 'field') {
+            point.fields[name] = value?.toString?.()
+          } else if (valueType === 'tag') {
+            point.tag(name, value)
+          } else if (valueType === 'timestamp') {
+            point.timestamp(value)
+          }
+        }
+
+        yield point
       }
     }
   }
