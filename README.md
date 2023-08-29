@@ -138,6 +138,24 @@ for await (const row of queryResult) {
 }
 ```
 
+or use typesafe Point structure with `client.queryPoints`
+
+```ts
+const queryPointsResult = client.queryPoints(
+    query,
+    database,
+    queryType,
+    'stat'
+)
+
+for await (const row of queryPointsResult) {
+    console.log(`avg is ${row.getField('avg', 'float')}`)
+    console.log(`max is ${row.getField('max', 'float')}`)
+    console.log(`lp: ${row.toLineProtocol()}`)
+}
+```
+
+
 ## Examples
 
 For more advanced usage, see [examples](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/README.md).
