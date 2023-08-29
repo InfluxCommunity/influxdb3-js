@@ -10,6 +10,13 @@ export type PointRecord = {
   timestamp?: string | number | Date
 }
 
+export type PointFieldType =
+  | 'float'
+  | 'integer'
+  | 'uinteger'
+  | 'string'
+  | 'boolean'
+
 /**
  * Point defines values of a single measurement.
  */
@@ -161,6 +168,33 @@ export class Point {
       this.fields[name] = escape.quoted(value)
     }
     return this
+  }
+
+  /**
+   * Adds field based on provided type.
+   *
+   * @param name - field name
+   * @param type - field type
+   * @param value - field value
+   * @returns this
+   */
+  public field(name: string, type: PointFieldType, value: any): Point {
+    switch (type) {
+      case 'string':
+        return this.stringField(name, value)
+      case 'boolean':
+        return this.booleanField(name, value)
+      case 'float':
+        return this.floatField(name, value)
+      case 'integer':
+        return this.intField(name, value)
+      case 'uinteger':
+        return this.uintField(name, value)
+      default:
+        throw new Error(
+          `invalid field type for field '${name}': type -> ${type}, value -> ${value}!`
+        )
+    }
   }
 
   /**

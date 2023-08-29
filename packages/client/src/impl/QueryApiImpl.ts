@@ -100,7 +100,8 @@ export default class QueryApiImpl implements QueryApi {
           const [, , valueType, _fieldType] = type.split('::')
 
           if (valueType === 'field') {
-            point.fields[name] = value?.toString?.()
+            if (_fieldType && value !== undefined && value !== null)
+              point.field(name, _fieldType as any, value)
           } else if (valueType === 'tag') {
             point.tag(name, value)
           } else if (valueType === 'timestamp') {
