@@ -287,7 +287,7 @@ export class Point {
     const fieldEntry = this._fields[name]
     if (!fieldEntry) return undefined
     const [actualType, value] = fieldEntry
-    if (!type || type !== actualType)
+    if (type !== undefined && type !== actualType)
       throw new Error(
         `field ${name} of type ${actualType} doesn't match expected type ${type}!`
       )

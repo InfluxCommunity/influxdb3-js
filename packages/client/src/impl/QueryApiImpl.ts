@@ -6,7 +6,7 @@ import {ConnectionOptions, QueryType} from '../options'
 import {createInt32Uint8Array} from '../util/common'
 import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
-import {Point} from '../Point'
+import {Point, PointFieldType} from '../Point'
 
 export default class QueryApiImpl implements QueryApi {
   private _closed = false
@@ -101,7 +101,7 @@ export default class QueryApiImpl implements QueryApi {
 
           if (valueType === 'field') {
             if (_fieldType && value !== undefined && value !== null)
-              point.field(_fieldType as any, name, value)
+              point.field(name, value, _fieldType as PointFieldType)
           } else if (valueType === 'tag') {
             point.tag(name, value)
           } else if (valueType === 'timestamp') {
