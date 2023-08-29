@@ -74,6 +74,18 @@ describe('e2e test', () => {
     row = await data.next()
     expect(row.done).to.equal(true)
 
+    const dataPoints = client.queryPoints(query, database, queryType, 'stat')
+
+    let pointRow: IteratorResult<Point, void>
+    pointRow = await dataPoints.next()
+
+    expect(pointRow.done).to.equal(false)
+    expect(pointRow.value?.getField('avg')).to.equal(avg1)
+    expect(pointRow.value?.getField('max')).to.equal(max1)
+
+    pointRow = await dataPoints.next()
+    expect(pointRow.done).to.equal(true)
+
     await client.close()
     await rejects(client.query(query, database, queryType).next())
   })

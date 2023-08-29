@@ -9,9 +9,10 @@ describe('point', () => {
       .booleanField('falsy', false)
       .intField('intFromString', '20')
       .floatField('floatFromString', '60.3')
+      .stringField('str', 'abc')
       .timestamp('')
     expect(point.toLineProtocol()).to.equal(
-      'blah falsy=F,floatFromString=60.3,intFromString=20i,truthy=T'
+      'blah falsy=F,floatFromString=60.3,intFromString=20i,str="abc",truthy=T'
     )
   })
 
@@ -60,6 +61,43 @@ describe('point', () => {
     )
   })
 
+  it('infers type when no type supported', () => {
+    const point = new Point('a')
+      .fields({
+        float: 20.3,
+        float2: 20,
+        string: 'text',
+        bool: true,
+        nothing: undefined as any,
+      })
+      .timestamp('')
+    expect(point.toLineProtocol()).to.equal(
+      'a bool=T,float=20.3,float2=20,string="text"'
+    )
+  })
+
+  it('throws when invalid type for method field is provided', () => {
+    expect(() => {
+      new Point().field('errorlike', undefined, 'bad-type' as any)
+    }).to.throw(
+      `invalid field type for field 'errorlike': type -> bad-type, value -> undefined!`
+    )
+  })
+
+  it('adds field using field method', () => {
+    const point = new Point()
+      .measurement('blah')
+      .field('truthy', true, 'boolean')
+      .field('falsy', false, 'boolean')
+      .field('intFromString', '20', 'integer')
+      .field('floatFromString', '60.3', 'float')
+      .field('str', 'abc', 'string')
+      .timestamp('')
+    expect(point.toLineProtocol()).to.equal(
+      'blah falsy=F,floatFromString=60.3,intFromString=20i,str="abc",truthy=T'
+    )
+  })
+
   it('creates point with uint fields', () => {
     const point = new Point('a')
       .uintField('floored', 10.88)
@@ -68,6 +106,48 @@ describe('point', () => {
     expect(point.toLineProtocol()).to.equal(
       'a floored=10u,fromString=789654123u'
     )
+  })
+
+  it('returns field of with getField and throws if type not match', () => {
+    const point = new Point('a').fields({
+      float: 20.3,
+      float2: 20,
+      string: 'text',
+      bool: true,
+      nothing: undefined as any,
+    })
+    expect(point.getField('float', 'float')).to.equal(20.3)
+    expect(point.getField('float2', 'float')).to.equal(20)
+    expect(point.getField('string', 'string')).to.equal('text')
+    expect(point.getField('bool', 'boolean')).to.equal(true)
+    expect(() => {
+      point.getField('bool', 'float')
+    }).to.throw(`field bool of type boolean doesn't match expected type float!`)
+    expect(() => {
+      point.getField('string', 'boolean')
+    }).to.throw(
+      `field string of type string doesn't match expected type boolean!`
+    )
+  })
+
+  it('creates deep copy of point', () => {
+    const point = new Point()
+      .measurement('measure1')
+      .booleanField('truthy', true)
+      .booleanField('falsy', false)
+      .intField('intFromString', '20')
+      .uintField('intFromString', '20')
+      .floatField('floatFromString', '60.3')
+      .stringField('str', 'abc')
+      .timestamp('')
+
+    const copy = point.copy()
+
+    expect(copy.toLineProtocol()).to.equal(point.toLineProtocol())
+
+    copy.intField('truthy', 1)
+
+    expect(copy.toLineProtocol()).to.not.equal(point.toLineProtocol())
   })
 
   describe('convert point time to line protocol', () => {
