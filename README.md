@@ -65,18 +65,18 @@ export INFLUXDB_TOKEN="<token>"
 
 ### powershell
 
-```console
-set INFLUXDB_URL=<url>
-set INFLUXDB_DATABASE=<database>
-set INFLUXDB_TOKEN=<token>
+```powershell
+$env:INFLUXDB_URL = "<url>"
+$env:INFLUXDB_DATABASE = "<database>"
+$env:INFLUXDB_TOKEN = "<token>"
 ```
 
 ### cmd
 
-```powershell
-$env:INFLUXDB_URL "<url>"
-$env:INFLUXDB_DATABASE "<database>"
-$env:INFLUXDB_TOKEN "<token>"
+```console
+set INFLUXDB_URL=<url>
+set INFLUXDB_DATABASE=<database>
+set INFLUXDB_TOKEN=<token>
 ```
 
 </details>
@@ -154,7 +154,6 @@ for await (const row of queryPointsResult) {
     console.log(`lp: ${row.toLineProtocol()}`)
 }
 ```
-
 
 ## Examples
 
