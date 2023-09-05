@@ -1,4 +1,4 @@
-import {Point} from './Point'
+import {PointValues} from './PointValues'
 import {QueryType} from './options'
 
 /**
@@ -25,13 +25,13 @@ export default interface QueryApi {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryType - The type of query (default: 'sql').
-   * @returns An async generator that yields Point object.
+   * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database: string,
     queryType: QueryType
-  ): AsyncGenerator<Point, void, void>
+  ): AsyncGenerator<PointValues, void, void>
 
   close(): Promise<void>
 }

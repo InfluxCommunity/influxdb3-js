@@ -22,7 +22,7 @@ describe('writableDataToLineProtocol', () => {
   })
 
   it('should convert single Point to line protocol', () => {
-    const point = new Point('test').floatField('blah', 123.6)
+    const point = Point.measurement('test').floatField('blah', 123.6)
     const output = writableDataToLineProtocol(point)
     expect(output.length).to.equal(1)
     expect(output[0]).satisfies((x: string) => {
@@ -31,10 +31,14 @@ describe('writableDataToLineProtocol', () => {
   })
 
   it('should convert array-like Point to line protocol', () => {
-    const point1 = new Point('test').floatField('blah', 123.6)
+    const point1 = Point.measurement('test').floatField('blah', 123.6)
     const date = Date.now()
-    const point2 = new Point('test').floatField('blah', 456.7).timestamp(date)
-    const point3 = new Point('test').floatField('blah', 789.8).timestamp('')
+    const point2 = Point.measurement('test')
+      .floatField('blah', 456.7)
+      .timestamp(date)
+    const point3 = Point.measurement('test')
+      .floatField('blah', 789.8)
+      .timestamp('')
     const input: WritableData = [point1, point2, point3]
     const output = writableDataToLineProtocol(input)
     expect(output.length).to.equal(3)

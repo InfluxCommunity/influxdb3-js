@@ -6,7 +6,7 @@ import {ConnectionOptions, QueryType} from '../options'
 import {createInt32Uint8Array} from '../util/common'
 import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
-import {Point, PointFieldType} from '../Point'
+import {PointFieldType, PointValues} from '../PointValues'
 
 export default class QueryApiImpl implements QueryApi {
   private _closed = false
@@ -86,12 +86,12 @@ export default class QueryApiImpl implements QueryApi {
     query: string,
     database: string,
     queryType: QueryType
-  ): AsyncGenerator<Point, void, void> {
+  ): AsyncGenerator<PointValues, void, void> {
     const batches = this._queryRawBatches(query, database, queryType)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
-        const point = new Point()
+        const point = new PointValues()
         for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
           const columnSchema = batch.schema.fields[columnIndex]
           const name = columnSchema.name

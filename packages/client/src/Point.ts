@@ -2,16 +2,16 @@ import {TimeConverter} from './WriteApi'
 import {convertTimeToNanos, convertTime} from './util/time'
 import {escape} from './util/escape'
 import {WritePrecision} from './options'
-import { PointFieldType, PointValues } from "./PointValues"
+import {PointFieldType, PointValues} from './PointValues'
 
 const fieldToLPString: {
-(type: 'float', value: number): string,
-(type: 'integer', value: number): string,
-(type: 'uinteger', value: number): string,
-(type: 'string', value: string): string,
-(type: 'boolean', value: boolean): string,
-(type: PointFieldType, value: number|string|boolean): string,
-} = (type: PointFieldType, value: number|string|boolean): string => {
+  (type: 'float', value: number): string
+  (type: 'integer', value: number): string
+  (type: 'uinteger', value: number): string
+  (type: 'string', value: string): string
+  (type: 'boolean', value: boolean): string
+  (type: PointFieldType, value: number | string | boolean): string
+} = (type: PointFieldType, value: number | string | boolean): string => {
   switch (type) {
     case 'string':
       return escape.quoted(value as string)
@@ -46,15 +46,15 @@ export class Point {
    *
    * @param measurementName - the measurement name
    */
-  constructor(measurementName: string)
+  private constructor(measurementName: string)
   /**
    * Create a new Point with given values.
    * After creating Point, it's values shouldn't be modified directly by PointValues object.
    *
    * @param measurementName - the measurement name
    */
-  constructor(values: PointValues)
-  constructor(arg0?: PointValues | string) {
+  private constructor(values: PointValues)
+  private constructor(arg0?: PointValues | string) {
     if (arg0 instanceof PointValues) {
       this._values = arg0
     } else {
@@ -62,6 +62,14 @@ export class Point {
     }
 
     if (typeof arg0 === 'string') this._values.measurement(arg0)
+  }
+
+  public static measurement(name: string): Point {
+    return new Point(name)
+  }
+
+  public static fromValues(values: PointValues): Point {
+    return new Point(values)
   }
 
   /**
@@ -76,7 +84,9 @@ export class Point {
   }
 
   public getMeasurement(): string {
-    return this._values.getMeasurement() as NonNullable<ReturnType<(typeof this._values.getMeasurement)>>
+    return this._values.getMeasurement() as NonNullable<
+      ReturnType<typeof this._values.getMeasurement>
+    >
   }
 
   /**
@@ -140,7 +150,7 @@ export class Point {
         throw new Error(`uint value for field '${name}' out of range: ${value}`)
       }
       this._values.uintField(name, Math.floor(value as number))
-  } else {
+    } else {
       const strVal = String(value)
       for (let i = 0; i < strVal.length; i++) {
         const code = strVal.charCodeAt(i)
@@ -197,8 +207,8 @@ export class Point {
   public stringField(name: string, value: string | any): Point {
     if (value !== null && value !== undefined) {
       if (typeof value !== 'string') value = String(value)
-    this._values.stringField(name, value)
-  }
+      this._values.stringField(name, value)
+    }
     return this
   }
 
@@ -328,13 +338,14 @@ export class Point {
   ): string | undefined {
     if (!this._values.getMeasurement()) return undefined
     let fieldsLine = ''
-    this._values.getFieldNames()
+    this._values
+      .getFieldNames()
       .sort()
       .forEach((name) => {
         if (name) {
           const type = this._values.getFieldType(name)
           const value = this._values.getField(name)
-          if (!type || !value) return;
+          if (type === undefined || value === undefined) return
           const lpStringValue = fieldToLPString(type, value)
           if (fieldsLine.length > 0) fieldsLine += ','
           fieldsLine += `${escape.tag(name)}=${lpStringValue}`
@@ -343,18 +354,16 @@ export class Point {
     if (fieldsLine.length === 0) return undefined // no fields present
     let tagsLine = ''
     const tagNames = this._values.getTagNames()
-    tagNames
-      .sort()
-      .forEach((x) => {
-        if (x) {
-          const val = this._values.getTag(x)
-          if (val) {
-            tagsLine += ','
-            tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
-          }
+    tagNames.sort().forEach((x) => {
+      if (x) {
+        const val = this._values.getTag(x)
+        if (val) {
+          tagsLine += ','
+          tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
         }
-      })
-    let time = this._values.getTimestamp();
+      }
+    })
+    let time = this._values.getTimestamp()
 
     if (!convertTimePrecision) {
       time = convertTimeToNanos(time)
@@ -364,9 +373,9 @@ export class Point {
       time = convertTimePrecision(time)
     }
 
-    return `${escape.measurement(this.getMeasurement())}${tagsLine} ${fieldsLine}${
-      time !== undefined ? ` ${time}` : ''
-    }`
+    return `${escape.measurement(
+      this.getMeasurement()
+    )}${tagsLine} ${fieldsLine}${time !== undefined ? ` ${time}` : ''}`
   }
 
   toString(): string {

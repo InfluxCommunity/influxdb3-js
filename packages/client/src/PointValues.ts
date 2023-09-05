@@ -1,4 +1,4 @@
-import { Point } from "./Point"
+import {Point} from './Point'
 
 export type PointFieldType =
   | 'float'
@@ -72,7 +72,7 @@ export class PointValues {
   }
 
   public getTag(name: string): string | undefined {
-    return this._tags[name];
+    return this._tags[name]
   }
 
   public getTagNames(): string[] {
@@ -226,7 +226,9 @@ export class PointValues {
    * @param value - field value
    * @returns this
    */
-  public fields(fields: {[key: string]: number | boolean | string}): PointValues {
+  public fields(fields: {
+    [key: string]: number | boolean | string
+  }): PointValues {
     for (const [name, value] of Object.entries(fields)) {
       this.field(name, value)
     }
@@ -318,11 +320,11 @@ export class PointValues {
   }
 
   public getTimestamp(): Date | number | string | undefined {
-    return this._time;
+    return this._time
   }
 
   public asPoint(): Point {
-    return new Point(this);
+    return Point.fromValues(this)
   }
 
   copy(): PointValues {

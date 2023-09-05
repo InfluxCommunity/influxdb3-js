@@ -1,6 +1,7 @@
 import {expect} from 'chai'
 import {InfluxDBClient, Point} from '../../src'
 import {rejects} from 'assert'
+import {PointValues} from '../../src/PointValues'
 
 const getEnvVariables = () => {
   const {
@@ -42,7 +43,7 @@ describe('e2e test', () => {
     const avg1 = getRandomInt(110, 500)
     const max1 = getRandomInt(900, 1000)
 
-    const point = new Point('stat')
+    const point = Point.measurement('stat')
       .tag('unit', 'temperature')
       .floatField('avg', avg1)
       .floatField('max', max1)
@@ -76,7 +77,7 @@ describe('e2e test', () => {
 
     const dataPoints = client.queryPoints(query, database, queryType, 'stat')
 
-    let pointRow: IteratorResult<Point, void>
+    let pointRow: IteratorResult<PointValues, void>
     pointRow = await dataPoints.next()
 
     expect(pointRow.done).to.equal(false)

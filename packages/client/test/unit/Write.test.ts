@@ -71,10 +71,16 @@ describe('Write', () => {
       await rejects(subject.write('text value=1', DATABASE))
       await rejects(subject.write(['text value=1', 'text value=2'], DATABASE))
       await rejects(
-        subject.write(new Point('test').floatField('value', 1), DATABASE)
+        subject.write(
+          Point.measurement('test').floatField('value', 1),
+          DATABASE
+        )
       )
       await rejects(
-        subject.write([new Point('test').floatField('value', 1)], DATABASE)
+        subject.write(
+          [Point.measurement('test').floatField('value', 1)],
+          DATABASE
+        )
       )
     })
   })
@@ -129,7 +135,7 @@ describe('Write', () => {
               }
             })
             .persist()
-          const point = new Point('test')
+          const point = Point.measurement('test')
             .tag('t', ' ')
             .floatField('value', 1)
             .timestamp('')
@@ -155,7 +161,7 @@ describe('Write', () => {
           requests = 0
 
           // generates no lines, no requests done
-          await subject.write(new Point(), DATABASE)
+          await subject.write(Point.measurement('m'), DATABASE)
           await subject.write([], DATABASE)
           await subject.write('', DATABASE)
           expect(requests).to.equal(0)
@@ -163,10 +169,12 @@ describe('Write', () => {
           expect(logs.warn).has.length(0)
 
           const points = [
-            new Point('test').floatField('value', 1).timestamp('1'),
-            new Point('test').floatField('value', 2).timestamp(2.1),
-            new Point('test').floatField('value', 3).timestamp(new Date(3)),
-            new Point('test')
+            Point.measurement('test').floatField('value', 1).timestamp('1'),
+            Point.measurement('test').floatField('value', 2).timestamp(2.1),
+            Point.measurement('test')
+              .floatField('value', 3)
+              .timestamp(new Date(3)),
+            Point.measurement('test')
               .floatField('value', 4)
               .timestamp(false as any as string), // server decides what to do with such values
           ]
@@ -224,7 +232,10 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.write(new Point('test').floatField('value', 1), DATABASE)
+      await subject.write(
+        Point.measurement('test').floatField('value', 1),
+        DATABASE
+      )
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
@@ -241,7 +252,10 @@ describe('Write', () => {
           return [204, '', {}]
         })
         .persist()
-      await subject.write(new Point('test').floatField('value', 1), DATABASE)
+      await subject.write(
+        Point.measurement('test').floatField('value', 1),
+        DATABASE
+      )
       await subject.close()
       expect(logs.error).has.length(0)
       expect(logs.warn).deep.equals([])

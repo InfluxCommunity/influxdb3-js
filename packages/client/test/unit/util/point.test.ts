@@ -3,8 +3,7 @@ import {Point, convertTime} from '../../../src'
 
 describe('point', () => {
   it('creates point with various fields', () => {
-    const point = new Point()
-      .measurement('blah')
+    const point = Point.measurement('blah')
       .booleanField('truthy', true)
       .booleanField('falsy', false)
       .intField('intFromString', '20')
@@ -18,32 +17,32 @@ describe('point', () => {
 
   it('fails on invalid fields', () => {
     expect(() => {
-      new Point().intField('fails', NaN)
+      Point.measurement('a').intField('fails', NaN)
     }).to.throw(`invalid integer value for field 'fails': 'NaN'`)
 
     expect(() => {
-      new Point().intField('fails', Infinity)
+      Point.measurement('a').intField('fails', Infinity)
     }).to.throw(`invalid integer value for field 'fails': 'Infinity'!`)
 
     expect(() => {
-      new Point().intField('fails', 9223372036854776e3)
+      Point.measurement('a').intField('fails', 9223372036854776e3)
     }).to.throw(
       `invalid integer value for field 'fails': '9223372036854776000'!`
     )
     expect(() => {
-      new Point().floatField('fails', Infinity)
+      Point.measurement('a').floatField('fails', Infinity)
     }).to.throw(`invalid float value for field 'fails': 'Infinity'!`)
 
     expect(() => {
-      new Point().uintField('fails', NaN)
+      Point.measurement('a').uintField('fails', NaN)
     }).to.throw(`uint value for field 'fails' out of range: NaN`)
 
     expect(() => {
-      new Point().uintField('fails', -1)
+      Point.measurement('a').uintField('fails', -1)
     }).to.throw(`uint value for field 'fails' out of range: -1`)
 
     expect(() => {
-      new Point().uintField('fails', Number.MAX_SAFE_INTEGER + 10)
+      Point.measurement('a').uintField('fails', Number.MAX_SAFE_INTEGER + 10)
     }).to.throw(
       `uint value for field 'fails' out of range: ${
         Number.MAX_SAFE_INTEGER + 10
@@ -51,18 +50,18 @@ describe('point', () => {
     )
 
     expect(() => {
-      new Point().uintField('fails', '10a8')
+      Point.measurement('a').uintField('fails', '10a8')
     }).to.throw(`uint value has an unsupported character at pos 2: 10a8`)
 
     expect(() => {
-      new Point().uintField('fails', '18446744073709551616')
+      Point.measurement('a').uintField('fails', '18446744073709551616')
     }).to.throw(
       `uint value for field 'fails' out of range: 18446744073709551616`
     )
   })
 
   it('infers type when no type supported', () => {
-    const point = new Point('a')
+    const point = Point.measurement('a')
       .fields({
         float: 20.3,
         float2: 20,
@@ -78,15 +77,14 @@ describe('point', () => {
 
   it('throws when invalid type for method field is provided', () => {
     expect(() => {
-      new Point().field('errorlike', undefined, 'bad-type' as any)
+      Point.measurement('a').field('errorlike', undefined, 'bad-type' as any)
     }).to.throw(
       `invalid field type for field 'errorlike': type -> bad-type, value -> undefined!`
     )
   })
 
   it('adds field using field method', () => {
-    const point = new Point()
-      .measurement('blah')
+    const point = Point.measurement('blah')
       .field('truthy', true, 'boolean')
       .field('falsy', false, 'boolean')
       .field('intFromString', '20', 'integer')
@@ -99,7 +97,7 @@ describe('point', () => {
   })
 
   it('creates point with uint fields', () => {
-    const point = new Point('a')
+    const point = Point.measurement('a')
       .uintField('floored', 10.88)
       .uintField('fromString', '789654123')
       .timestamp('')
@@ -109,7 +107,7 @@ describe('point', () => {
   })
 
   it('returns field of with getField and throws if type not match', () => {
-    const point = new Point('a').fields({
+    const point = Point.measurement('a').fields({
       float: 20.3,
       float2: 20,
       string: 'text',
@@ -131,8 +129,7 @@ describe('point', () => {
   })
 
   it('creates deep copy of point', () => {
-    const point = new Point()
-      .measurement('measure1')
+    const point = Point.measurement('measure1')
       .booleanField('truthy', true)
       .booleanField('falsy', false)
       .intField('intFromString', '20')
@@ -156,20 +153,20 @@ describe('point', () => {
       convertTime(value, precision)
 
     it('converts empty string to no timestamp', () => {
-      const p = new Point('a').floatField('b', 1).timestamp('')
+      const p = Point.measurement('a').floatField('b', 1).timestamp('')
       expect(p.toLineProtocol(clinetConvertTime)).equals('a b=1')
     })
     it('converts number to timestamp', () => {
-      const p = new Point('a').floatField('b', 1).timestamp(1.2)
+      const p = Point.measurement('a').floatField('b', 1).timestamp(1.2)
       expect(p.toLineProtocol(clinetConvertTime)).equals('a b=1 1')
     })
     it('converts Date to timestamp', () => {
       const d = new Date()
-      const p = new Point('a').floatField('b', 1).timestamp(d)
+      const p = Point.measurement('a').floatField('b', 1).timestamp(d)
       expect(p.toLineProtocol(precision)).equals(`a b=1 ${d.getTime()}`)
     })
     it('converts undefined to local timestamp', () => {
-      const p = new Point('a').floatField('b', 1)
+      const p = Point.measurement('a').floatField('b', 1)
       expect(p.toLineProtocol(precision)).satisfies((x: string) => {
         return x.startsWith('a b=1')
       }, `does not start with 'a b=1'`)
@@ -178,7 +175,10 @@ describe('point', () => {
       })
     })
     it('toString() works same as toLineProtocol()', () => {
-      const p = new Point('a').floatField('b', 1).tag('c', 'd').timestamp('')
+      const p = Point.measurement('a')
+        .floatField('b', 1)
+        .tag('c', 'd')
+        .timestamp('')
       expect(p.toLineProtocol()).equals(p.toString())
     })
   })
