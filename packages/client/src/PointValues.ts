@@ -1,30 +1,24 @@
-import {TimeConverter} from './WriteApi'
-import {convertTimeToNanos, convertTime} from './util/time'
-import {escape} from './util/escape'
-import {WritePrecision} from './options'
-import { PointFieldType, PointValues } from "./PointValues"
+import { Point } from "./Point"
 
-const fieldToLPString: {
-(type: 'float', value: number): string,
-(type: 'integer', value: number): string,
-(type: 'uinteger', value: number): string,
-(type: 'string', value: string): string,
-(type: 'boolean', value: boolean): string,
-(type: PointFieldType, value: number|string|boolean): string,
-} = (type: PointFieldType, value: number|string|boolean): string => {
-  switch (type) {
-    case 'string':
-      return escape.quoted(value as string)
-    case 'boolean':
-      return value ? 'T' : 'F'
-    case 'float':
-      return `${value}`
-    case 'integer':
-      return `${value}i`
-    case 'uinteger':
-      return `${value}u`
-  }
-}
+export type PointFieldType =
+  | 'float'
+  | 'integer'
+  | 'uinteger'
+  | 'string'
+  | 'boolean'
+
+type FieldEntryFloat = ['float', number]
+type FieldEntryInteger = ['integer', number]
+type FieldEntryUinteger = ['uinteger', number]
+type FieldEntryString = ['string', string]
+type FieldEntryBoolean = ['boolean', boolean]
+
+type FieldEntry =
+  | FieldEntryFloat
+  | FieldEntryInteger
+  | FieldEntryUinteger
+  | FieldEntryString
+  | FieldEntryBoolean
 
 const inferType = (
   value: number | string | boolean | undefined
@@ -38,31 +32,16 @@ const inferType = (
 /**
  * Point defines values of a single measurement.
  */
-export class Point {
-  private readonly _values: PointValues
+export class PointValues {
+  private _name: string | undefined
+  private _time: string | number | Date | undefined
+  private _tags: {[key: string]: string} = {}
+  private _fields: {[key: string]: FieldEntry} = {}
 
   /**
-   * Create a new Point with specified a measurement name.
-   *
-   * @param measurementName - the measurement name
+   * Create an empty PointValues.
    */
-  constructor(measurementName: string)
-  /**
-   * Create a new Point with given values.
-   * After creating Point, it's values shouldn't be modified directly by PointValues object.
-   *
-   * @param measurementName - the measurement name
-   */
-  constructor(values: PointValues)
-  constructor(arg0?: PointValues | string) {
-    if (arg0 instanceof PointValues) {
-      this._values = arg0
-    } else {
-      this._values = new PointValues()
-    }
-
-    if (typeof arg0 === 'string') this._values.measurement(arg0)
-  }
+  constructor() {}
 
   /**
    * Sets point's measurement.
@@ -70,13 +49,13 @@ export class Point {
    * @param name - measurement name
    * @returns this
    */
-  public measurement(name: string): Point {
-    this._values.measurement(name)
+  public measurement(name: string): PointValues {
+    this._name = name
     return this
   }
 
-  public getMeasurement(): string {
-    return this._values.getMeasurement() as NonNullable<ReturnType<(typeof this._values.getMeasurement)>>
+  getMeasurement(): string | undefined {
+    return this._name
   }
 
   /**
@@ -87,9 +66,17 @@ export class Point {
    * @param value - tag value
    * @returns this
    */
-  public tag(name: string, value: string): Point {
-    this._values.tag(name, value)
+  public tag(name: string, value: string): PointValues {
+    this._tags[name] = value
     return this
+  }
+
+  public getTag(name: string): string | undefined {
+    return this._tags[name];
+  }
+
+  public getTagNames(): string[] {
+    return Object.keys(this._tags)
   }
 
   /**
@@ -99,8 +86,8 @@ export class Point {
    * @param value - field value
    * @returns this
    */
-  public booleanField(name: string, value: boolean | any): Point {
-    this._values.booleanField(name, value)
+  public booleanField(name: string, value: boolean | any): PointValues {
+    this._fields[name] = ['boolean', !!value]
     return this
   }
 
@@ -112,7 +99,7 @@ export class Point {
    * @returns this
    * @throws NaN or out of int64 range value is supplied
    */
-  public intField(name: string, value: number | any): Point {
+  public intField(name: string, value: number | any): PointValues {
     let val: number
     if (typeof value === 'number') {
       val = value
@@ -122,7 +109,7 @@ export class Point {
     if (isNaN(val) || val <= -9223372036854776e3 || val >= 9223372036854776e3) {
       throw new Error(`invalid integer value for field '${name}': '${value}'!`)
     }
-    this._values.intField(name, Math.floor(val))
+    this._fields[name] = ['integer', Math.floor(val)]
     return this
   }
 
@@ -134,13 +121,13 @@ export class Point {
    * @returns this
    * @throws NaN out of range value is supplied
    */
-  public uintField(name: string, value: number | any): Point {
+  public uintField(name: string, value: number | any): PointValues {
     if (typeof value === 'number') {
       if (isNaN(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
         throw new Error(`uint value for field '${name}' out of range: ${value}`)
       }
-      this._values.uintField(name, Math.floor(value as number))
-  } else {
+      this._fields[name] = ['uinteger', Math.floor(value as number)]
+    } else {
       const strVal = String(value)
       for (let i = 0; i < strVal.length; i++) {
         const code = strVal.charCodeAt(i)
@@ -159,7 +146,7 @@ export class Point {
           `uint value for field '${name}' out of range: ${strVal}`
         )
       }
-      this._values.uintField(name, +strVal)
+      this._fields[name] = ['uinteger', +strVal]
     }
     return this
   }
@@ -172,7 +159,7 @@ export class Point {
    * @returns this
    * @throws NaN/Infinity/-Infinity is supplied
    */
-  public floatField(name: string, value: number | any): Point {
+  public floatField(name: string, value: number | any): PointValues {
     let val: number
     if (typeof value === 'number') {
       val = value
@@ -183,7 +170,7 @@ export class Point {
       throw new Error(`invalid float value for field '${name}': '${value}'!`)
     }
 
-    this._values.floatField(name, val)
+    this._fields[name] = ['float', val]
     return this
   }
 
@@ -194,11 +181,11 @@ export class Point {
    * @param value - field value
    * @returns this
    */
-  public stringField(name: string, value: string | any): Point {
+  public stringField(name: string, value: string | any): PointValues {
     if (value !== null && value !== undefined) {
       if (typeof value !== 'string') value = String(value)
-    this._values.stringField(name, value)
-  }
+      this._fields[name] = ['string', value]
+    }
     return this
   }
 
@@ -210,7 +197,7 @@ export class Point {
    * @param type - field type
    * @returns this
    */
-  public field(name: string, value: any, type?: PointFieldType): Point {
+  public field(name: string, value: any, type?: PointFieldType): PointValues {
     const inferedType = type ?? inferType(value)
     switch (inferedType) {
       case 'string':
@@ -239,7 +226,7 @@ export class Point {
    * @param value - field value
    * @returns this
    */
-  public fields(fields: {[key: string]: number | boolean | string}): Point {
+  public fields(fields: {[key: string]: number | boolean | string}): PointValues {
     for (const [name, value] of Object.entries(fields)) {
       this.field(name, value)
     }
@@ -287,11 +274,24 @@ export class Point {
     name: string,
     type?: PointFieldType
   ): number | string | boolean | undefined {
-    return this._values.getField(name, type as any)
+    const fieldEntry = this._fields[name]
+    if (!fieldEntry) return undefined
+    const [actualType, value] = fieldEntry
+    if (type !== undefined && type !== actualType)
+      throw new Error(
+        `field ${name} of type ${actualType} doesn't match expected type ${type}!`
+      )
+    return value
   }
 
   public getFieldType(name: string): PointFieldType | undefined {
-    return this._values.getFieldType(name)
+    const fieldEntry = this._fields[name]
+    if (!fieldEntry) return undefined
+    return fieldEntry[0]
+  }
+
+  public getFieldNames(): string[] {
+    return Object.keys(this._fields)
   }
 
   /**
@@ -312,69 +312,27 @@ export class Point {
    * @param value - point time
    * @returns this
    */
-  public timestamp(value: Date | number | string | undefined): Point {
-    this._values.timestamp(value)
+  public timestamp(value: Date | number | string | undefined): PointValues {
+    this._time = value
     return this
   }
 
-  /**
-   * Creates an InfluxDB protocol line out of this instance.
-   * @param settings - settings control serialization of a point timestamp and can also add default tags,
-   * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
-   * @returns an InfluxDB protocol line out of this instance
-   */
-  public toLineProtocol(
-    convertTimePrecision?: TimeConverter | WritePrecision
-  ): string | undefined {
-    if (!this._values.getMeasurement()) return undefined
-    let fieldsLine = ''
-    this._values.getFieldNames()
-      .sort()
-      .forEach((name) => {
-        if (name) {
-          const type = this._values.getFieldType(name)
-          const value = this._values.getField(name)
-          if (!type || !value) return;
-          const lpStringValue = fieldToLPString(type, value)
-          if (fieldsLine.length > 0) fieldsLine += ','
-          fieldsLine += `${escape.tag(name)}=${lpStringValue}`
-        }
-      })
-    if (fieldsLine.length === 0) return undefined // no fields present
-    let tagsLine = ''
-    const tagNames = this._values.getTagNames()
-    tagNames
-      .sort()
-      .forEach((x) => {
-        if (x) {
-          const val = this._values.getTag(x)
-          if (val) {
-            tagsLine += ','
-            tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
-          }
-        }
-      })
-    let time = this._values.getTimestamp();
-
-    if (!convertTimePrecision) {
-      time = convertTimeToNanos(time)
-    } else if (typeof convertTimePrecision === 'string')
-      time = convertTime(time, convertTimePrecision)
-    else {
-      time = convertTimePrecision(time)
-    }
-
-    return `${escape.measurement(this.getMeasurement())}${tagsLine} ${fieldsLine}${
-      time !== undefined ? ` ${time}` : ''
-    }`
+  public getTimestamp(): Date | number | string | undefined {
+    return this._time;
   }
 
-  toString(): string {
-    const line = this.toLineProtocol(undefined)
-    return line ? line : `invalid point: ${JSON.stringify(this, undefined)}`
+  public asPoint(): Point {
+    return new Point(this);
   }
 
-  copy(): Point {
-    return new Point(this._values.copy())
+  copy(): PointValues {
+    const copy = new PointValues()
+    copy._name = this._name
+    copy._time = this._time
+    copy._tags = Object.fromEntries(Object.entries(this._tags))
+    copy._fields = Object.fromEntries(
+      Object.entries(this._fields).map((entry) => [...entry])
+    )
+    return copy
   }
 }
