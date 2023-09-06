@@ -90,7 +90,7 @@ export default class InfluxDBClient {
     )
 
     for await (const point of points) {
-      yield point.measurement(measurement)
+      yield point.setMeasurement(measurement)
     }
   }
 

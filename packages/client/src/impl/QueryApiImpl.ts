@@ -91,7 +91,7 @@ export default class QueryApiImpl implements QueryApi {
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
-        const point = new PointValues()
+        const values = new PointValues()
         for (let columnIndex = 0; columnIndex < batch.numCols; columnIndex++) {
           const columnSchema = batch.schema.fields[columnIndex]
           const name = columnSchema.name
@@ -105,15 +105,15 @@ export default class QueryApiImpl implements QueryApi {
             (name === 'measurement' || name == 'iox::measurement') &&
             typeof value === 'string'
           ) {
-            point.measurement(value)
+            values.setMeasurement(value)
             continue
           }
 
           if (!metaType) {
             if (name === 'time' && arrowTypeId === ArrowType.Timestamp) {
-              point.timestamp(value)
+              values.setTimestamp(value)
             } else {
-              point.field(name, value)
+              values.setField(name, value)
             }
 
             continue
@@ -123,15 +123,15 @@ export default class QueryApiImpl implements QueryApi {
 
           if (valueType === 'field') {
             if (_fieldType && value !== undefined && value !== null)
-              point.field(name, value, _fieldType as PointFieldType)
+              values.setField(name, value, _fieldType as PointFieldType)
           } else if (valueType === 'tag') {
-            point.tag(name, value)
+            values.setTag(name, value)
           } else if (valueType === 'timestamp') {
-            point.timestamp(value)
+            values.setTimestamp(value)
           }
         }
 
-        yield point
+        yield values
       }
     }
   }

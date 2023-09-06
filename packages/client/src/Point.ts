@@ -26,15 +26,6 @@ const fieldToLPString: {
   }
 }
 
-const inferType = (
-  value: number | string | boolean | undefined
-): PointFieldType | undefined => {
-  if (typeof value === 'number') return 'float'
-  else if (typeof value === 'string') return 'string'
-  else if (typeof value === 'boolean') return 'boolean'
-  else return undefined
-}
-
 /**
  * Point defines values of a single measurement.
  */
@@ -61,7 +52,7 @@ export class Point {
       this._values = new PointValues()
     }
 
-    if (typeof arg0 === 'string') this._values.measurement(arg0)
+    if (typeof arg0 === 'string') this._values.setMeasurement(arg0)
   }
 
   public static measurement(name: string): Point {
@@ -72,21 +63,50 @@ export class Point {
     return new Point(values)
   }
 
+  public getMeasurement(): string {
+    return this._values.getMeasurement() as string
+  }
+
   /**
    * Sets point's measurement.
    *
    * @param name - measurement name
    * @returns this
    */
-  public measurement(name: string): Point {
-    this._values.measurement(name)
+  public setMeasurement(name: string): Point {
+    this._values.setMeasurement(name)
     return this
   }
 
-  public getMeasurement(): string {
-    return this._values.getMeasurement() as NonNullable<
-      ReturnType<typeof this._values.getMeasurement>
-    >
+  public getTimestamp(): Date | number | string | undefined {
+    return this._values.getTimestamp()
+  }
+
+  /**
+   * Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string
+   * or an undefined value. An undefined value instructs to assign a local timestamp using
+   * the client's clock. An empty string can be used to let the server assign
+   * the timestamp. A number value represents time as a count of time units since epoch, the
+   * exact time unit then depends on the {@link InfluxDBClient.write | precision} of the API
+   * that writes the point.
+   *
+   * Beware that the current time in nanoseconds can't precisely fit into a JS number,
+   * which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as
+   * a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds,
+   * BigInt's `toString()` returns the required high-precision string.
+   *
+   * Note that InfluxDB requires the timestamp to fit into int64 data type.
+   *
+   * @param value - point time
+   * @returns this
+   */
+  public setTimestamp(value: Date | number | string | undefined): Point {
+    this._values.setTimestamp(value)
+    return this
+  }
+
+  public getTag(name: string): string | undefined {
+    return this._values.getTag(name)
   }
 
   /**
@@ -97,81 +117,18 @@ export class Point {
    * @param value - tag value
    * @returns this
    */
-  public tag(name: string, value: string): Point {
-    this._values.tag(name, value)
+  public setTag(name: string, value: string): Point {
+    this._values.setTag(name, value)
     return this
   }
 
-  /**
-   * Adds a boolean field.
-   *
-   * @param field - field name
-   * @param value - field value
-   * @returns this
-   */
-  public booleanField(name: string, value: boolean | any): Point {
-    this._values.booleanField(name, value)
+  public removeTag(name: string): Point {
+    this._values.removeTag(name)
     return this
   }
 
-  /**
-   * Adds an integer field.
-   *
-   * @param name - field name
-   * @param value - field value
-   * @returns this
-   * @throws NaN or out of int64 range value is supplied
-   */
-  public intField(name: string, value: number | any): Point {
-    let val: number
-    if (typeof value === 'number') {
-      val = value
-    } else {
-      val = parseInt(String(value))
-    }
-    if (isNaN(val) || val <= -9223372036854776e3 || val >= 9223372036854776e3) {
-      throw new Error(`invalid integer value for field '${name}': '${value}'!`)
-    }
-    this._values.intField(name, Math.floor(val))
-    return this
-  }
-
-  /**
-   * Adds an unsigned integer field.
-   *
-   * @param name - field name
-   * @param value - field value
-   * @returns this
-   * @throws NaN out of range value is supplied
-   */
-  public uintField(name: string, value: number | any): Point {
-    if (typeof value === 'number') {
-      if (isNaN(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
-        throw new Error(`uint value for field '${name}' out of range: ${value}`)
-      }
-      this._values.uintField(name, Math.floor(value as number))
-    } else {
-      const strVal = String(value)
-      for (let i = 0; i < strVal.length; i++) {
-        const code = strVal.charCodeAt(i)
-        if (code < 48 || code > 57) {
-          throw new Error(
-            `uint value has an unsupported character at pos ${i}: ${value}`
-          )
-        }
-      }
-      if (
-        strVal.length > 20 ||
-        (strVal.length === 20 &&
-          strVal.localeCompare('18446744073709551615') > 0)
-      ) {
-        throw new Error(
-          `uint value for field '${name}' out of range: ${strVal}`
-        )
-      }
-      this._values.uintField(name, +strVal)
-    }
-    return this
+  public getTagNames(): string[] {
+    return this._values.getTagNames()
   }
 
   /**
@@ -182,19 +139,44 @@ export class Point {
    * @returns this
    * @throws NaN/Infinity/-Infinity is supplied
    */
-  public floatField(name: string, value: number | any): Point {
-    let val: number
-    if (typeof value === 'number') {
-      val = value
-    } else {
-      val = parseFloat(value)
-    }
-    if (!isFinite(val)) {
-      throw new Error(`invalid float value for field '${name}': '${value}'!`)
-    }
-
-    this._values.floatField(name, val)
+  public setFloatField(name: string, value: number | any): Point {
+    this._values.setFloatField(name, value)
     return this
+  }
+  public getIntField(name: string): number | undefined {
+    return this._values.getIntField(name)
+  }
+
+  /**
+   * Adds an integer field.
+   *
+   * @param name - field name
+   * @param value - field value
+   * @returns this
+   * @throws NaN or out of int64 range value is supplied
+   */
+  public setIntField(name: string, value: number | any): Point {
+    this._values.setIntField(name, value)
+    return this
+  }
+  public getUintField(name: string): number | undefined {
+    return this._values.getUintField(name)
+  }
+
+  /**
+   * Adds an unsigned integer field.
+   *
+   * @param name - field name
+   * @param value - field value
+   * @returns this
+   * @throws NaN out of range value is supplied
+   */
+  public setUintField(name: string, value: number | any): Point {
+    this._values.setUintField(name, value)
+    return this
+  }
+  public getStringField(name: string): string | undefined {
+    return this._values.getStringField(name)
   }
 
   /**
@@ -204,55 +186,23 @@ export class Point {
    * @param value - field value
    * @returns this
    */
-  public stringField(name: string, value: string | any): Point {
-    if (value !== null && value !== undefined) {
-      if (typeof value !== 'string') value = String(value)
-      this._values.stringField(name, value)
-    }
+  public setStringField(name: string, value: string | any): Point {
+    this._values.setStringField(name, value)
     return this
   }
-
-  /**
-   * Adds field based on provided type.
-   *
-   * @param name - field name
-   * @param value - field value
-   * @param type - field type
-   * @returns this
-   */
-  public field(name: string, value: any, type?: PointFieldType): Point {
-    const inferedType = type ?? inferType(value)
-    switch (inferedType) {
-      case 'string':
-        return this.stringField(name, value)
-      case 'boolean':
-        return this.booleanField(name, value)
-      case 'float':
-        return this.floatField(name, value)
-      case 'integer':
-        return this.intField(name, value)
-      case 'uinteger':
-        return this.uintField(name, value)
-      case undefined:
-        return this
-      default:
-        throw new Error(
-          `invalid field type for field '${name}': type -> ${type}, value -> ${value}!`
-        )
-    }
+  public getBooleanField(name: string): boolean | undefined {
+    return this._values.getBooleanField(name)
   }
 
   /**
-   * Add fields according to their type. All numeric type is considered float
+   * Adds a boolean field.
    *
-   * @param name - field name
+   * @param field - field name
    * @param value - field value
    * @returns this
    */
-  public fields(fields: {[key: string]: number | boolean | string}): Point {
-    for (const [name, value] of Object.entries(fields)) {
-      this.field(name, value)
-    }
+  public setBooleanField(name: string, value: boolean | any): Point {
+    this._values.setBooleanField(name, value)
     return this
   }
 
@@ -305,26 +255,45 @@ export class Point {
   }
 
   /**
-   * Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string
-   * or an undefined value. An undefined value instructs to assign a local timestamp using
-   * the client's clock. An empty string can be used to let the server assign
-   * the timestamp. A number value represents time as a count of time units since epoch, the
-   * exact time unit then depends on the {@link InfluxDBClient.write | precision} of the API
-   * that writes the point.
+   * Adds field based on provided type.
    *
-   * Beware that the current time in nanoseconds can't precisely fit into a JS number,
-   * which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as
-   * a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds,
-   * BigInt's `toString()` returns the required high-precision string.
-   *
-   * Note that InfluxDB requires the timestamp to fit into int64 data type.
-   *
-   * @param value - point time
+   * @param name - field name
+   * @param value - field value
+   * @param type - field type
    * @returns this
    */
-  public timestamp(value: Date | number | string | undefined): Point {
-    this._values.timestamp(value)
+  public setField(name: string, value: any, type?: PointFieldType): Point {
+    this._values.setField(name, value, type)
     return this
+  }
+
+  /**
+   * Add fields according to their type. All numeric type is considered float
+   *
+   * @param name - field name
+   * @param value - field value
+   * @returns this
+   */
+  public setFields(fields: {[key: string]: number | boolean | string}): Point {
+    this._values.setFields(fields)
+    return this
+  }
+
+  public removeField(name: string): Point {
+    this._values.removeField(name)
+    return this
+  }
+
+  public getFieldNames(): string[] {
+    return this._values.getFieldNames()
+  }
+
+  public hasFields(): boolean {
+    return this._values.hasFields()
+  }
+
+  copy(): Point {
+    return new Point(this._values.copy())
   }
 
   /**
@@ -348,7 +317,7 @@ export class Point {
           if (type === undefined || value === undefined) return
           const lpStringValue = fieldToLPString(type, value)
           if (fieldsLine.length > 0) fieldsLine += ','
-          fieldsLine += `${escape.tag(name)}=${lpStringValue}`
+          fieldsLine += `${escape.setTag(name)}=${lpStringValue}`
         }
       })
     if (fieldsLine.length === 0) return undefined // no fields present
@@ -359,7 +328,7 @@ export class Point {
         const val = this._values.getTag(x)
         if (val) {
           tagsLine += ','
-          tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
+          tagsLine += `${escape.setTag(x)}=${escape.setTag(val)}`
         }
       }
     })
@@ -381,9 +350,5 @@ export class Point {
   toString(): string {
     const line = this.toLineProtocol(undefined)
     return line ? line : `invalid point: ${JSON.stringify(this, undefined)}`
-  }
-
-  copy(): Point {
-    return new Point(this._values.copy())
   }
 }

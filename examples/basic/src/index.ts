@@ -24,23 +24,26 @@ async function main() {
 
   try {
     // Write point
-    const p = new Point('stat')
-      .tag('unit', 'temperature')
-      .floatField('avg', 24.5)
-      .floatField('max', 45.0)
-      .timestamp(new Date())
+    const p = Point.measurement('stat')
+      .setTag('unit', 'temperature')
+      .setFloatField('avg', 24.5)
+      .setFloatField('max', 45.0)
+      .setTimestamp(new Date())
     await client.write(p, database)
 
     // Write point as template with anonymous fields object
     const pointTemplate = Object.freeze(
-      new Point('stat').tag('unit', 'temperature')
+      Point.measurement('stat').setTag('unit', 'temperature')
     )
 
     const sensorData = {
       avg: 28,
       max: 40.3,
     }
-    const p2 = pointTemplate.copy().fields(sensorData).timestamp(new Date())
+    const p2 = pointTemplate
+      .copy()
+      .setFields(sensorData)
+      .setTimestamp(new Date())
 
     await client.write(p2, database)
 
@@ -78,7 +81,6 @@ async function main() {
     for await (const row of queryPointsResult) {
       console.log(`avg is ${row.getField('avg', 'float')}`)
       console.log(`max is ${row.getField('max', 'float')}`)
-      console.log(`lp: ${row.toLineProtocol()}`)
     }
   } catch (err) {
     console.error(err)

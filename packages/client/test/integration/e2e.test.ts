@@ -44,10 +44,10 @@ describe('e2e test', () => {
     const max1 = getRandomInt(900, 1000)
 
     const point = Point.measurement('stat')
-      .tag('unit', 'temperature')
-      .floatField('avg', avg1)
-      .floatField('max', max1)
-      .intField('testId', testId)
+      .setTag('unit', 'temperature')
+      .setFloatField('avg', avg1)
+      .setFloatField('max', max1)
+      .setIntField('testId', testId)
     await client.write(point, database)
 
     const query = `
