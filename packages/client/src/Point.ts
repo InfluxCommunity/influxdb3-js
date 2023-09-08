@@ -317,7 +317,7 @@ export class Point {
           if (type === undefined || value === undefined) return
           const lpStringValue = fieldToLPString(type, value)
           if (fieldsLine.length > 0) fieldsLine += ','
-          fieldsLine += `${escape.setTag(name)}=${lpStringValue}`
+          fieldsLine += `${escape.tag(name)}=${lpStringValue}`
         }
       })
     if (fieldsLine.length === 0) return undefined // no fields present
@@ -328,7 +328,7 @@ export class Point {
         const val = this._values.getTag(x)
         if (val) {
           tagsLine += ','
-          tagsLine += `${escape.setTag(x)}=${escape.setTag(val)}`
+          tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
         }
       }
     })
