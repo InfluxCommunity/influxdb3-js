@@ -29,6 +29,21 @@ const inferType = (
   else return undefined
 }
 
+export class GetFieldTypeMissmatchError extends Error {
+  /* istanbul ignore next */
+  constructor(
+    fieldName: string,
+    expectedType: PointFieldType,
+    actualType: PointFieldType
+  ) {
+    super(
+      `field ${fieldName} of type ${actualType} doesn't match expected type ${expectedType}!`
+    )
+    this.name = 'GetFieldTypeMissmatchError'
+    Object.setPrototypeOf(this, GetFieldTypeMissmatchError.prototype)
+  }
+}
+
 /**
  * Point defines values of a single measurement.
  */
@@ -43,6 +58,11 @@ export class PointValues {
    */
   constructor() {}
 
+  /**
+   * Get measurement name. Can be undefined if not set.
+   *
+   * @return measurement name or undefined
+   */
   getMeasurement(): string | undefined {
     return this._name
   }
@@ -58,6 +78,11 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Get timestamp. Can be undefined if not set.
+   *
+   * @return timestamp or undefined
+   */
   public getTimestamp(): Date | number | string | undefined {
     return this._time
   }
@@ -98,19 +123,45 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Gets value of tag with given name. Returns undefined if tag not found.
+   *
+   * @param name - tag name
+   * @returns tag value or undefined
+   */
   public getTag(name: string): string | undefined {
     return this._tags[name]
   }
 
+  /**
+   * Removes a tag with the specified name if it exists; otherwise, it does nothing.
+   *
+   * @param name - The name of the tag to be removed.
+   * @returns this
+   */
   public removeTag(name: string): PointValues {
     delete this._tags[name]
     return this
   }
 
+  /**
+   * Gets an array of tag names.
+   *
+   * @returns An array of tag names.
+   */
   public getTagNames(): string[] {
     return Object.keys(this._tags)
   }
 
+  /**
+   * Gets the float field value associated with the specified name.
+   * Throws if actual type of field with given name is not float.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
+   * @returns The float field value or undefined.
+   */
   public getFloatField(name: string): number | undefined {
     return this.getField(name, 'float')
   }
@@ -164,6 +215,15 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Gets the uint field value associated with the specified name.
+   * Throws if actual type of field with given name is not uint.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
+   * @returns The uint field value or undefined.
+   */
   public getUintField(name: string): number | undefined {
     return this.getField(name, 'uinteger')
   }
@@ -206,6 +266,15 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Gets the string field value associated with the specified name.
+   * Throws if actual type of field with given name is not string.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
+   * @returns The string field value or undefined.
+   */
   public getStringField(name: string): string | undefined {
     return this.getField(name, 'string')
   }
@@ -225,6 +294,15 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Gets the boolean field value associated with the specified name.
+   * Throws if actual type of field with given name is not boolean.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
+   * @returns The boolean field value or undefined.
+   */
   public getBooleanField(name: string): boolean | undefined {
     return this.getField(name, 'boolean')
   }
@@ -243,10 +321,12 @@ export class PointValues {
 
   /**
    * Get field of numeric type.
+   * Throws if actual type of field with given name is not given numeric type.
+   * If the field is not present, returns undefined.
    *
    * @param name - field name
    * @param type - field numeric type
-   * @throws Field type doesn't match actual type
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided numeric type.
    * @returns this
    */
   public getField(
@@ -255,24 +335,29 @@ export class PointValues {
   ): number | undefined
   /**
    * Get field of string type.
+   * Throws if actual type of field with given name is not string.
+   * If the field is not present, returns undefined.
    *
    * @param name - field name
    * @param type - field string type
-   * @throws Field type doesn't match actual type
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'string' type.
    * @returns this
    */
   public getField(name: string, type: 'string'): string | undefined
   /**
    * Get field of boolean type.
+   * Throws if actual type of field with given name is not boolean.
+   * If the field is not present, returns undefined.
    *
    * @param name - field name
    * @param type - field boolean type
-   * @throws Field type doesn't match actual type
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'boolean' type.
    * @returns this
    */
   public getField(name: string, type: 'boolean'): boolean | undefined
   /**
    * Get field without type check.
+   * If the field is not present, returns undefined.
    *
    * @param name - field name
    * @returns this
@@ -286,12 +371,17 @@ export class PointValues {
     if (!fieldEntry) return undefined
     const [actualType, value] = fieldEntry
     if (type !== undefined && type !== actualType)
-      throw new Error(
-        `field ${name} of type ${actualType} doesn't match expected type ${type}!`
-      )
+      throw new GetFieldTypeMissmatchError(name, actualType, type)
     return value
   }
 
+  /**
+   * Gets the type of field with given name, if it exists.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @returns The field type or undefined.
+   */
   public getFieldType(name: string): PointFieldType | undefined {
     const fieldEntry = this._fields[name]
     if (!fieldEntry) return undefined
@@ -348,19 +438,40 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Removes a field with the specified name if it exists; otherwise, it does nothing.
+   *
+   * @param name - The name of the field to be removed.
+   * @returns this
+   */
   public removeField(name: string): PointValues {
     delete this._fields[name]
     return this
   }
 
+  /**
+   * Gets an array of field names associated with this object.
+   *
+   * @returns An array of field names.
+   */
   public getFieldNames(): string[] {
     return Object.keys(this._fields)
   }
 
+  /**
+   * Checks if this object has any fields.
+   *
+   * @returns true if fields are present, false otherwise.
+   */
   public hasFields(): boolean {
     return this.getFieldNames().length > 0
   }
 
+  /**
+   * Creates a copy of this object.
+   *
+   * @returns A new instance with same values.
+   */
   copy(): PointValues {
     const copy = new PointValues()
     copy._name = this._name
@@ -372,6 +483,11 @@ export class PointValues {
     return copy
   }
 
+  /**
+   * Creates new Point with this as values.
+   *
+   * @returns Point from this values.
+   */
   public asPoint(): Point {
     return Point.fromValues(this)
   }
