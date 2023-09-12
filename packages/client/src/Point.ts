@@ -55,10 +55,24 @@ export class Point {
     if (typeof arg0 === 'string') this._values.setMeasurement(arg0)
   }
 
+  /**
+   * Creates new Point with given measurement.
+   *
+   * @param name - measurement name
+   * @returns new Point
+   */
   public static measurement(name: string): Point {
     return new Point(name)
   }
 
+  /**
+   * Creates new point from PointValues object.
+   * Can throw error if measurement missing.
+   *
+   * @param values - point values object with measurement
+   * @throws {Error} missing measurement
+   * @return new point from values
+   */
   public static fromValues(values: PointValues): Point {
     if (!values.getMeasurement() || values.getMeasurement() === '') {
       throw new Error('cannot convert values to point without measurement set!')
@@ -66,6 +80,11 @@ export class Point {
     return new Point(values)
   }
 
+  /**
+   * Get measurement name.
+   *
+   * @return measurement name
+   */
   public getMeasurement(): string {
     return this._values.getMeasurement() as string
   }
@@ -77,10 +96,17 @@ export class Point {
    * @returns this
    */
   public setMeasurement(name: string): Point {
-    this._values.setMeasurement(name)
+    if (name !== '') {
+      this._values.setMeasurement(name)
+    }
     return this
   }
 
+  /**
+   * Get timestamp. Can be undefined if not set.
+   *
+   * @return timestamp or undefined
+   */
   public getTimestamp(): Date | number | string | undefined {
     return this._values.getTimestamp()
   }
@@ -108,6 +134,12 @@ export class Point {
     return this
   }
 
+  /**
+   * Gets value of tag with given name. Returns undefined if tag not found.
+   *
+   * @param name - tag name
+   * @returns tag value or undefined
+   */
   public getTag(name: string): string | undefined {
     return this._values.getTag(name)
   }
@@ -125,15 +157,35 @@ export class Point {
     return this
   }
 
+  /**
+   * Removes a tag with the specified name if it exists; otherwise, it does nothing.
+   *
+   * @param name - The name of the tag to be removed.
+   * @returns this
+   */
   public removeTag(name: string): Point {
     this._values.removeTag(name)
     return this
   }
 
+  /**
+   * Gets an array of tag names.
+   *
+   * @returns An array of tag names.
+   */
   public getTagNames(): string[] {
     return this._values.getTagNames()
   }
 
+  /**
+   * Gets the float field value associated with the specified name.
+   * Throws if actual type of field with given name is not float.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
+   * @returns The float field value or undefined.
+   */
   public getFloatField(name: string): number | undefined {
     return this._values.getFloatField(name)
   }
@@ -151,6 +203,15 @@ export class Point {
     return this
   }
 
+  /**
+   * Gets the integer field value associated with the specified name.
+   * Throws if actual type of field with given name is not integer.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
+   * @returns The integer field value or undefined.
+   */
   public getIntegerField(name: string): number | undefined {
     return this._values.getIntegerField(name)
   }
@@ -167,6 +228,16 @@ export class Point {
     this._values.setIntegerField(name, value)
     return this
   }
+
+  /**
+   * Gets the uint field value associated with the specified name.
+   * Throws if actual type of field with given name is not uint.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
+   * @returns The uint field value or undefined.
+   */
   public getUintegerField(name: string): number | undefined {
     return this._values.getUintegerField(name)
   }
@@ -183,6 +254,16 @@ export class Point {
     this._values.setUintegerField(name, value)
     return this
   }
+
+  /**
+   * Gets the string field value associated with the specified name.
+   * Throws if actual type of field with given name is not string.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
+   * @returns The string field value or undefined.
+   */
   public getStringField(name: string): string | undefined {
     return this._values.getStringField(name)
   }
@@ -198,6 +279,16 @@ export class Point {
     this._values.setStringField(name, value)
     return this
   }
+
+  /**
+   * Gets the boolean field value associated with the specified name.
+   * Throws if actual type of field with given name is not boolean.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
+   * @returns The boolean field value or undefined.
+   */
   public getBooleanField(name: string): boolean | undefined {
     return this._values.getBooleanField(name)
   }
@@ -258,6 +349,13 @@ export class Point {
     return this._values.getField(name, type as any)
   }
 
+  /**
+   * Gets the type of field with given name, if it exists.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @returns The field type or undefined.
+   */
   public getFieldType(name: string): PointFieldType | undefined {
     return this._values.getFieldType(name)
   }
@@ -287,19 +385,40 @@ export class Point {
     return this
   }
 
+  /**
+   * Removes a field with the specified name if it exists; otherwise, it does nothing.
+   *
+   * @param name - The name of the field to be removed.
+   * @returns this
+   */
   public removeField(name: string): Point {
     this._values.removeField(name)
     return this
   }
 
+  /**
+   * Gets an array of field names associated with this object.
+   *
+   * @returns An array of field names.
+   */
   public getFieldNames(): string[] {
     return this._values.getFieldNames()
   }
 
+  /**
+   * Checks if this object has any fields.
+   *
+   * @returns true if fields are present, false otherwise.
+   */
   public hasFields(): boolean {
     return this._values.hasFields()
   }
 
+  /**
+   * Creates a copy of this object.
+   *
+   * @returns A new instance with same values.
+   */
   copy(): Point {
     return new Point(this._values.copy())
   }

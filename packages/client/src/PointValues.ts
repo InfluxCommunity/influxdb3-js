@@ -189,6 +189,15 @@ export class PointValues {
     return this
   }
 
+  /**
+   * Gets the integer field value associated with the specified name.
+   * Throws if actual type of field with given name is not integer.
+   * If the field is not present, returns undefined.
+   *
+   * @param name - field name
+   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
+   * @returns The integer field value or undefined.
+   */
   public getIntegerField(name: string): number | undefined {
     return this.getField(name, 'integer')
   }
