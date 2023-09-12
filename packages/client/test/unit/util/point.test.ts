@@ -6,7 +6,7 @@ describe('point', () => {
     const point = Point.measurement('blah')
       .setBooleanField('truthy', true)
       .setBooleanField('falsy', false)
-      .setIntField('intFromString', '20')
+      .setIntegerField('intFromString', '20')
       .setFloatField('floatFromString', '60.3')
       .setStringField('str', 'abc')
       .setTimestamp('')
@@ -17,15 +17,15 @@ describe('point', () => {
 
   it('fails on invalid fields', () => {
     expect(() => {
-      Point.measurement('a').setIntField('fails', NaN)
+      Point.measurement('a').setIntegerField('fails', NaN)
     }).to.throw(`invalid integer value for field 'fails': 'NaN'`)
 
     expect(() => {
-      Point.measurement('a').setIntField('fails', Infinity)
+      Point.measurement('a').setIntegerField('fails', Infinity)
     }).to.throw(`invalid integer value for field 'fails': 'Infinity'!`)
 
     expect(() => {
-      Point.measurement('a').setIntField('fails', 9223372036854776e3)
+      Point.measurement('a').setIntegerField('fails', 9223372036854776e3)
     }).to.throw(
       `invalid integer value for field 'fails': '9223372036854776000'!`
     )
@@ -34,15 +34,15 @@ describe('point', () => {
     }).to.throw(`invalid float value for field 'fails': 'Infinity'!`)
 
     expect(() => {
-      Point.measurement('a').setUintField('fails', NaN)
+      Point.measurement('a').setUintegerField('fails', NaN)
     }).to.throw(`uint value for field 'fails' out of range: NaN`)
 
     expect(() => {
-      Point.measurement('a').setUintField('fails', -1)
+      Point.measurement('a').setUintegerField('fails', -1)
     }).to.throw(`uint value for field 'fails' out of range: -1`)
 
     expect(() => {
-      Point.measurement('a').setUintField('fails', Number.MAX_SAFE_INTEGER + 10)
+      Point.measurement('a').setUintegerField('fails', Number.MAX_SAFE_INTEGER + 10)
     }).to.throw(
       `uint value for field 'fails' out of range: ${
         Number.MAX_SAFE_INTEGER + 10
@@ -50,11 +50,11 @@ describe('point', () => {
     )
 
     expect(() => {
-      Point.measurement('a').setUintField('fails', '10a8')
+      Point.measurement('a').setUintegerField('fails', '10a8')
     }).to.throw(`uint value has an unsupported character at pos 2: 10a8`)
 
     expect(() => {
-      Point.measurement('a').setUintField('fails', '18446744073709551616')
+      Point.measurement('a').setUintegerField('fails', '18446744073709551616')
     }).to.throw(
       `uint value for field 'fails' out of range: 18446744073709551616`
     )
@@ -98,8 +98,8 @@ describe('point', () => {
 
   it('creates point with uint fields', () => {
     const point = Point.measurement('a')
-      .setUintField('floored', 10.88)
-      .setUintField('fromString', '789654123')
+      .setUintegerField('floored', 10.88)
+      .setUintegerField('fromString', '789654123')
       .setTimestamp('')
     expect(point.toLineProtocol()).to.equal(
       'a floored=10u,fromString=789654123u'
@@ -132,8 +132,8 @@ describe('point', () => {
     const point = Point.measurement('measure1')
       .setBooleanField('truthy', true)
       .setBooleanField('falsy', false)
-      .setIntField('intFromString', '20')
-      .setUintField('intFromString', '20')
+      .setIntegerField('intFromString', '20')
+      .setUintegerField('intFromString', '20')
       .setFloatField('floatFromString', '60.3')
       .setStringField('str', 'abc')
       .setTimestamp('')
@@ -142,7 +142,7 @@ describe('point', () => {
 
     expect(copy.toLineProtocol()).to.equal(point.toLineProtocol())
 
-    copy.setIntField('truthy', 1)
+    copy.setIntegerField('truthy', 1)
 
     expect(copy.toLineProtocol()).to.not.equal(point.toLineProtocol())
   })

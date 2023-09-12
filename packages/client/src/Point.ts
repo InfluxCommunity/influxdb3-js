@@ -131,6 +131,10 @@ export class Point {
     return this._values.getTagNames()
   }
 
+  public getFloatField(name: string): number | undefined {
+    return this._values.getFloatField(name)
+  }
+
   /**
    * Adds a number field.
    *
@@ -143,8 +147,9 @@ export class Point {
     this._values.setFloatField(name, value)
     return this
   }
-  public getIntField(name: string): number | undefined {
-    return this._values.getIntField(name)
+
+  public getIntegerField(name: string): number | undefined {
+    return this._values.getIntegerField(name)
   }
 
   /**
@@ -155,12 +160,12 @@ export class Point {
    * @returns this
    * @throws NaN or out of int64 range value is supplied
    */
-  public setIntField(name: string, value: number | any): Point {
-    this._values.setIntField(name, value)
+  public setIntegerField(name: string, value: number | any): Point {
+    this._values.setIntegerField(name, value)
     return this
   }
-  public getUintField(name: string): number | undefined {
-    return this._values.getUintField(name)
+  public getUintegerField(name: string): number | undefined {
+    return this._values.getUintegerField(name)
   }
 
   /**
@@ -171,8 +176,8 @@ export class Point {
    * @returns this
    * @throws NaN out of range value is supplied
    */
-  public setUintField(name: string, value: number | any): Point {
-    this._values.setUintField(name, value)
+  public setUintegerField(name: string, value: number | any): Point {
+    this._values.setUintegerField(name, value)
     return this
   }
   public getStringField(name: string): string | undefined {

@@ -111,6 +111,16 @@ export class PointValues {
   }
 
   /**
+   * Gets value of tag with given name. Returns undefined if tag not found.
+   *
+   * @param name - tag name
+   * @returns tag value or undefined
+   */
+  public getTag(name: string): string | undefined {
+    return this._tags[name]
+  }
+
+  /**
    * Adds a tag. The caller has to ensure that both name and value are not empty
    * and do not end with backslash.
    *
@@ -121,16 +131,6 @@ export class PointValues {
   public setTag(name: string, value: string): PointValues {
     this._tags[name] = value
     return this
-  }
-
-  /**
-   * Gets value of tag with given name. Returns undefined if tag not found.
-   *
-   * @param name - tag name
-   * @returns tag value or undefined
-   */
-  public getTag(name: string): string | undefined {
-    return this._tags[name]
   }
 
   /**
@@ -189,7 +189,7 @@ export class PointValues {
     return this
   }
 
-  public getIntField(name: string): number | undefined {
+  public getIntegerField(name: string): number | undefined {
     return this.getField(name, 'integer')
   }
 
@@ -201,7 +201,7 @@ export class PointValues {
    * @returns this
    * @throws NaN or out of int64 range value is supplied
    */
-  public setIntField(name: string, value: number | any): PointValues {
+  public setIntegerField(name: string, value: number | any): PointValues {
     let val: number
     if (typeof value === 'number') {
       val = value
@@ -224,7 +224,7 @@ export class PointValues {
    * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
    * @returns The uint field value or undefined.
    */
-  public getUintField(name: string): number | undefined {
+  public getUintegerField(name: string): number | undefined {
     return this.getField(name, 'uinteger')
   }
 
@@ -236,7 +236,7 @@ export class PointValues {
    * @returns this
    * @throws NaN out of range value is supplied
    */
-  public setUintField(name: string, value: number | any): PointValues {
+  public setUintegerField(name: string, value: number | any): PointValues {
     if (typeof value === 'number') {
       if (isNaN(value) || value < 0 || value > Number.MAX_SAFE_INTEGER) {
         throw new Error(`uint value for field '${name}' out of range: ${value}`)
@@ -410,9 +410,9 @@ export class PointValues {
       case 'float':
         return this.setFloatField(name, value)
       case 'integer':
-        return this.setIntField(name, value)
+        return this.setIntegerField(name, value)
       case 'uinteger':
-        return this.setUintField(name, value)
+        return this.setUintegerField(name, value)
       case undefined:
         return this
       default:
@@ -488,7 +488,9 @@ export class PointValues {
    *
    * @returns Point from this values.
    */
-  public asPoint(): Point {
-    return Point.fromValues(this)
+  public asPoint(measurement?: string): Point {
+    return Point.fromValues(
+      measurement ? this.setMeasurement(measurement) : this
+    )
   }
 }

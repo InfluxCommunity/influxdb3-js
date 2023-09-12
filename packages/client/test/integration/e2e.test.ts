@@ -47,7 +47,7 @@ describe('e2e test', () => {
       .setTag('unit', 'temperature')
       .setFloatField('avg', avg1)
       .setFloatField('max', max1)
-      .setIntField('testId', testId)
+      .setIntegerField('testId', testId)
     await client.write(point, database)
 
     const query = `
