@@ -60,6 +60,9 @@ export class Point {
   }
 
   public static fromValues(values: PointValues): Point {
+    if (!values.getMeasurement() || values.getMeasurement() === '') {
+      throw new Error('cannot convert values to point without measurement set!')
+    }
     return new Point(values)
   }
 
