@@ -70,17 +70,36 @@ async function main() {
       console.log(`max is ${row.max}`)
     }
 
-    // Execute query again as points
+    const downsamplingQuery = `\
+    SELECT
+      date_bin('5 minutes', "time") as window_start,
+      AVG("avg") as avg,
+      MAX("max") as max
+    FROM "stat"
+    WHERE
+      "time" >= now() - interval '1 hour'
+    GROUP BY window_start
+    ORDER BY window_start DESC;`
+
+    // Execute downsampling query into pointValues
     const queryPointsResult = client.queryPoints(
-      query,
+      downsamplingQuery,
       database,
-      queryType,
-      'stat'
+      queryType
     )
 
     for await (const row of queryPointsResult) {
       console.log(`avg is ${row.getField('avg', 'float')}`)
       console.log(`max is ${row.getField('max', 'float')}`)
+
+      // write back downsampled point
+      const point = row.asPoint('stat_downsampled')
+      const windowStart = point.getFloatField('window_start') as number
+      point.setTimestamp(windowStart)
+
+      await client.write(point, database, undefined, {
+        precision: 'ms',
+      })
     }
   } catch (err) {
     console.error(err)
