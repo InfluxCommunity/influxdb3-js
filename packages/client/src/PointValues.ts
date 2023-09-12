@@ -380,7 +380,7 @@ export class PointValues {
     if (!fieldEntry) return undefined
     const [actualType, value] = fieldEntry
     if (type !== undefined && type !== actualType)
-      throw new GetFieldTypeMissmatchError(name, actualType, type)
+      throw new GetFieldTypeMissmatchError(name, type, actualType)
     return value
   }
 

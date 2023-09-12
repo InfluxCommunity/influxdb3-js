@@ -78,8 +78,7 @@ export default class InfluxDBClient {
   async *queryPoints(
     query: string,
     database: string,
-    queryType: QueryType,
-    measurement: string
+    queryType: QueryType
   ): AsyncGenerator<PointValues, void, void> {
     const points = this._queryApi.queryPoints(
       query,
@@ -90,7 +89,7 @@ export default class InfluxDBClient {
     )
 
     for await (const point of points) {
-      yield point.setMeasurement(measurement)
+      yield point
     }
   }
 

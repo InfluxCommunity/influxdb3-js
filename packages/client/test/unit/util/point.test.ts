@@ -42,7 +42,10 @@ describe('point', () => {
     }).to.throw(`uint value for field 'fails' out of range: -1`)
 
     expect(() => {
-      Point.measurement('a').setUintegerField('fails', Number.MAX_SAFE_INTEGER + 10)
+      Point.measurement('a').setUintegerField(
+        'fails',
+        Number.MAX_SAFE_INTEGER + 10
+      )
     }).to.throw(
       `uint value for field 'fails' out of range: ${
         Number.MAX_SAFE_INTEGER + 10

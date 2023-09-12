@@ -75,7 +75,7 @@ describe('e2e test', () => {
     row = await data.next()
     expect(row.done).to.equal(true)
 
-    const dataPoints = client.queryPoints(query, database, queryType, 'stat')
+    const dataPoints = client.queryPoints(query, database, queryType)
 
     let pointRow: IteratorResult<PointValues, void>
     pointRow = await dataPoints.next()
