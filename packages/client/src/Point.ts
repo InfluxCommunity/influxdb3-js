@@ -376,8 +376,7 @@ export class Point {
   /**
    * Add fields according to their type. All numeric type is considered float
    *
-   * @param name - field name
-   * @param value - field value
+   * @param fields - name-value map
    * @returns this
    */
   public setFields(fields: {[key: string]: number | boolean | string}): Point {
