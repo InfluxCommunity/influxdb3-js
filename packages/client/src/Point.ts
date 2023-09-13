@@ -145,7 +145,7 @@ export class Point {
   }
 
   /**
-   * Adds a tag. The caller has to ensure that both name and value are not empty
+   * Sets a tag. The caller has to ensure that both name and value are not empty
    * and do not end with backslash.
    *
    * @param name - tag name
@@ -191,7 +191,7 @@ export class Point {
   }
 
   /**
-   * Adds a number field.
+   * Sets a number field.
    *
    * @param name - field name
    * @param value - field value
@@ -217,7 +217,7 @@ export class Point {
   }
 
   /**
-   * Adds an integer field.
+   * Sets an integer field.
    *
    * @param name - field name
    * @param value - field value
@@ -243,7 +243,7 @@ export class Point {
   }
 
   /**
-   * Adds an unsigned integer field.
+   * Sets an unsigned integer field.
    *
    * @param name - field name
    * @param value - field value
@@ -269,7 +269,7 @@ export class Point {
   }
 
   /**
-   * Adds a string field.
+   * Sets a string field.
    *
    * @param name - field name
    * @param value - field value
@@ -294,7 +294,7 @@ export class Point {
   }
 
   /**
-   * Adds a boolean field.
+   * Sets a boolean field.
    *
    * @param field - field name
    * @param value - field value
@@ -361,7 +361,7 @@ export class Point {
   }
 
   /**
-   * Adds field based on provided type.
+   * Sets field based on provided type.
    *
    * @param name - field name
    * @param value - field value
