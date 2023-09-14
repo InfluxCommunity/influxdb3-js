@@ -61,7 +61,7 @@ export class PointValues {
   /**
    * Get measurement name. Can be undefined if not set.
    *
-   * @return measurement name or undefined
+   * @returns measurement name or undefined
    */
   getMeasurement(): string | undefined {
     return this._name
@@ -81,7 +81,7 @@ export class PointValues {
   /**
    * Get timestamp. Can be undefined if not set.
    *
-   * @return timestamp or undefined
+   * @returns timestamp or undefined
    */
   public getTimestamp(): Date | number | string | undefined {
     return this._time
@@ -159,7 +159,7 @@ export class PointValues {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
    * @returns The float field value or undefined.
    */
   public getFloatField(name: string): number | undefined {
@@ -195,7 +195,7 @@ export class PointValues {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
    * @returns The integer field value or undefined.
    */
   public getIntegerField(name: string): number | undefined {
@@ -230,7 +230,7 @@ export class PointValues {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
    * @returns The uint field value or undefined.
    */
   public getUintegerField(name: string): number | undefined {
@@ -281,7 +281,7 @@ export class PointValues {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
    * @returns The string field value or undefined.
    */
   public getStringField(name: string): string | undefined {
@@ -309,7 +309,7 @@ export class PointValues {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
    * @returns The boolean field value or undefined.
    */
   public getBooleanField(name: string): boolean | undefined {
@@ -335,7 +335,7 @@ export class PointValues {
    *
    * @param name - field name
    * @param type - field numeric type
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided numeric type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match provided numeric type.
    * @returns this
    */
   public getField(
@@ -349,7 +349,7 @@ export class PointValues {
    *
    * @param name - field name
    * @param type - field string type
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'string' type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'string' type.
    * @returns this
    */
   public getField(name: string, type: 'string'): string | undefined
@@ -360,7 +360,7 @@ export class PointValues {
    *
    * @param name - field name
    * @param type - field boolean type
-   * @throws {GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'boolean' type.
+   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match provided 'boolean' type.
    * @returns this
    */
   public getField(name: string, type: 'boolean'): boolean | undefined
