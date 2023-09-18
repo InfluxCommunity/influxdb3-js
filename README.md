@@ -138,7 +138,7 @@ for await (const row of queryResult) {
 }
 ```
 
-or use typesafe Point structure with `client.queryPoints`
+or use typesafe `PointValues` structure with `client.queryPoints`
 
 ```ts
 const queryPointsResult = client.queryPoints(
