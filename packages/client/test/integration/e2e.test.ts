@@ -1,7 +1,7 @@
 import {expect} from 'chai'
 import {InfluxDBClient, Point} from '../../src'
 import {rejects} from 'assert'
-import {PointValues} from '../../src/PointValues'
+import {PointValues} from '../../src'
 
 const getEnvVariables = () => {
   const {

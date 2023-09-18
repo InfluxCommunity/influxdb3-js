@@ -20,6 +20,7 @@ describe('InfluxDB', () => {
     const queryApi: QueryApi = (client as any)._queryApi
     const writeStub = sinon.stub(writeApi, 'doWrite')
     const queryStub = sinon.stub(queryApi, 'query')
+    const queryPointsStub = sinon.stub(queryApi, 'queryPoints')
 
     const lines = ['lpdata']
 
@@ -39,6 +40,15 @@ describe('InfluxDB', () => {
 
     client.query(query, 'another')
     expect(queryStub.calledOnceWith(query, 'another', 'sql')).to.be.true
+
+    // queryPoints
+    client.queryPoints(query).next()
+
+    expect(queryPointsStub.calledOnceWith(query, database, 'sql')).to.be.true
+    queryPointsStub.resetHistory()
+
+    client.queryPoints(query, 'another').next()
+    expect(queryPointsStub.calledOnceWith(query, 'another', 'sql')).to.be.true
   })
 
   it('throws when no database provided', async () => {

@@ -259,6 +259,7 @@ describe('point', () => {
         .setField('e', 3.45)
         .setUintegerField('f', 8)
         .setStringField('g', 88)
+        .setStringField('h', undefined)
         .setTimestamp(150)
       expect(1).deep.equals(v.getIntegerField('b'))
       expect('xyz').deep.equals(v.getStringField('c'))
