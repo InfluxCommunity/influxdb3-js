@@ -187,28 +187,25 @@ describe('point', () => {
   })
 
   describe('point values', () => {
-    it ('convert point values to point', () => {
+    it('convert point values to point', () => {
       const v = new PointValues()
-          .setMeasurement('a')
-          .setField('b', 1)
-          .setTag('c', 'd')
-          .setTimestamp(150);
-      const p = Point.fromValues(v);
+        .setMeasurement('a')
+        .setField('b', 1)
+        .setTag('c', 'd')
+        .setTimestamp(150)
+      const p = Point.fromValues(v)
       expect('a,c=d b=1 150').equals(p.toString())
     })
 
-    it ('convert point values to point with undefined measurement', () => {
-        const v = new PointValues()
-            .setMeasurement('')
-            .setField('b', 1)
-            .setTag('c', 'd')
-            .setTimestamp(150);
-        expect(() => {
-            Point.fromValues(v);
-        }).to.throw(
-            `Cannot convert values to point without measurement set!`
-        )
-
+    it('convert point values to point with undefined measurement', () => {
+      const v = new PointValues()
+        .setMeasurement('')
+        .setField('b', 1)
+        .setTag('c', 'd')
+        .setTimestamp(150)
+      expect(() => {
+        Point.fromValues(v)
+      }).to.throw(`Cannot convert values to point without measurement set!`)
     })
   })
 })
