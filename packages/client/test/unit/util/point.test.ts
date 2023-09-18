@@ -1,5 +1,5 @@
 import {expect} from 'chai'
-import {Point, convertTime} from '../../../src'
+import {Point, PointValues, convertTime} from '../../../src'
 
 describe('point', () => {
   it('creates point with various fields', () => {
@@ -183,6 +183,32 @@ describe('point', () => {
         .setTag('c', 'd')
         .setTimestamp('')
       expect(p.toLineProtocol()).equals(p.toString())
+    })
+  })
+
+  describe('point values', () => {
+    it ('convert point values to point', () => {
+      const v = new PointValues()
+          .setMeasurement('a')
+          .setField('b', 1)
+          .setTag('c', 'd')
+          .setTimestamp(150);
+      const p = Point.fromValues(v);
+      expect('a,c=d b=1 150').equals(p.toString())
+    })
+
+    it ('convert point values to point with undefined measurement', () => {
+        const v = new PointValues()
+            .setMeasurement('')
+            .setField('b', 1)
+            .setTag('c', 'd')
+            .setTimestamp(150);
+        expect(() => {
+            Point.fromValues(v);
+        }).to.throw(
+            `Cannot convert values to point without measurement set!`
+        )
+
     })
   })
 })
