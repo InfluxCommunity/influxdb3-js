@@ -42,7 +42,7 @@ export class Point {
    * Create a new Point with given values.
    * After creating Point, it's values shouldn't be modified directly by PointValues object.
    *
-   * @param measurementName - the measurement name
+   * @param values - point values
    */
   private constructor(values: PointValues)
   private constructor(arg0?: PointValues | string) {
@@ -296,7 +296,7 @@ export class Point {
   /**
    * Sets a boolean field.
    *
-   * @param field - field name
+   * @param name - field name
    * @param value - field value
    * @returns this
    */
@@ -424,7 +424,7 @@ export class Point {
 
   /**
    * Creates an InfluxDB protocol line out of this instance.
-   * @param settings - settings control serialization of a point timestamp and can also add default tags,
+   * @param convertTimePrecision - settings control serialization of a point timestamp and can also add default tags,
    * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
    * @returns an InfluxDB protocol line out of this instance
    */
