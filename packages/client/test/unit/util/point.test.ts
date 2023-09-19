@@ -92,11 +92,12 @@ describe('point', () => {
       .setField('truthy', true, 'boolean')
       .setField('falsy', false, 'boolean')
       .setField('intFromString', '20', 'integer')
+      .setField('uintFromString', '30', 'uinteger')
       .setField('floatFromString', '60.3', 'float')
       .setField('str', 'abc', 'string')
       .setTimestamp('')
     expect(point.toLineProtocol()).to.equal(
-      'blah falsy=F,floatFromString=60.3,intFromString=20i,str="abc",truthy=T'
+      'blah falsy=F,floatFromString=60.3,intFromString=20i,str="abc",truthy=T,uintFromString=30u'
     )
   })
 
@@ -260,6 +261,13 @@ describe('point', () => {
         .setTag('c', 'd')
         .setTimestamp('')
       expect(p.toLineProtocol()).equals(p.toString())
+    })
+    it('without measurement', () => {
+      const p = Point.measurement('')
+        .setFloatField('b', 1)
+        .setTag('c', 'd')
+        .setTimestamp('')
+      expect(p.toLineProtocol()).equals(undefined)
     })
   })
 
