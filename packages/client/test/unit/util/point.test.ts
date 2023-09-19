@@ -180,6 +180,35 @@ describe('point', () => {
     expect('88').to.equal(point.getStringField('g'))
     expect(8).to.equal(point.getUintegerField('f'))
     expect(true).to.equal(point.getBooleanField('i'))
+    expect(3.45).to.equal(point.getFloatField('e'))
+  })
+
+  it('get field type', () => {
+    const point = Point.measurement('measurement').setField('a', 3.45)
+
+    expect('float').to.equal(point.getFieldType('a'))
+  })
+
+  it('get timestamp', () => {
+    const point = Point.measurement('measurement')
+      .setField('a', 3.45)
+      .setTimestamp(156)
+
+    expect(156).to.equal(point.getTimestamp())
+  })
+
+  it('tags', () => {
+    const point = Point.measurement('measurement')
+      .setTag('tag', 'b')
+      .setField('a', 3.45)
+      .setTimestamp(156)
+
+    expect('b').to.equal(point.getTag('tag'))
+    expect(undefined).to.equal(point.getTag('xyz'))
+    expect(['tag']).to.deep.equal(point.getTagNames())
+
+    point.removeTag('tag')
+    expect([]).to.deep.equal(point.getTagNames())
   })
 
   it('has fields', () => {
