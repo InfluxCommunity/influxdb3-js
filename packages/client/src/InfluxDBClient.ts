@@ -98,22 +98,18 @@ export default class InfluxDBClient {
    * @param queryType - The type of query (default: 'sql').
    * @returns An async generator that yields PointValues object.
    */
-  async *queryPoints(
+  queryPoints(
     query: string,
     database?: string,
     queryType: QueryType = 'sql'
   ): AsyncGenerator<PointValues, void, void> {
-    const points = this._queryApi.queryPoints(
+    return this._queryApi.queryPoints(
       query,
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
       queryType
     )
-
-    for await (const point of points) {
-      yield point
-    }
   }
 
   /**

@@ -4,6 +4,7 @@ import {Point, PointValues, convertTime} from '../../../src'
 describe('point', () => {
   it('creates point with various fields', () => {
     const point = Point.measurement('blah')
+      .setMeasurement('')
       .setBooleanField('truthy', true)
       .setBooleanField('falsy', false)
       .setIntegerField('intFromString', '20')
