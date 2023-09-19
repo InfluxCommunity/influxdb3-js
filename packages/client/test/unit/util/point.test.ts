@@ -151,6 +151,53 @@ describe('point', () => {
     expect(copy.toLineProtocol()).to.not.equal(point.toLineProtocol())
   })
 
+  it('change measurement', () => {
+    const point = Point.measurement('measurement').setBooleanField(
+      'truthy',
+      true
+    )
+
+    expect('measurement').to.equal(point.getMeasurement())
+
+    point.setMeasurement('measurement2')
+    expect('measurement2').to.equal(point.getMeasurement())
+  })
+
+  it('get typed fields', () => {
+    const point = Point.measurement('measurement')
+      .setMeasurement('a')
+      .setIntegerField('b', 1)
+      .setField('c', 'xyz')
+      .setField('d', false)
+      .setField('e', 3.45)
+      .setUintegerField('f', 8)
+      .setStringField('g', 88)
+      .setStringField('h', undefined)
+      .setBooleanField('i', true)
+      .setTimestamp(150)
+
+    expect(1).to.equal(point.getIntegerField('b'))
+    expect('88').to.equal(point.getStringField('g'))
+    expect(8).to.equal(point.getUintegerField('f'))
+    expect(true).to.equal(point.getBooleanField('i'))
+  })
+
+  it('has fields', () => {
+    const point1 = Point.measurement('measurement')
+      .setTag('c', 'd')
+      .setTimestamp(150)
+    expect(false).equals(point1.hasFields())
+    const point2 = Point.measurement('a')
+      .setField('b', 1)
+      .setTag('c', 'd')
+      .setTimestamp(150)
+    expect(true).equals(point2.hasFields())
+    expect(['b']).to.deep.equals(point2.getFieldNames())
+
+    point2.removeField('b')
+    expect(false).equals(point2.hasFields())
+  })
+
   describe('convert point time to line protocol', () => {
     const precision = 'ms'
     const clinetConvertTime = (value: Parameters<typeof convertTime>[0]) =>

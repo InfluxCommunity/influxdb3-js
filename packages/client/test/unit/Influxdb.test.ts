@@ -63,6 +63,18 @@ at 'ClientOptions.database'
     await rejects(client.write('data'))
   })
 
+  it('throws when no database provided queryPoints', async () => {
+    const client = new InfluxDBClient({
+      host: 'http://localhost:8086',
+    })
+
+    expect(() => client.queryPoints('query')).to.throw(`\
+Please specify the 'database' as a method parameter or use default configuration \
+at 'ClientOptions.database'
+`)
+    await rejects(client.write('data'))
+  })
+
   describe('constructor', () => {
     it('is created from configuration with host', () => {
       expect(
