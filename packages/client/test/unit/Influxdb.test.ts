@@ -42,12 +42,12 @@ describe('InfluxDB', () => {
     expect(queryStub.calledOnceWith(query, 'another', 'sql')).to.be.true
 
     // queryPoints
-    client.queryPoints(query).next()
+    client.queryPoints(query)
 
     expect(queryPointsStub.calledOnceWith(query, database, 'sql')).to.be.true
     queryPointsStub.resetHistory()
 
-    client.queryPoints(query, 'another').next()
+    client.queryPoints(query, 'another')
     expect(queryPointsStub.calledOnceWith(query, 'another', 'sql')).to.be.true
   })
 
