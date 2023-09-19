@@ -75,7 +75,7 @@ describe('e2e test', () => {
     row = await data.next()
     expect(row.done).to.equal(true)
 
-    const dataPoints = client.queryPoints(query, database, queryType)
+    let dataPoints = client.queryPoints(query, database, queryType)
 
     let pointRow: IteratorResult<PointValues, void>
     pointRow = await dataPoints.next()
@@ -86,6 +86,23 @@ describe('e2e test', () => {
 
     pointRow = await dataPoints.next()
     expect(pointRow.done).to.equal(true)
+
+    //
+    // test aggregation query
+    //
+    const queryAggregation = `
+    SELECT sum("avg") as "sum_avg", sum("max") as "sum_max"
+        FROM "stat"
+        WHERE "testId" = ${testId}
+    `
+
+    dataPoints = client.queryPoints(queryAggregation, database, queryType)
+
+    pointRow = await dataPoints.next()
+
+    expect(pointRow.done).to.equal(false)
+    expect(pointRow.value?.getField('sum_avg')).to.equal(avg1)
+    expect(pointRow.value?.getField('sum_max')).to.equal(max1)
 
     await client.close()
     await rejects(client.query(query, database, queryType).next())
