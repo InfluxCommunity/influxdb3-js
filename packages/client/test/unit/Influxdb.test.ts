@@ -1,7 +1,80 @@
 import {expect} from 'chai'
+import sinon from 'sinon'
 import {InfluxDBClient, ClientOptions, Transport} from '../../src'
+import type WriteApi from '../../src/WriteApi'
+import type QueryApi from '../../src/QueryApi'
+import {rejects} from 'assert'
 
 describe('InfluxDB', () => {
+  afterEach(() => {
+    sinon.restore()
+  })
+
+  it('uses options database', () => {
+    const database = 'my-db'
+    const client = new InfluxDBClient({
+      host: 'http://localhost:8086',
+      database,
+    })
+    const writeApi: WriteApi = (client as any)._writeApi
+    const queryApi: QueryApi = (client as any)._queryApi
+    const writeStub = sinon.stub(writeApi, 'doWrite')
+    const queryStub = sinon.stub(queryApi, 'query')
+    const queryPointsStub = sinon.stub(queryApi, 'queryPoints')
+
+    const lines = ['lpdata']
+
+    client.write(lines)
+
+    expect(writeStub.calledWith(lines, database)).to.be.true
+    writeStub.resetHistory()
+
+    client.write(lines, 'another')
+    expect(writeStub.calledOnceWith(lines, 'another')).to.be.true
+
+    const query = 'select *'
+    client.query(query)
+
+    expect(queryStub.calledOnceWith(query, database, 'sql')).to.be.true
+    queryStub.resetHistory()
+
+    client.query(query, 'another')
+    expect(queryStub.calledOnceWith(query, 'another', 'sql')).to.be.true
+
+    // queryPoints
+    client.queryPoints(query)
+
+    expect(queryPointsStub.calledOnceWith(query, database, 'sql')).to.be.true
+    queryPointsStub.resetHistory()
+
+    client.queryPoints(query, 'another')
+    expect(queryPointsStub.calledOnceWith(query, 'another', 'sql')).to.be.true
+  })
+
+  it('throws when no database provided', async () => {
+    const client = new InfluxDBClient({
+      host: 'http://localhost:8086',
+    })
+
+    expect(() => client.query('query')).to.throw(`\
+Please specify the 'database' as a method parameter or use default configuration \
+at 'ClientOptions.database'
+`)
+    await rejects(client.write('data'))
+  })
+
+  it('throws when no database provided queryPoints', async () => {
+    const client = new InfluxDBClient({
+      host: 'http://localhost:8086',
+    })
+
+    expect(() => client.queryPoints('query')).to.throw(`\
+Please specify the 'database' as a method parameter or use default configuration \
+at 'ClientOptions.database'
+`)
+    await rejects(client.write('data'))
+  })
+
   describe('constructor', () => {
     it('is created from configuration with host', () => {
       expect(

@@ -1,4 +1,4 @@
-import {InfluxDBClient, Point, PointRecord} from '@influxdata/influxdb3-client'
+import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 
 type Defined<T> = Exclude<T, undefined>
 
@@ -24,30 +24,32 @@ async function main() {
 
   try {
     // Write point
-    const p = new Point('stat')
-      .tag('unit', 'temperature')
-      .floatField('avg', 24.5)
-      .floatField('max', 45.0)
-      .timestamp(new Date())
+    const p = Point.measurement('stat')
+      .setTag('unit', 'temperature')
+      .setFloatField('avg', 24.5)
+      .setFloatField('max', 45.0)
+      .setTimestamp(new Date())
     await client.write(p, database)
 
-    // Write record
-    const sensorData: PointRecord = {
-      measurement: 'stat',
-      tags: {
-        unit: 'temperature',
-      },
-      fields: {
-        avg: 28,
-        max: 40.3,
-      },
-      timestamp: new Date(),
+    // Write point as template with anonymous fields object
+    const pointTemplate = Object.freeze(
+      Point.measurement('stat').setTag('unit', 'temperature')
+    )
+
+    const sensorData = {
+      avg: 28,
+      max: 40.3,
     }
-    await client.write([sensorData], database)
+    const p2 = pointTemplate
+      .copy()
+      .setFields(sensorData)
+      .setTimestamp(new Date())
+
+    await client.write(p2, database)
 
     // Or write directly line protocol
-    const line = `stat,unit=temperature avg=20.5,max=43.0`
-    await client.write(line, database)
+    const lp = `stat,unit=temperature avg=20.5,max=43.0`
+    await client.write(lp, database)
 
     // Prepare flightsql query
     const query = `
@@ -66,6 +68,14 @@ async function main() {
     for await (const row of queryResult) {
       console.log(`avg is ${row.avg}`)
       console.log(`max is ${row.max}`)
+    }
+
+    // Execute query again as points
+    const queryPointsResult = client.queryPoints(query, database, queryType)
+
+    for await (const row of queryPointsResult) {
+      console.log(`avg is ${row.getField('avg', 'float')}`)
+      console.log(`max is ${row.getField('max', 'float')}`)
     }
   } catch (err) {
     console.error(err)

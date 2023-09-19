@@ -56,14 +56,14 @@ view.setOnRandomize(() => {
 
 view.setOnWrite(async () => {
   const data = view.getWriteInput()
-  const p = new Point('stat')
-    .tag('Device', data['Device'])
-    .floatField('Temperature', data['Temperature'])
-    .floatField('Humidity', data['Humidity'])
-    .floatField('Pressure', data['Pressure'])
-    .intField('CO2', data['CO2'])
-    .intField('TVOC', data['TVOC'])
-    .timestamp(new Date())
+  const p = Point.measurement('stat')
+    .setTag('Device', data['Device'])
+    .setFloatField('Temperature', data['Temperature'])
+    .setFloatField('Humidity', data['Humidity'])
+    .setFloatField('Pressure', data['Pressure'])
+    .setIntField('CO2', data['CO2'])
+    .setIntField('TVOC', data['TVOC'])
+    .setTimestamp(new Date())
 
   try {
     view.setWriteInfo('writing')

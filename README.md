@@ -65,18 +65,18 @@ export INFLUXDB_TOKEN="<token>"
 
 ### powershell
 
-```console
-set INFLUXDB_URL=<url>
-set INFLUXDB_DATABASE=<database>
-set INFLUXDB_TOKEN=<token>
+```powershell
+$env:INFLUXDB_URL = "<url>"
+$env:INFLUXDB_DATABASE = "<database>"
+$env:INFLUXDB_TOKEN = "<token>"
 ```
 
 ### cmd
 
-```powershell
-$env:INFLUXDB_URL "<url>"
-$env:INFLUXDB_DATABASE "<database>"
-$env:INFLUXDB_TOKEN "<token>"
+```console
+set INFLUXDB_URL=<url>
+set INFLUXDB_DATABASE=<database>
+set INFLUXDB_TOKEN=<token>
 ```
 
 </details>
@@ -135,6 +135,23 @@ const queryResult = await client.query(query, database)
 for await (const row of queryResult) {
     console.log(`avg is ${row.avg}`)
     console.log(`max is ${row.max}`)
+}
+```
+
+or use typesafe `PointValues` structure with `client.queryPoints`
+
+```ts
+const queryPointsResult = client.queryPoints(
+    query,
+    database,
+    queryType,
+    'stat'
+)
+
+for await (const row of queryPointsResult) {
+    console.log(`avg is ${row.getField('avg', 'float')}`)
+    console.log(`max is ${row.getField('max', 'float')}`)
+    console.log(`lp: ${row.toLineProtocol()}`)
 }
 ```
 

@@ -1,6 +1,6 @@
-## Basic Example
+## Downsampling Example
 
-- [IOxExample](./src/index.ts) - How to use write and query data from InfluxDB IOx
+- [index.ts](./src/index.ts) - How to use queries to structure data for downsampling
 
 ## prerequisites
 

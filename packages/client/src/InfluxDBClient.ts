@@ -6,6 +6,7 @@ import {ClientOptions, QueryType, WriteOptions} from './options'
 import {IllegalArgumentError} from './errors'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
 import {throwReturn} from './util/common'
+import {PointValues} from './PointValues'
 
 const argumentErrorMessage = `\
 Please specify the 'database' as a method parameter or use default configuration \
@@ -44,6 +45,13 @@ export default class InfluxDBClient {
     }
   }
 
+  /**
+   * Write data into specified database.
+   * @param data - data to write
+   * @param database - database to write into
+   * @param org - organization to write into
+   * @param writeOptions - write options
+   */
   async write(
     data: WritableData,
     database?: string,
@@ -60,6 +68,14 @@ export default class InfluxDBClient {
     )
   }
 
+  /**
+   * Execute a query and return the results as an async generator.
+   *
+   * @param query - The query string.
+   * @param database - The name of the database to query.
+   * @param queryType - The type of query (default: 'sql').
+   * @returns An async generator that yields maps of string keys to any values.
+   */
   query(
     query: string,
     database?: string,
@@ -74,6 +90,31 @@ export default class InfluxDBClient {
     )
   }
 
+  /**
+   * Execute a query and return the results as an async generator.
+   *
+   * @param query - The query string.
+   * @param database - The name of the database to query.
+   * @param queryType - The type of query (default: 'sql').
+   * @returns An async generator that yields PointValues object.
+   */
+  queryPoints(
+    query: string,
+    database?: string,
+    queryType: QueryType = 'sql'
+  ): AsyncGenerator<PointValues, void, void> {
+    return this._queryApi.queryPoints(
+      query,
+      database ??
+        this._options.database ??
+        throwReturn(new Error(argumentErrorMessage)),
+      queryType
+    )
+  }
+
+  /**
+   * Closes the client and all its resources (connections, ...)
+   */
   async close(): Promise<void> {
     await this._writeApi.close()
     await this._queryApi.close()
