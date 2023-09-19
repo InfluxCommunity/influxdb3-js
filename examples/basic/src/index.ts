@@ -71,11 +71,7 @@ async function main() {
     }
 
     // Execute query again as points
-    const queryPointsResult = client.queryPoints(
-      query,
-      database,
-      queryType
-    )
+    const queryPointsResult = client.queryPoints(query, database, queryType)
 
     for await (const row of queryPointsResult) {
       console.log(`avg is ${row.getField('avg', 'float')}`)
