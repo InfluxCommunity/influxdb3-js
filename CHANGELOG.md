@@ -4,6 +4,10 @@
 
 1. [#89](https://github.com/InfluxCommunity/influxdb3-js/pull/89): Add structured query support
 
+### Docs
+
+1. [#89](https://github.com/InfluxCommunity/influxdb3-js/pull/89): Add downsampling example
+
 ## 0.2.0 [2023-08-11]
 
 ### Features
