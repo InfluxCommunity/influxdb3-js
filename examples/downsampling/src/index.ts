@@ -70,6 +70,7 @@ async function main() {
       //
       const downSampledPoint = row
         .asPoint('stat_downsampled')
+        .removeField('window_start')
         .setTimestamp(timestamp)
 
       await client.write(downSampledPoint, database)
