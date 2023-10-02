@@ -4,6 +4,8 @@
 
 ## InfluxDBClient.write() method
 
+Write data into specified database.
+
 **Signature:**
 
 ```typescript
@@ -14,10 +16,10 @@ write(data: WritableData, database?: string, org?: string, writeOptions?: Partia
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  data | [WritableData](./influxdb3-client.writabledata.md) |  |
-|  database | string | _(Optional)_ |
-|  org | string | _(Optional)_ |
-|  writeOptions | Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt; | _(Optional)_ |
+|  data | [WritableData](./influxdb3-client.writabledata.md) | data to write |
+|  database | string | _(Optional)_ database to write into |
+|  org | string | _(Optional)_ organization to write into |
+|  writeOptions | Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt; | _(Optional)_ write options |
 
 **Returns:**
 

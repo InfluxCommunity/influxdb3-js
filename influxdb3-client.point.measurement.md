@@ -4,12 +4,12 @@
 
 ## Point.measurement() method
 
-Sets point's measurement.
+Creates new Point with given measurement.
 
 **Signature:**
 
 ```typescript
-measurement(name: string): Point;
+static measurement(name: string): Point;
 ```
 
 ## Parameters
@@ -22,5 +22,5 @@ measurement(name: string): Point;
 
 [Point](./influxdb3-client.point.md)
 
-this
+new Point
 

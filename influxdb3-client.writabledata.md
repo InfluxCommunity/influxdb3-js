@@ -10,12 +10,10 @@ The `WritableData` type represents different types of data that can be written. 
 
 - `string`<!-- -->: Represents lines of the [Line Protocol](https://bit.ly/2QL99fu)<!-- -->.
 
-- `PointRecord`<!-- -->: Represents an anonymous object. Note that a single `PointRecord` should not have a property of name length, as it could be misinterpreted as ArrayLike. If unsure, encapsulate your record in an array, i.e. \[record\].
-
 **Signature:**
 
 ```typescript
-type WritableData = NotPointRecord<ArrayLike<string> | ArrayLike<Point> | ArrayLike<PointRecord>> | NotArrayLike<PointRecord> | string | Point;
+type WritableData = ArrayLike<string> | ArrayLike<Point> | string | Point;
 ```
-**References:** [NotPointRecord](./influxdb3-client.notpointrecord.md)<!-- -->, [Point](./influxdb3-client.point.md)<!-- -->, [PointRecord](./influxdb3-client.pointrecord.md)<!-- -->, [NotArrayLike](./influxdb3-client.notarraylike.md)
+**References:** [Point](./influxdb3-client.point.md)
 

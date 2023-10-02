@@ -12,31 +12,41 @@ Point defines values of a single measurement.
 declare class Point 
 ```
 
-## Constructors
-
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(measurementName)](./influxdb3-client.point._constructor_.md) |  | Create a new Point with specified a measurement name. |
-
-## Properties
-
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [fields](./influxdb3-client.point.fields.md) |  | { \[key: string\]: string; } | escaped field values |
-
 ## Methods
 
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
-|  [booleanField(name, value)](./influxdb3-client.point.booleanfield.md) |  | Adds a boolean field. |
-|  [floatField(name, value)](./influxdb3-client.point.floatfield.md) |  | Adds a number field. |
-|  [fromRecord(record)](./influxdb3-client.point.fromrecord.md) | <code>static</code> |  |
-|  [intField(name, value)](./influxdb3-client.point.intfield.md) |  | Adds an integer field. |
-|  [measurement(name)](./influxdb3-client.point.measurement.md) |  | Sets point's measurement. |
-|  [stringField(name, value)](./influxdb3-client.point.stringfield.md) |  | Adds a string field. |
-|  [tag(name, value)](./influxdb3-client.point.tag.md) |  | Adds a tag. The caller has to ensure that both name and value are not empty and do not end with backslash. |
-|  [timestamp(value)](./influxdb3-client.point.timestamp.md) |  | <p>Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string or an undefined value. An undefined value instructs to assign a local timestamp using the client's clock. An empty string can be used to let the server assign the timestamp. A number value represents time as a count of time units since epoch, the exact time unit then depends on the [precision](./influxdb3-client.influxdbclient.write.md) of the API that writes the point.</p><p>Beware that the current time in nanoseconds can't precisely fit into a JS number, which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds, BigInt's <code>toString()</code> returns the required high-precision string.</p><p>Note that InfluxDB requires the timestamp to fit into int64 data type.</p> |
+|  [copy()](./influxdb3-client.point.copy.md) |  | Creates a copy of this object. |
+|  [fromValues(values)](./influxdb3-client.point.fromvalues.md) | <code>static</code> | Creates new point from PointValues object. Can throw error if measurement missing. |
+|  [getBooleanField(name)](./influxdb3-client.point.getbooleanfield.md) |  | Gets the boolean field value associated with the specified name. Throws if actual type of field with given name is not boolean. If the field is not present, returns undefined. |
+|  [getField(name, type)](./influxdb3-client.point.getfield.md) |  | Get field of numeric type. |
+|  [getField(name, type)](./influxdb3-client.point.getfield_1.md) |  | Get field of string type. |
+|  [getField(name, type)](./influxdb3-client.point.getfield_2.md) |  | Get field of boolean type. |
+|  [getField(name)](./influxdb3-client.point.getfield_3.md) |  | Get field without type check. |
+|  [getFieldNames()](./influxdb3-client.point.getfieldnames.md) |  | Gets an array of field names associated with this object. |
+|  [getFieldType(name)](./influxdb3-client.point.getfieldtype.md) |  | Gets the type of field with given name, if it exists. If the field is not present, returns undefined. |
+|  [getFloatField(name)](./influxdb3-client.point.getfloatfield.md) |  | Gets the float field value associated with the specified name. Throws if actual type of field with given name is not float. If the field is not present, returns undefined. |
+|  [getIntegerField(name)](./influxdb3-client.point.getintegerfield.md) |  | Gets the integer field value associated with the specified name. Throws if actual type of field with given name is not integer. If the field is not present, returns undefined. |
+|  [getMeasurement()](./influxdb3-client.point.getmeasurement.md) |  | Get measurement name. |
+|  [getStringField(name)](./influxdb3-client.point.getstringfield.md) |  | Gets the string field value associated with the specified name. Throws if actual type of field with given name is not string. If the field is not present, returns undefined. |
+|  [getTag(name)](./influxdb3-client.point.gettag.md) |  | Gets value of tag with given name. Returns undefined if tag not found. |
+|  [getTagNames()](./influxdb3-client.point.gettagnames.md) |  | Gets an array of tag names. |
+|  [getTimestamp()](./influxdb3-client.point.gettimestamp.md) |  | Get timestamp. Can be undefined if not set. |
+|  [getUintegerField(name)](./influxdb3-client.point.getuintegerfield.md) |  | Gets the uint field value associated with the specified name. Throws if actual type of field with given name is not uint. If the field is not present, returns undefined. |
+|  [hasFields()](./influxdb3-client.point.hasfields.md) |  | Checks if this object has any fields. |
+|  [measurement(name)](./influxdb3-client.point.measurement.md) | <code>static</code> | Creates new Point with given measurement. |
+|  [removeField(name)](./influxdb3-client.point.removefield.md) |  | Removes a field with the specified name if it exists; otherwise, it does nothing. |
+|  [removeTag(name)](./influxdb3-client.point.removetag.md) |  | Removes a tag with the specified name if it exists; otherwise, it does nothing. |
+|  [setBooleanField(name, value)](./influxdb3-client.point.setbooleanfield.md) |  | Sets a boolean field. |
+|  [setField(name, value, type)](./influxdb3-client.point.setfield.md) |  | Sets field based on provided type. |
+|  [setFields(fields)](./influxdb3-client.point.setfields.md) |  | Add fields according to their type. All numeric type is considered float |
+|  [setFloatField(name, value)](./influxdb3-client.point.setfloatfield.md) |  | Sets a number field. |
+|  [setIntegerField(name, value)](./influxdb3-client.point.setintegerfield.md) |  | Sets an integer field. |
+|  [setMeasurement(name)](./influxdb3-client.point.setmeasurement.md) |  | Sets point's measurement. |
+|  [setStringField(name, value)](./influxdb3-client.point.setstringfield.md) |  | Sets a string field. |
+|  [setTag(name, value)](./influxdb3-client.point.settag.md) |  | Sets a tag. The caller has to ensure that both name and value are not empty and do not end with backslash. |
+|  [setTimestamp(value)](./influxdb3-client.point.settimestamp.md) |  | <p>Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string or an undefined value. An undefined value instructs to assign a local timestamp using the client's clock. An empty string can be used to let the server assign the timestamp. A number value represents time as a count of time units since epoch, the exact time unit then depends on the [precision](./influxdb3-client.influxdbclient.write.md) of the API that writes the point.</p><p>Beware that the current time in nanoseconds can't precisely fit into a JS number, which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds, BigInt's <code>toString()</code> returns the required high-precision string.</p><p>Note that InfluxDB requires the timestamp to fit into int64 data type.</p> |
+|  [setUintegerField(name, value)](./influxdb3-client.point.setuintegerfield.md) |  | Sets an unsigned integer field. |
 |  [toLineProtocol(convertTimePrecision)](./influxdb3-client.point.tolineprotocol.md) |  | Creates an InfluxDB protocol line out of this instance. |
 |  [toString()](./influxdb3-client.point.tostring.md) |  |  |
-|  [uintField(name, value)](./influxdb3-client.point.uintfield.md) |  | Adds an unsigned integer field. |
 

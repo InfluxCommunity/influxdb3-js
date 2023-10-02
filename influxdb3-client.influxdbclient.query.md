@@ -4,6 +4,8 @@
 
 ## InfluxDBClient.query() method
 
+Execute a query and return the results as an async generator.
+
 **Signature:**
 
 ```typescript
@@ -14,11 +16,13 @@ query(query: string, database?: string, queryType?: QueryType): AsyncGenerator<R
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  query | string |  |
-|  database | string | _(Optional)_ |
-|  queryType | [QueryType](./influxdb3-client.querytype.md) | _(Optional)_ |
+|  query | string | The query string. |
+|  database | string | _(Optional)_ The name of the database to query. |
+|  queryType | [QueryType](./influxdb3-client.querytype.md) | _(Optional)_ The type of query (default: 'sql'). |
 
 **Returns:**
 
 AsyncGenerator&lt;Record&lt;string, any&gt;, void, void&gt;
+
+An async generator that yields maps of string keys to any values.
 

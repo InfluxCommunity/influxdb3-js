@@ -22,7 +22,8 @@ declare class InfluxDBClient
 
 |  Method | Modifiers | Description |
 |  --- | --- | --- |
-|  [close()](./influxdb3-client.influxdbclient.close.md) |  |  |
-|  [query(query, database, queryType)](./influxdb3-client.influxdbclient.query.md) |  |  |
-|  [write(data, database, org, writeOptions)](./influxdb3-client.influxdbclient.write.md) |  |  |
+|  [close()](./influxdb3-client.influxdbclient.close.md) |  | Closes the client and all its resources (connections, ...) |
+|  [query(query, database, queryType)](./influxdb3-client.influxdbclient.query.md) |  | Execute a query and return the results as an async generator. |
+|  [queryPoints(query, database, queryType)](./influxdb3-client.influxdbclient.querypoints.md) |  | Execute a query and return the results as an async generator. |
+|  [write(data, database, org, writeOptions)](./influxdb3-client.influxdbclient.write.md) |  | Write data into specified database. |
 

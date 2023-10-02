@@ -4,6 +4,8 @@
 
 ## InfluxDBClient.close() method
 
+Closes the client and all its resources (connections, ...)
+
 **Signature:**
 
 ```typescript

@@ -9,10 +9,12 @@
 |  Class | Description |
 |  --- | --- |
 |  [AbortError](./influxdb3-client.aborterror.md) | AbortError indicates that the communication with the server was aborted |
+|  [GetFieldTypeMissmatchError](./influxdb3-client.getfieldtypemissmatcherror.md) |  |
 |  [HttpError](./influxdb3-client.httperror.md) | A general HTTP error. |
 |  [IllegalArgumentError](./influxdb3-client.illegalargumenterror.md) | IllegalArgumentError is thrown when illegal argument is supplied. |
 |  [InfluxDBClient](./influxdb3-client.influxdbclient.md) | <code>InfluxDBClient</code> for interacting with an InfluxDB server, simplifying common operations such as writing, querying. |
 |  [Point](./influxdb3-client.point.md) | Point defines values of a single measurement. |
+|  [PointValues](./influxdb3-client.pointvalues.md) | Point defines values of a single measurement. |
 |  [RequestTimedOutError](./influxdb3-client.requesttimedouterror.md) | RequestTimedOutError indicates request timeout in the communication with the server |
 
 ## Functions
@@ -59,11 +61,9 @@
 |  Type Alias | Description |
 |  --- | --- |
 |  [HttpHeaders](./influxdb3-client.httpheaders.md) | Type of HTTP headers. |
-|  [NotArrayLike](./influxdb3-client.notarraylike.md) | Prevents confusion with the ArrayLike type. Use with PointRecord |
-|  [NotPointRecord](./influxdb3-client.notpointrecord.md) | Prevents confusion with the PointRecord type. |
-|  [PointRecord](./influxdb3-client.pointrecord.md) |  |
+|  [PointFieldType](./influxdb3-client.pointfieldtype.md) |  |
 |  [QueryType](./influxdb3-client.querytype.md) |  |
 |  [ResponseStartedFn](./influxdb3-client.responsestartedfn.md) | Informs about a start of response processing. |
-|  [WritableData](./influxdb3-client.writabledata.md) | <p>The <code>WritableData</code> type represents different types of data that can be written. The data can either be a uniform ArrayLike collection or a single value of the following types:</p><p>- <code>Point</code>: Represents a [Point](./influxdb3-client.point.md) object.</p><p>- <code>string</code>: Represents lines of the [Line Protocol](https://bit.ly/2QL99fu)<!-- -->.</p><p>- <code>PointRecord</code>: Represents an anonymous object. Note that a single <code>PointRecord</code> should not have a property of name length, as it could be misinterpreted as ArrayLike. If unsure, encapsulate your record in an array, i.e. \[record\].</p> |
+|  [WritableData](./influxdb3-client.writabledata.md) | <p>The <code>WritableData</code> type represents different types of data that can be written. The data can either be a uniform ArrayLike collection or a single value of the following types:</p><p>- <code>Point</code>: Represents a [Point](./influxdb3-client.point.md) object.</p><p>- <code>string</code>: Represents lines of the [Line Protocol](https://bit.ly/2QL99fu)<!-- -->.</p> |
 |  [WritePrecision](./influxdb3-client.writeprecision.md) | Timestamp precision used in write operations. See [https://docs.influxdata.com/influxdb/latest/api/\#operation/PostWrite](https://docs.influxdata.com/influxdb/latest/api/#operation/PostWrite) |
 
