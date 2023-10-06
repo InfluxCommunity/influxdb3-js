@@ -1,4 +1,6 @@
-## 0.4.0 [unreleased]
+## 0.3.1 [unreleased]
+
+Fixed package distribution files. The distribution files were not being included in the npm package.
 
 ## 0.3.0 [2023-10-02]
 
