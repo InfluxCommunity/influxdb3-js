@@ -119,6 +119,12 @@ export function fromConnectionString(connectionString: string): ClientOptions {
  * Creates `ClientOptions` from environment variables.
  */
 export function fromEnv(): ClientOptions {
+  if (!process.env.INFLUX_HOST) {
+    throw Error('INFLUX_HOST variable not set!')
+  }
+  if (!process.env.INFLUX_TOKEN) {
+    throw Error('INFLUX_TOKEN variable not set!')
+  }
   let options:ClientOptions = {
     host: process.env.INFLUX_HOST!
   }

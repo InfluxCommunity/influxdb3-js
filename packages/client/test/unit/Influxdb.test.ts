@@ -297,12 +297,16 @@ at 'ClientOptions.database'
     }
     it('fails on missing host', () => {
       clear()
-      expect(() => new InfluxDBClient()).to.throw('No host specified!')
+      expect(() => new InfluxDBClient()).to.throw(
+        'INFLUX_HOST variable not set!'
+      )
     })
     it('fails on missing token', () => {
       clear()
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
-      expect(() => new InfluxDBClient()).to.throw('No token specified!')
+      expect(() => new InfluxDBClient()).to.throw(
+        'INFLUX_TOKEN variable not set!'
+      )
     })
     it('is created with host and token', () => {
       clear()
