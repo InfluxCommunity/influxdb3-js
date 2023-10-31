@@ -88,53 +88,59 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
  * @param connectionString
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
-    const url = new URL(connectionString)
-    let options:ClientOptions = {
-      host: url.host,
-    }
-    if (url.searchParams.has('token')) {
-      options.token = url.searchParams.get('token')!
-    }
-    if (url.searchParams.has('database')) {
-      options.database = url.searchParams.get('database')!
-    }
-    if (url.searchParams.has('timeout')) {
-      options.timeout = parseInt(url.searchParams.get('timeout')!)
-    }
-    options.writeOptions = { ...DEFAULT_WriteOptions }
-    if (url.searchParams.has('precision')) {
-      options.writeOptions.precision = url.searchParams.get('precision') as WritePrecision
-    }
-    if (url.searchParams.has('gzipThreshold')) {
-      options.writeOptions.gzipThreshold = parseInt(url.searchParams.get('gzipThreshold')!)
-    }
+  let options:ClientOptions = {
+    host: connectionString.split('?')[0],
+  }
+  const url = new URL(connectionString)
+  if (url.searchParams.has('token')) {
+    options.token = url.searchParams.get('token')!
+  }
+  if (url.searchParams.has('database')) {
+    options.database = url.searchParams.get('database')!
+  }
+  if (url.searchParams.has('timeout')) {
+    options.timeout = parseInt(url.searchParams.get('timeout')!)
+  }
+  if (url.searchParams.has('precision')) {
+    if (!options.writeOptions)
+      options.writeOptions = {} as WriteOptions
+    options.writeOptions.precision = url.searchParams.get('precision') as WritePrecision
+  }
+  if (url.searchParams.has('gzipThreshold')) {
+    if (!options.writeOptions)
+      options.writeOptions = {} as WriteOptions
+    options.writeOptions.gzipThreshold = parseInt(url.searchParams.get('gzipThreshold')!)
+  }
 
-    return options
+  return options
 }
 
 /**
  * Creates `ClientOptions` from environment variables.
  */
 export function fromEnv(): ClientOptions {
-    let options:ClientOptions = {
-        host: process.env.INFLUX_HOST
-    }
-    if (process.env.INFLUX_TOKEN) {
-        options.token = process.env.INFLUX_TOKEN
-    }
-    if (process.env.INFLUX_DATABASE) {
-        options.database = process.env.INFLUX_DATABASE
-    }
-    if (process.env.INFLUX_TIMEOUT) {
-        options.timeout = process.env.INFLUX_TIMEOUT
-    }
-    options.writeOptions = { ...DEFAULT_WriteOptions }
-    if (process.env.INFLUX_PRECISION) {
-        options.writeOptions.precision = process.env.INFLUX_PRECISION as WritePrecision
-    }
-    if (process.env.INFLUX_GZIP_THRESHOLD) {
-        options.writeOptions.gzipThreshold = process.env.INFLUX_GZIP_THRESHOLD
-    }
+  let options:ClientOptions = {
+    host: process.env['INFLUX_HOST']!
+  }
+  if (process.env.INFLUX_TOKEN) {
+      options.token = process.env.INFLUX_TOKEN
+  }
+  if (process.env.INFLUX_DATABASE) {
+      options.database = process.env.INFLUX_DATABASE
+  }
+  if (process.env.INFLUX_TIMEOUT) {
+      options.timeout = parseInt(process.env.INFLUX_TIMEOUT)
+  }
+  if (process.env.INFLUX_PRECISION) {
+    if (!options.writeOptions)
+      options.writeOptions = {} as WriteOptions
+    options.writeOptions.precision = process.env.INFLUX_PRECISION as WritePrecision
+  }
+  if (process.env.INFLUX_GZIP_THRESHOLD) {
+    if (!options.writeOptions)
+      options.writeOptions = {} as WriteOptions
+    options.writeOptions.gzipThreshold = parseInt(process.env.INFLUX_GZIP_THRESHOLD)
+  }
 
-    return options
+  return options
 }
