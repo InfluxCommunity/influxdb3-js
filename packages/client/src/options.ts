@@ -120,7 +120,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
  */
 export function fromEnv(): ClientOptions {
   let options:ClientOptions = {
-    host: process.env['INFLUX_HOST']!
+    host: process.env.INFLUX_HOST!
   }
   if (process.env.INFLUX_TOKEN) {
       options.token = process.env.INFLUX_TOKEN
