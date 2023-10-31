@@ -63,7 +63,9 @@ export default class InfluxDBClient {
           break;
         }
         case 1: {
-          if (typeof args[0] === "string") {
+          if (args [0] == null) {
+            throw new IllegalArgumentError('No configuration specified!')
+          } else if (typeof args[0] === "string") {
             options = fromConnectionString(args[0])
           } else {
             options = args[0]
@@ -80,7 +82,7 @@ export default class InfluxDBClient {
         throw new IllegalArgumentError('No host specified!')
     if (host.endsWith('/'))
         this._options.host = host.substring(0, host.length - 1)
-    if (typeof token !== 'string')
+    if (typeof this._options.token !== 'string')
         throw new IllegalArgumentError('No token specified!')
     this._queryApi = new QueryApiImpl(this._options)
     this._writeApi = new WriteApiImpl(this._options)
