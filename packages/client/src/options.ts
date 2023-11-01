@@ -93,13 +93,13 @@ export function fromConnectionString(connectionString: string): ClientOptions {
   }
   const url = new URL(connectionString)
   if (url.searchParams.has('token')) {
-    options.token = url.searchParams.get('token')!
+    options.token = url.searchParams.get('token') as string
   }
   if (url.searchParams.has('database')) {
-    options.database = url.searchParams.get('database')!
+    options.database = url.searchParams.get('database') as string
   }
   if (url.searchParams.has('timeout')) {
-    options.timeout = parseInt(url.searchParams.get('timeout')!)
+    options.timeout = parseInt(url.searchParams.get('timeout') as string)
   }
   if (url.searchParams.has('precision')) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
@@ -110,7 +110,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
   if (url.searchParams.has('gzipThreshold')) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
     options.writeOptions.gzipThreshold = parseInt(
-      url.searchParams.get('gzipThreshold')!
+      url.searchParams.get('gzipThreshold') as string
     )
   }
 
@@ -141,8 +141,8 @@ export function fromEnv(): ClientOptions {
   }
   if (process.env.INFLUX_PRECISION) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision =
-      process.env.INFLUX_PRECISION as WritePrecision
+    options.writeOptions.precision = process.env
+      .INFLUX_PRECISION as WritePrecision
   }
   if (process.env.INFLUX_GZIP_THRESHOLD) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions

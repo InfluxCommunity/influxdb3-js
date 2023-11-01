@@ -7,7 +7,6 @@ import {InfluxDBClient} from '@influxdata/influxdb3-client'
 
 /* eslint-disable no-console */
 async function main() {
-
   let client: InfluxDBClient
 
   // Create a new client using ClientOptions
