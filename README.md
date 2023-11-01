@@ -45,11 +45,12 @@ It provides main (CJS), module (ESM), and browser (UMD) exports.
 
 Set environment variables:
 
-- `INFLUX_HOST` InfluxDB address, eg. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
-- `INFLUX_TOKEN` access token
-- `INFLUX_DATABASE` database (bucket) name, eg. *`my-database`*
+- `INFLUX_HOST` - InfluxDB address, eg. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
+- `INFLUX_TOKEN` - access token
+- `INFLUX_DATABASE` - database (bucket) name, eg. *`my-database`*
 
-_Deprecated names_
+Deprecated variable names:
+
 - `INFLUXDB_URL`
 - `INFLUXDB_TOKEN`
 - `INFLUXDB_DATABASE`
@@ -114,7 +115,8 @@ async function main() {
 main()
 ```
 
-You can also use provided constructor for `InfluxDBClient` instantiation using environment variables:  
+You can use provided constructor for `InfluxDBClient` instantiation using environment variables:
+
 ```ts
 
 async function main() {
@@ -128,7 +130,8 @@ async function main() {
 main()
 ```
 
-You can instantiate `InfluxDBClient` with connections string:
+You can also instantiate `InfluxDBClient` with connections string:
+
 ```ts
 
 async function main() {

@@ -85,10 +85,10 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
 
 /**
  * Parses connection string into `ClientOptions`.
- * @param connectionString
+ * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
-  let options:ClientOptions = {
+  const options: ClientOptions = {
     host: connectionString.split('?')[0],
   }
   const url = new URL(connectionString)
@@ -102,14 +102,16 @@ export function fromConnectionString(connectionString: string): ClientOptions {
     options.timeout = parseInt(url.searchParams.get('timeout')!)
   }
   if (url.searchParams.has('precision')) {
-    if (!options.writeOptions)
-      options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = url.searchParams.get('precision') as WritePrecision
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.precision = url.searchParams.get(
+      'precision'
+    ) as WritePrecision
   }
   if (url.searchParams.has('gzipThreshold')) {
-    if (!options.writeOptions)
-      options.writeOptions = {} as WriteOptions
-    options.writeOptions.gzipThreshold = parseInt(url.searchParams.get('gzipThreshold')!)
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.gzipThreshold = parseInt(
+      url.searchParams.get('gzipThreshold')!
+    )
   }
 
   return options
@@ -125,27 +127,28 @@ export function fromEnv(): ClientOptions {
   if (!process.env.INFLUX_TOKEN) {
     throw Error('INFLUX_TOKEN variable not set!')
   }
-  let options:ClientOptions = {
-    host: process.env.INFLUX_HOST!
+  const options: ClientOptions = {
+    host: process.env.INFLUX_HOST,
   }
   if (process.env.INFLUX_TOKEN) {
-      options.token = process.env.INFLUX_TOKEN
+    options.token = process.env.INFLUX_TOKEN
   }
   if (process.env.INFLUX_DATABASE) {
-      options.database = process.env.INFLUX_DATABASE
+    options.database = process.env.INFLUX_DATABASE
   }
   if (process.env.INFLUX_TIMEOUT) {
-      options.timeout = parseInt(process.env.INFLUX_TIMEOUT)
+    options.timeout = parseInt(process.env.INFLUX_TIMEOUT)
   }
   if (process.env.INFLUX_PRECISION) {
-    if (!options.writeOptions)
-      options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = process.env.INFLUX_PRECISION as WritePrecision
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.precision =
+      process.env.INFLUX_PRECISION as WritePrecision
   }
   if (process.env.INFLUX_GZIP_THRESHOLD) {
-    if (!options.writeOptions)
-      options.writeOptions = {} as WriteOptions
-    options.writeOptions.gzipThreshold = parseInt(process.env.INFLUX_GZIP_THRESHOLD)
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.gzipThreshold = parseInt(
+      process.env.INFLUX_GZIP_THRESHOLD
+    )
   }
 
   return options

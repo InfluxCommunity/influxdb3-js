@@ -2,7 +2,13 @@ import WriteApi from './WriteApi'
 import WriteApiImpl from './impl/WriteApiImpl'
 import QueryApi from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
-import {ClientOptions, QueryType, WriteOptions, fromConnectionString, fromEnv} from './options'
+import {
+  ClientOptions,
+  QueryType,
+  WriteOptions,
+  fromConnectionString,
+  fromEnv,
+} from './options'
 import {IllegalArgumentError} from './errors'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
 import {throwReturn} from './util/common'
@@ -25,7 +31,7 @@ export default class InfluxDBClient {
    * Creates a new instance of the `InfluxDBClient` from `ClientOptions`.
    * @param options - client options
    */
-  constructor(options: ClientOptions);
+  constructor(options: ClientOptions)
 
   /**
    * Creates a new instance of the `InfluxDBClient` from connection string.
@@ -40,7 +46,7 @@ export default class InfluxDBClient {
    *
    * @param connectionString - connection string
    */
-  constructor(connectionString: string);
+  constructor(connectionString: string)
 
   /**
    * Creates a new instance of the `InfluxDBClient` from environment variables.
@@ -53,37 +59,37 @@ export default class InfluxDBClient {
    *   - INFLUX_PRECISION - timestamp precision when writing data
    *   - INFLUX_GZIP_THRESHOLD - payload size threshold for gzipping data
    */
-  constructor();
+  constructor()
 
   constructor(...args: Array<any>) {
-    let options:ClientOptions
-    switch(args.length) {
-        case 0: {
-            options = fromEnv()
-          break;
+    let options: ClientOptions
+    switch (args.length) {
+      case 0: {
+        options = fromEnv()
+        break
+      }
+      case 1: {
+        if (args[0] == null) {
+          throw new IllegalArgumentError('No configuration specified!')
+        } else if (typeof args[0] === 'string') {
+          options = fromConnectionString(args[0])
+        } else {
+          options = args[0]
         }
-        case 1: {
-          if (args [0] == null) {
-            throw new IllegalArgumentError('No configuration specified!')
-          } else if (typeof args[0] === "string") {
-            options = fromConnectionString(args[0])
-          } else {
-            options = args[0]
-          }
-          break;
-        }
-        default: {
-            throw new IllegalArgumentError('Multiple arguments specified!')
-        }
+        break
+      }
+      default: {
+        throw new IllegalArgumentError('Multiple arguments specified!')
+      }
     }
     this._options = options
     const host = this._options.host
     if (typeof host !== 'string')
-        throw new IllegalArgumentError('No host specified!')
+      throw new IllegalArgumentError('No host specified!')
     if (host.endsWith('/'))
-        this._options.host = host.substring(0, host.length - 1)
+      this._options.host = host.substring(0, host.length - 1)
     if (typeof this._options.token !== 'string')
-        throw new IllegalArgumentError('No token specified!')
+      throw new IllegalArgumentError('No token specified!')
     this._queryApi = new QueryApiImpl(this._options)
     this._writeApi = new WriteApiImpl(this._options)
   }
