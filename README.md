@@ -43,19 +43,25 @@ It provides main (CJS), module (ESM), and browser (UMD) exports.
 
 ## Usage
 
-set environment variables:
+Set environment variables:
 
-- `INFLUXDB_URL` region of your influxdb cloud e.g. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
-- `INFLUXDB_TOKEN` read/write token generated in cloud
-- `INFLUXDB_DATABASE` name of database e.g .*`my-database`*
+- `INFLUX_HOST` - InfluxDB address, eg. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
+- `INFLUX_TOKEN` - access token
+- `INFLUX_DATABASE` - database (bucket) name, eg. *`my-database`*
+
+Deprecated variable names:
+
+- `INFLUX_HOST`
+- `INFLUX_TOKEN`
+- `INFLUX_DATABASE`
 
 <details>
   <summary>linux/macos</summary>
 
 ```sh
-export INFLUXDB_URL="<url>"
-export INFLUXDB_DATABASE="<database>"
-export INFLUXDB_TOKEN="<token>"
+export INFLUX_HOST="<url>"
+export INFLUX_DATABASE="<database>"
+export INFLUX_TOKEN="<token>"
 ```
 
 </details>
@@ -66,17 +72,17 @@ export INFLUXDB_TOKEN="<token>"
 ### powershell
 
 ```powershell
-$env:INFLUXDB_URL = "<url>"
-$env:INFLUXDB_DATABASE = "<database>"
-$env:INFLUXDB_TOKEN = "<token>"
+$env:INFLUX_HOST = "<url>"
+$env:INFLUX_DATABASE = "<database>"
+$env:INFLUX_TOKEN = "<token>"
 ```
 
 ### cmd
 
 ```console
-set INFLUXDB_URL=<url>
-set INFLUXDB_DATABASE=<database>
-set INFLUXDB_TOKEN=<token>
+set INFLUX_HOST=<url>
+set INFLUX_DATABASE=<database>
+set INFLUX_TOKEN=<token>
 ```
 
 </details>
@@ -89,17 +95,49 @@ To get started with influxdb client import `@influxdata/influxdb3-client` packag
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 ```
 
-Assign constants for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function. Make sure to `close` the client when it's no longer needed for writing or querying.
+Assign values for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function.
+Please note that token is mandatory parameter.
+Make sure to `close` the client when it's no longer needed for writing or querying.
 
 ```ts
-const host = process.env.INFLUXDB_URL
-const token = process.env.INFLUXDB_TOKEN
-const database = process.env.INFLUXDB_DATABASE
+const host = process.env.INFLUX_HOST
+const token = process.env.INFLUX_TOKEN
+const database = process.env.INFLUX_DATABASE
 
 async function main() {
-    const client = new InfluxDBClient({host, token})
+    const client = new InfluxDBClient({host, token, database})
 
-    // following code goes here
+    // code goes here
+
+    client.close()
+}
+
+main()
+```
+
+You can use provided constructor for `InfluxDBClient` instantiation using environment variables:
+
+```ts
+
+async function main() {
+    const client = new InfluxDBClient()
+
+    // code goes here
+
+    client.close()
+}
+
+main()
+```
+
+You can also instantiate `InfluxDBClient` with connections string:
+
+```ts
+
+async function main() {
+    const client = new InfluxDBClient('https://us-east-1-1.aws.cloud2.influxdata.com/?token=my-token&database=my-database')
+
+    // code goes here
 
     client.close()
 }

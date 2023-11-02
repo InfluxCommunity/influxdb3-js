@@ -15,9 +15,9 @@ const getEnv = (variableName: string): string =>
 /* eslint-disable no-console */
 async function main() {
   // Use environment variables to initialize client
-  const host = getEnv('INFLUXDB_URL')
-  const token = getEnv('INFLUXDB_TOKEN')
-  const database = getEnv('INFLUXDB_DATABASE')
+  const host = getEnv('INFLUX_HOST')
+  const token = getEnv('INFLUX_TOKEN')
+  const database = getEnv('INFLUX_DATABASE')
 
   // Create a new client using an InfluxDB server base URL and an authentication token
   const client = new InfluxDBClient({host, token})
