@@ -14,16 +14,16 @@
 
 set environment variables.
 
-- `INFLUXDB_URL` region of your influxdb cloud e.g. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
-- `INFLUXDB_TOKEN` read/write token generated in cloud
-- `INFLUXDB_DATABASE` name of database e.g .*`my-database`*
+- `INFLUX_HOST` region of your influxdb cloud e.g. *`https://us-east-1-1.aws.cloud2.influxdata.com/`*
+- `INFLUX_TOKEN` read/write token generated in cloud
+- `INFLUX_DATABASE` name of database e.g .*`my-database`*
 
 For simplicity, you can use dotenv library to load environment variables in this example. Create `.env` file and paste your variables as follows:
 
 ```conf
-INFLUXDB_URL="<url>"
-INFLUXDB_DATABASE="<database>"
-INFLUXDB_TOKEN="<token>"
+INFLUX_HOST="<url>"
+INFLUX_DATABASE="<database>"
+INFLUX_TOKEN="<token>"
 ```
 
 ### Run example

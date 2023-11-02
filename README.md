@@ -51,9 +51,9 @@ Set environment variables:
 
 Deprecated variable names:
 
-- `INFLUXDB_URL`
-- `INFLUXDB_TOKEN`
-- `INFLUXDB_DATABASE`
+- `INFLUX_HOST`
+- `INFLUX_TOKEN`
+- `INFLUX_DATABASE`
 
 <details>
   <summary>linux/macos</summary>
