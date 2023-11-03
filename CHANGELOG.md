@@ -1,10 +1,10 @@
-## 0.4.0 [unreleased]
+## 0.4.0 [2023-11-03]
 
 ### Features
 
 1. [#157](https://github.com/InfluxCommunity/influxdb3-js/pull/157): Add client instantiation from connection string and environment variables
 
-## 0.3.1 [2023-06-10]
+## 0.3.1 [2023-10-06]
 
 Fixed package distribution files. The distribution files were not being included in the npm package.
 
