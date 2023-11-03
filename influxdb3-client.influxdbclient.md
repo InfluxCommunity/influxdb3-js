@@ -16,7 +16,9 @@ declare class InfluxDBClient
 
 |  Constructor | Modifiers | Description |
 |  --- | --- | --- |
-|  [(constructor)(options)](./influxdb3-client.influxdbclient._constructor_.md) |  | Creates a new instance of the <code>InfluxDBClient</code> for interacting with an InfluxDB server, simplifying common operations such as writing, querying. |
+|  [(constructor)(options)](./influxdb3-client.influxdbclient._constructor_.md) |  | Creates a new instance of the <code>InfluxDBClient</code> from <code>ClientOptions</code>. |
+|  [(constructor)(connectionString)](./influxdb3-client.influxdbclient._constructor__1.md) |  | Creates a new instance of the <code>InfluxDBClient</code> from connection string. |
+|  [(constructor)()](./influxdb3-client.influxdbclient._constructor__2.md) |  | <p>Creates a new instance of the <code>InfluxDBClient</code> from environment variables.</p><p>Supported variables: - INFLUX\_HOST - cloud/server URL (required) - INFLUX\_TOKEN - authentication token (required) - INFLUX\_TIMEOUT - I/O timeout - INFLUX\_DATABASE - database (bucket) name - INFLUX\_PRECISION - timestamp precision when writing data - INFLUX\_GZIP\_THRESHOLD - payload size threshold for gzipping data</p> |
 
 ## Methods
 

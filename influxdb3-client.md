@@ -23,6 +23,8 @@
 |  --- | --- |
 |  [convertTimeToNanos(value)](./influxdb3-client.converttimetonanos.md) | convertTimeToNanos converts Point's timestamp to a string. |
 |  [createTextDecoderCombiner()](./influxdb3-client.createtextdecodercombiner.md) | Creates a chunk combiner instance that uses UTF-8 TextDecoder to decode Uint8Arrays into strings. |
+|  [fromConnectionString(connectionString)](./influxdb3-client.fromconnectionstring.md) | Parses connection string into <code>ClientOptions</code>. |
+|  [fromEnv()](./influxdb3-client.fromenv.md) | Creates <code>ClientOptions</code> from environment variables. |
 |  [setLogger(logger)](./influxdb3-client.setlogger.md) | Sets custom logger. |
 |  [useProcessHrtime(use)](./influxdb3-client.useprocesshrtime.md) |  |
 

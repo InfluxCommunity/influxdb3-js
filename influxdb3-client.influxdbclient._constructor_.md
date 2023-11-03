@@ -4,7 +4,7 @@
 
 ## InfluxDBClient.(constructor)
 
-Creates a new instance of the `InfluxDBClient` for interacting with an InfluxDB server, simplifying common operations such as writing, querying.
+Creates a new instance of the `InfluxDBClient` from `ClientOptions`<!-- -->.
 
 **Signature:**
 
