@@ -189,7 +189,7 @@ const queryPointsResult = client.queryPoints(
 for await (const row of queryPointsResult) {
     console.log(`avg is ${row.getField('avg', 'float')}`)
     console.log(`max is ${row.getField('max', 'float')}`)
-    console.log(`lp: ${row.toLineProtocol()}`)
+    console.log(`lp: ${row.asPoint('stat').toLineProtocol()}`)
 }
 ```
 
