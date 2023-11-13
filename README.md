@@ -49,12 +49,6 @@ Set environment variables:
 - `INFLUX_TOKEN` - access token
 - `INFLUX_DATABASE` - database (bucket) name, eg. *`my-database`*
 
-Deprecated variable names:
-
-- `INFLUX_HOST`
-- `INFLUX_TOKEN`
-- `INFLUX_DATABASE`
-
 <details>
   <summary>linux/macos</summary>
 
