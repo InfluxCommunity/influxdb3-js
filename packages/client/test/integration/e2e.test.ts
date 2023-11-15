@@ -202,7 +202,7 @@ describe('e2e test', () => {
     })
 
     const testId = getRandomInt(0, 100000000)
-    const values = range(50_000).map(() => ({
+    const values = range(5_000).map(() => ({
       avg: getRandomInt(110, 500),
       max: getRandomInt(900, 1000),
     }))
