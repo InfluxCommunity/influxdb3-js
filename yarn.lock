@@ -523,10 +523,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.53.0.tgz#bea56f2ed2b5baea164348ff4d5a879f6f81f20d"
   integrity sha512-Kn7K8dx/5U6+cT1yEhpX1w4PCSg0M+XyRILPgvwcEBjerFWCwQj5sbr3/VmxqV0JGHCBCzyd6LxypEuehypY1w==
 
-"@grpc/grpc-js@^1.8.16":
-  version "1.9.8"
-  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.8.tgz#92dc0eca37d701b3d3b7b898e55ce20e0507176b"
-  integrity sha512-FFPzDS333Vw8hvf+1FaEsaCYVPBdNdUCw7zArTiF7+6gOzln967b4GBCBekKGqoKEgna8d3Ayxv8t+IvazXG3g==
+"@grpc/grpc-js@^1.9.9":
+  version "1.9.10"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-1.9.10.tgz#d4eb0086662a3d05948312124a0212e71fc0cf0a"
+  integrity sha512-6W1NMW40R0fs4Tlv+Tx2+4J23IA/kV+ifnNaOcDAqDOBfbk3BTPuFmHVOxVQX0DEK9oD6KzKPyu2OiHW87tFpA==
   dependencies:
     "@grpc/proto-loader" "^0.7.8"
     "@types/node" ">=12.12.47"
@@ -1068,7 +1068,7 @@
     picocolors "^1.0.0"
     tslib "^2.6.0"
 
-"@protobuf-ts/grpc-transport@^2.9.0":
+"@protobuf-ts/grpc-transport@^2.9.1":
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/grpc-transport/-/grpc-transport-2.9.1.tgz#dd6429fa35dc22c0dcc76c5e3c3c0c10ea1c5c09"
   integrity sha512-p3o69oQUqMX1dG0QcBsnK7/2h0ReEIfJRbZykMCumTn2uAc9znTfh74xB8aH8I5Q+sWphucG8mPytJ/QIW9WSA==
@@ -1076,7 +1076,7 @@
     "@protobuf-ts/runtime" "^2.9.1"
     "@protobuf-ts/runtime-rpc" "^2.9.1"
 
-"@protobuf-ts/grpcweb-transport@^2.9.0":
+"@protobuf-ts/grpcweb-transport@^2.9.1":
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/grpcweb-transport/-/grpcweb-transport-2.9.1.tgz#523647acbf98de54b291a57e770e3127820ba879"
   integrity sha512-42bvBX312qhPlosMNTZE9XI+lt58ISM5vEJKv/wOx2Fu70J0TdlLa4Bjz8xcuRlv4Pq1CA+94DC1IgNxNRsQdg==
@@ -1084,7 +1084,7 @@
     "@protobuf-ts/runtime" "^2.9.1"
     "@protobuf-ts/runtime-rpc" "^2.9.1"
 
-"@protobuf-ts/runtime-rpc@^2.9.0", "@protobuf-ts/runtime-rpc@^2.9.1":
+"@protobuf-ts/runtime-rpc@^2.9.1":
   version "2.9.1"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime-rpc/-/runtime-rpc-2.9.1.tgz#6a1c8f189005de5dc6bce7a18751ef3fe304c8eb"
   integrity sha512-pzO20J6s07LTWcj8hKAXh/dAacU5HIVir6SANKXXH8G0pn0VIIB4FFECq5Hbv25/8PQoOGZ7iApq/DMHaSjGhg==
@@ -3323,7 +3323,7 @@ graphemer@^1.4.0:
   resolved "https://registry.yarnpkg.com/graphemer/-/graphemer-1.4.0.tgz#fb2f1d55e0e3a1849aeffc90c4fa0dd53a0e66c6"
   integrity sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==
 
-grpc-web@^1.4.2:
+grpc-web@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/grpc-web/-/grpc-web-1.5.0.tgz#154e4007ab59a94bf7726b87ef6c5bd8815ecf6e"
   integrity sha512-y1tS3BBIoiVSzKTDF3Hm7E8hV2n7YY7pO0Uo7depfWJqKzWE+SKr0jvHNIJsJJYILQlpYShpi/DRJJMbosgDMQ==

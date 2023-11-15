@@ -86,11 +86,11 @@
     "typescript": "^5.1.3"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.8.16",
-    "@protobuf-ts/grpc-transport": "^2.9.0",
-    "@protobuf-ts/grpcweb-transport": "^2.9.0",
-    "@protobuf-ts/runtime-rpc": "^2.9.0",
+    "@grpc/grpc-js": "^1.9.9",
+    "@protobuf-ts/grpc-transport": "^2.9.1",
+    "@protobuf-ts/grpcweb-transport": "^2.9.1",
+    "@protobuf-ts/runtime-rpc": "^2.9.1",
     "apache-arrow": "^14.0.1",
-    "grpc-web": "^1.4.2"
+    "grpc-web": "^1.5.0"
   }
 }
