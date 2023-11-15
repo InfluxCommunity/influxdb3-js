@@ -41,8 +41,8 @@ export default class QueryApiImpl implements QueryApi {
 
     const token = this._options.token
     if (token) meta['authorization'] = `Bearer ${token}`
-
-    const options: RpcOptions = {meta}
+    const timeout = this._options.queryTimeout
+    const options: RpcOptions = {meta, timeout}
 
     const flightDataStream = client.doGet(ticket, options)
 

@@ -14,6 +14,11 @@ export interface ConnectionOptions {
    */
   timeout?: number
   /**
+   * stream timeout for query (grpc timeout)
+   * @defaultValue 60000
+   */
+  queryTimeout?: number
+  /**
    * default database for write query if not present as argument.
    */
   database?: string
@@ -43,6 +48,7 @@ export interface ConnectionOptions {
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
   timeout: 10000,
+  queryTimeout: 60000,
 }
 
 /**
