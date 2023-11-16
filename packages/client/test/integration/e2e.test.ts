@@ -190,7 +190,7 @@ describe('e2e test', () => {
     await client.close()
   })
 
-  it.only('big query', async () => {
+  it('big query', async () => {
     const {database, token, url} = getEnvVariables()
 
     const client = new InfluxDBClient({
