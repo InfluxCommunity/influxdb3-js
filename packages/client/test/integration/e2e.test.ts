@@ -150,6 +150,7 @@ describe('e2e test', () => {
         .setTimestamp(time + i)
     )
     await client.write(points, database)
+    await sleep(1000)
 
     const query = `
       SELECT *
@@ -217,6 +218,7 @@ describe('e2e test', () => {
         .setTimestamp(time + i)
     )
     await client.write(points, database)
+    await sleep(1000)
 
     const query = `
       SELECT *

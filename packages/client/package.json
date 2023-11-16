@@ -15,7 +15,7 @@
     "test": "yarn run lint && yarn run typecheck && yarn run test:all",
     "test:all": "mocha 'test/**/*.test.ts' --timeout 60000 --exit",
     "test:unit": "mocha 'test/unit/**/*.test.ts' --exit",
-    "test:integration": "mocha 'test/integration/**/*.test.ts' --exit",
+    "test:integration": "mocha 'test/integration/**/*.test.ts' --timeout 60000 --exit",
     "test:ci": "yarn run lint:ci && yarn run test:all --exit --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/core_mocha/test-results.xml",
     "test:watch": "mocha 'test/unit/**/*.test.ts' --watch-extensions ts --watch",
     "typecheck": "tsc --noEmit --pretty",
