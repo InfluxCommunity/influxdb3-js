@@ -220,6 +220,9 @@ describe('e2e test', () => {
     )
     await client.write(points, database)
 
+    // wait for data to be written
+    await sleep(2_500)
+
     const query = `
       SELECT *
         FROM "stat"
