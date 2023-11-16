@@ -1,12 +1,8 @@
 ## 0.4.1 [unreleased]
 
-### Feature
-
-1. Query timeout
-
 ### Bugfix
 
-1. [#164](https://github.com/InfluxCommunity/influxdb3-js/issues/164): Default query timeout
+1. [#164](https://github.com/InfluxCommunity/influxdb3-js/issues/164): Query infinite wait state
 
 ## 0.4.0 [2023-11-03]
 
