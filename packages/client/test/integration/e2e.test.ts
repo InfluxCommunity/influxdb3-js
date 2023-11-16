@@ -124,7 +124,7 @@ describe('e2e test', () => {
     await rejects(client.query(query, database, queryType).next())
   })
 
-  it('parallel query', async () => {
+  it('concurrent query', async () => {
     const {database, token, url} = getEnvVariables()
 
     const client = new InfluxDBClient({
@@ -178,6 +178,7 @@ describe('e2e test', () => {
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               max: row.getFloatField('max')!,
             })
+            // Introduce concurrency: try to process more streams at once and switch between them
             await sleep(10)
           }
           return queryValues
