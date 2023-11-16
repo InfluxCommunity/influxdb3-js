@@ -189,7 +189,7 @@ describe('e2e test', () => {
     }
 
     await client.close()
-  })
+  }).timeout(10_000)
 
   it('big query', async () => {
     const {database, token, url} = getEnvVariables()
@@ -246,5 +246,5 @@ describe('e2e test', () => {
     expect(queryValues).to.deep.equal(values)
 
     await client.close()
-  })
+  }).timeout(10_000)
 })
