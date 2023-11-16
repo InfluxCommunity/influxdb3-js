@@ -73,7 +73,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
       })
       expect(transport._requestApi).to.equal(http.request)
     })
@@ -85,7 +84,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'https:',
-        timeout: 10000,
       })
       expect(transport._requestApi).to.equal(https.request)
     })
@@ -97,7 +95,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
       })
       expect(transport._contextPath).equals('/influx')
     })
@@ -109,7 +106,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
       })
       expect(transport._contextPath).equals('/influx')
     })

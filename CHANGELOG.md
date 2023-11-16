@@ -1,4 +1,8 @@
-## 0.5.0 [unreleased]
+## 0.4.1 [unreleased]
+
+### Bugfix
+
+1. [#164](https://github.com/InfluxCommunity/influxdb3-js/issues/164): Query infinite wait state
 
 ## 0.4.0 [2023-11-03]
 

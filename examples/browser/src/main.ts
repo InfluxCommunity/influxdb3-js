@@ -61,8 +61,8 @@ view.setOnWrite(async () => {
     .setFloatField('Temperature', data['Temperature'])
     .setFloatField('Humidity', data['Humidity'])
     .setFloatField('Pressure', data['Pressure'])
-    .setIntField('CO2', data['CO2'])
-    .setIntField('TVOC', data['TVOC'])
+    .setIntegerField('CO2', data['CO2'])
+    .setIntegerField('TVOC', data['TVOC'])
     .setTimestamp(new Date())
 
   try {

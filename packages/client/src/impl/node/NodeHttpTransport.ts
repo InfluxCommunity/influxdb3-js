@@ -15,7 +15,7 @@ import completeCommunicationObserver from '../completeCommunicationObserver'
 import {CLIENT_LIB_VERSION} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
-import {ConnectionOptions, DEFAULT_ConnectionOptions} from '../../options'
+import {ConnectionOptions} from '../../options'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -65,7 +65,6 @@ export class NodeHttpTransport implements Transport {
     const url = parse(proxyUrl || _url)
     this._token = token
     this._defaultOptions = {
-      ...DEFAULT_ConnectionOptions,
       ...nodeSupportedOptions,
       ...transportOptions,
       port: url.port,

@@ -4,6 +4,7 @@ import QueryApi from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
 import {
   ClientOptions,
+  DEFAULT_ConnectionOptions,
   QueryType,
   WriteOptions,
   fromConnectionString,
@@ -82,7 +83,10 @@ export default class InfluxDBClient {
         throw new IllegalArgumentError('Multiple arguments specified!')
       }
     }
-    this._options = options
+    this._options = {
+      ...DEFAULT_ConnectionOptions,
+      ...options,
+    }
     const host = this._options.host
     if (typeof host !== 'string')
       throw new IllegalArgumentError('No host specified!')

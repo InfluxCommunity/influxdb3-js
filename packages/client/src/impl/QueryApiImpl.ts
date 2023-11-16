@@ -14,7 +14,8 @@ export default class QueryApiImpl implements QueryApi {
   private _transport: ReturnType<typeof impl.queryTransport>
 
   constructor(private _options: ConnectionOptions) {
-    this._transport = impl.queryTransport(this._options)
+    const {host, queryTimeout: timeout} = this._options
+    this._transport = impl.queryTransport({host, timeout})
     this._flightClient = new FlightServiceClient(this._transport)
   }
 
@@ -41,7 +42,6 @@ export default class QueryApiImpl implements QueryApi {
 
     const token = this._options.token
     if (token) meta['authorization'] = `Bearer ${token}`
-
     const options: RpcOptions = {meta}
 
     const flightDataStream = client.doGet(ticket, options)
