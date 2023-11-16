@@ -33,6 +33,7 @@ function getRandomInt(min: number, max: number): number {
 const range: {
   (max: number): number[]
   (min: number, max: number, step?: number): number[]
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
 } = (n: number, n1?: number, step: number = 1): number[] => {
   const length = n1 === undefined ? n : Math.max(Math.ceil((n1 - n) / step), 0)
 
