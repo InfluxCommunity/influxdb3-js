@@ -14,7 +14,7 @@ export interface ConnectionOptions {
    */
   timeout?: number
   /**
-   * stream timeout for query (grpc timeout)
+   * stream timeout for query (grpc timeout). The gRPC doesn't apply the timeout to HTTP operations as is defined above. To successfully close a call to the gRPC endpoint, the queryTimeout must be specified. Without this timeout, a gRPC call might end up in an infinite wait state.
    * @defaultValue 60000
    */
   queryTimeout?: number
