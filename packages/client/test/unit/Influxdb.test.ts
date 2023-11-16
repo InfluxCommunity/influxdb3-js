@@ -6,6 +6,7 @@ import {
   Transport,
   WriteOptions,
   WritePrecision,
+  DEFAULT_ConnectionOptions,
 } from '../../src'
 import type WriteApi from '../../src/WriteApi'
 import type QueryApi from '../../src/QueryApi'
@@ -94,6 +95,7 @@ at 'ClientOptions.database'
           }) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
       })
@@ -107,6 +109,7 @@ at 'ClientOptions.database'
           }) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
       })
@@ -208,6 +211,7 @@ at 'ClientOptions.database'
         (new InfluxDBClient('https://localhost:8086?token=my-token') as any)
           ._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
       })
@@ -220,6 +224,7 @@ at 'ClientOptions.database'
           ) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         database: 'my-database',
@@ -233,6 +238,7 @@ at 'ClientOptions.database'
           ) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         timeout: 75,
@@ -246,6 +252,7 @@ at 'ClientOptions.database'
           ) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {
@@ -261,6 +268,7 @@ at 'ClientOptions.database'
           ) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {
@@ -276,6 +284,7 @@ at 'ClientOptions.database'
           ) as any
         )._options
       ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {
@@ -313,6 +322,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
       process.env['INFLUX_TOKEN'] = 'my-token'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
       })
@@ -323,6 +333,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_DATABASE'] = 'my-database'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         database: 'my-database',
@@ -334,6 +345,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_TIMEOUT'] = '75'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         timeout: 75,
@@ -345,6 +357,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_PRECISION'] = 'us'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {
@@ -358,6 +371,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_GZIP_THRESHOLD'] = '128'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {
@@ -372,6 +386,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_PRECISION'] = 'us'
       process.env['INFLUX_GZIP_THRESHOLD'] = '128'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
         writeOptions: {

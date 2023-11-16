@@ -11,7 +11,7 @@ import zlib from 'zlib'
 import {CLIENT_LIB_VERSION} from '../../../../src/impl/version'
 import {waitForCondition} from '../../util/waitForCondition'
 import {AddressInfo} from 'net'
-import {ConnectionOptions, DEFAULT_ConnectionOptions} from '../../../../src'
+import {ConnectionOptions} from '../../../../src'
 import {CollectedLogs, collectLogging} from '../../../util'
 
 function sendTestData(
@@ -73,8 +73,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
-        queryTimeout: DEFAULT_ConnectionOptions.queryTimeout,
       })
       expect(transport._requestApi).to.equal(http.request)
     })
@@ -86,8 +84,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'https:',
-        timeout: 10000,
-        queryTimeout: DEFAULT_ConnectionOptions.queryTimeout,
       })
       expect(transport._requestApi).to.equal(https.request)
     })
@@ -99,8 +95,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
-        queryTimeout: DEFAULT_ConnectionOptions.queryTimeout,
       })
       expect(transport._contextPath).equals('/influx')
     })
@@ -112,8 +106,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        timeout: 10000,
-        queryTimeout: DEFAULT_ConnectionOptions.queryTimeout,
       })
       expect(transport._contextPath).equals('/influx')
     })
@@ -147,7 +139,6 @@ describe('NodeHttpTransport', () => {
         hostname: 'test',
         port: '8086',
         protocol: 'http:',
-        queryTimeout: DEFAULT_ConnectionOptions.queryTimeout,
       })
       expect(transport._requestApi).to.equal(http.request)
     })
