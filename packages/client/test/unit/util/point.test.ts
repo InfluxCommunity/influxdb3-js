@@ -212,6 +212,27 @@ describe('point', () => {
     expect([]).to.deep.equal(point.getTagNames())
   })
 
+  it('uses default tags for line protocol', () => {
+    const defaultTags = {a: 'b', c: 'd'}
+    const point = Point.measurement('measurement')
+      .setTag('tag', 'b')
+      .setTag('a', 'f')
+      .setField('a', true)
+      .setTimestamp(123)
+
+    expect(point.toLineProtocol(undefined, defaultTags)).to.equal(
+      'measurement,c=d,a=f,tag=b a=T 123'
+    )
+    expect(point.toLineProtocol()).to.equal('measurement,a=f,tag=b a=T 123')
+
+    point.removeTag('a')
+
+    expect(point.toLineProtocol(undefined, defaultTags)).to.equal(
+      'measurement,a=b,c=d,tag=b a=T 123'
+    )
+    expect(point.toLineProtocol()).to.equal('measurement,tag=b a=T 123')
+  })
+
   it('has fields', () => {
     const point1 = Point.measurement('measurement')
       .setTag('c', 'd')
@@ -354,6 +375,7 @@ describe('point', () => {
       expect('88').deep.equals(v.getStringField('g'))
     })
   })
+
   it('undefined field', () => {
     const v = new PointValues()
       .setMeasurement('a')

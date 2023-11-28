@@ -11,7 +11,10 @@ import {isArrayLike, isDefined} from './common'
  */
 export type WritableData = ArrayLike<string> | ArrayLike<Point> | string | Point
 
-export const writableDataToLineProtocol = (data: WritableData): string[] => {
+export const writableDataToLineProtocol = (
+  data: WritableData,
+  defaultTags?: {[key: string]: string}
+): string[] => {
   const arrayData = (
     isArrayLike(data) && typeof data !== 'string'
       ? Array.from(data as any)
@@ -23,5 +26,7 @@ export const writableDataToLineProtocol = (data: WritableData): string[] => {
 
   return isLine
     ? (arrayData as string[])
-    : (arrayData as Point[]).map((p) => p.toLineProtocol()).filter(isDefined)
+    : (arrayData as Point[])
+        .map((p) => p.toLineProtocol(undefined, defaultTags))
+        .filter(isDefined)
 }

@@ -429,7 +429,8 @@ export class Point {
    * @returns an InfluxDB protocol line out of this instance
    */
   public toLineProtocol(
-    convertTimePrecision?: TimeConverter | WritePrecision
+    convertTimePrecision?: TimeConverter | WritePrecision,
+    defaultTags?: {[key: string]: string}
   ): string | undefined {
     if (!this._values.getMeasurement()) return undefined
     let fieldsLine = ''
@@ -449,6 +450,26 @@ export class Point {
     if (fieldsLine.length === 0) return undefined // no fields present
     let tagsLine = ''
     const tagNames = this._values.getTagNames()
+
+    if (defaultTags) {
+      const tagNamesSet = new Set(tagNames)
+      const defaultNames = Object.keys(defaultTags)
+      for (let i: number = defaultNames.length; i--; ) {
+        if (tagNamesSet.has(defaultNames[i])) {
+          defaultNames.splice(i, 1)
+        }
+      }
+      defaultNames.sort().forEach((x) => {
+        if (x) {
+          const val = defaultTags[x]
+          if (val) {
+            tagsLine += ','
+            tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
+          }
+        }
+      })
+    }
+
     tagNames.sort().forEach((x) => {
       if (x) {
         const val = this._values.getTag(x)
