@@ -213,7 +213,7 @@ describe('point', () => {
   })
 
   it('uses default tags for line protocol', () => {
-    const defaultTags = {a: 'b', c: 'd'}
+    const defaultTags = {a: 'b', c: 'd', '': 'e', f: ''}
     const point = Point.measurement('measurement')
       .setTag('tag', 'b')
       .setTag('a', 'f')

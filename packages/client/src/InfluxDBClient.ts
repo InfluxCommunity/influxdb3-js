@@ -118,16 +118,15 @@ export default class InfluxDBClient {
     org?: string,
     writeOptions?: Partial<WriteOptions>
   ): Promise<void> {
+    const options = this._mergeWriteOptions(writeOptions)
+
     await this._writeApi.doWrite(
-      writableDataToLineProtocol(
-        data,
-        this._mergeWriteOptions(writeOptions)?.defaultTags
-      ),
+      writableDataToLineProtocol(data, options?.defaultTags),
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
       org,
-      this._mergeWriteOptions(writeOptions)
+      options
     )
   }
 
