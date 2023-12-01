@@ -30,5 +30,6 @@ Open the `envoy.yaml` file and find the `address: "us-east-1-1.aws.cloud2.influx
 - Start docker with envoy proxy
   - run `docker compose up`
 - Execute example:
+  - run `yarn install` (in this directory)
   - run `yarn dev`
 - Example is running at `http://localhost:5173/` *(note that port can differes, look into console for exact address)*
