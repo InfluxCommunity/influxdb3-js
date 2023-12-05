@@ -9,7 +9,9 @@ Creates an InfluxDB protocol line out of this instance.
 **Signature:**
 
 ```typescript
-toLineProtocol(convertTimePrecision?: TimeConverter | WritePrecision): string | undefined;
+toLineProtocol(convertTimePrecision?: TimeConverter | WritePrecision, defaultTags?: {
+        [key: string]: string;
+    }): string | undefined;
 ```
 
 ## Parameters
@@ -17,6 +19,7 @@ toLineProtocol(convertTimePrecision?: TimeConverter | WritePrecision): string | 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  convertTimePrecision | [TimeConverter](./influxdb3-client.timeconverter.md) \| [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ settings control serialization of a point timestamp and can also add default tags, nanosecond timestamp precision is used when no <code>settings</code> or no <code>settings.convertTime</code> is supplied. |
+|  defaultTags | { \[key: string\]: string; } | _(Optional)_ |
 
 **Returns:**
 

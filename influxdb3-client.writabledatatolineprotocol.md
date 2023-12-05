@@ -7,5 +7,7 @@
 **Signature:**
 
 ```typescript
-writableDataToLineProtocol: (data: WritableData) => string[]
+writableDataToLineProtocol: (data: WritableData, defaultTags?: {
+    [key: string]: string;
+} | undefined) => string[]
 ```

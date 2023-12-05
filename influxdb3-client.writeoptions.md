@@ -16,8 +16,8 @@ interface WriteOptions
 
 |  Property | Modifiers | Type | Description |
 |  --- | --- | --- | --- |
-|  [consistency?](./influxdb3-client.writeoptions.consistency.md) |  | 'any' \| 'one' \| 'quorum' \| 'all' | _(Optional)_ InfluxDB Enterprise write consistency as explained in https://docs.influxdata.com/enterprise\_influxdb/v1.9/concepts/clustering/\#write-consistency |
+|  [defaultTags?](./influxdb3-client.writeoptions.defaulttags.md) |  | { \[key: string\]: string; } | _(Optional)_ default tags |
 |  [gzipThreshold?](./influxdb3-client.writeoptions.gzipthreshold.md) |  | number | _(Optional)_ When specified, write bodies larger than the threshold are gzipped |
 |  [headers?](./influxdb3-client.writeoptions.headers.md) |  | { \[key: string\]: string; } | _(Optional)_ HTTP headers that will be sent with every write request |
-|  [precision](./influxdb3-client.writeoptions.precision.md) |  | [WritePrecision](./influxdb3-client.writeprecision.md) | Precision to use in writes for timestamp. default ns |
+|  [precision?](./influxdb3-client.writeoptions.precision.md) |  | [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ Precision to use in writes for timestamp. default ns |
 

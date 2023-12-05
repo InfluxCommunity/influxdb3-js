@@ -9,5 +9,5 @@ Precision to use in writes for timestamp. default ns
 **Signature:**
 
 ```typescript
-precision: WritePrecision;
+precision?: WritePrecision;
 ```
