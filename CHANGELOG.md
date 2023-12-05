@@ -1,5 +1,9 @@
 ## 0.5.0 [unreleased]
 
+### Features
+
+1. [#183](https://github.com/InfluxCommunity/influxdb3-js/pull/183): Add default tags
+
 ## 0.4.1 [2023-11-16]
 
 ### Bugfix

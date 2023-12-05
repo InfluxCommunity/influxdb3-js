@@ -56,13 +56,47 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
-  precision: WritePrecision
+  precision?: WritePrecision
   /** HTTP headers that will be sent with every write request */
   headers?: {[key: string]: string}
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
-  /** InfluxDB Enterprise write consistency as explained in https://docs.influxdata.com/enterprise_influxdb/v1.9/concepts/clustering/#write-consistency */
-  consistency?: 'any' | 'one' | 'quorum' | 'all'
+  /** default tags
+   *
+   * @example Default tags using client config
+   * ```typescript
+   * const client = new InfluxDBClient({
+   *            host: 'my-host',
+   *            writeOptions: {
+   *              defaultTags: {
+   *                device: 'device-a',
+   *              },
+   *            },
+   * })
+   *
+   * const p = Point.measurement('measurement').setField('num', 3)
+   *
+   * // this will write point with device=device-a tag
+   * await client.write(p, 'my-db')
+   * ```
+   *
+   * @example Default tags using writeOptions argument
+   * ```typescript
+   * const client = new InfluxDBClient({
+   *            host: 'my-host',
+   * })
+   *
+   * const defaultTags = {
+   *            device: 'device-a',
+   * }
+   *
+   * const p = Point.measurement('measurement').setField('num', 3)
+   *
+   * // this will write point with device=device-a tag
+   * await client.write(p, 'my-db', undefined, {defaultTags})
+   * ```
+   */
+  defaultTags?: {[key: string]: string}
 }
 
 /** default writeOptions */

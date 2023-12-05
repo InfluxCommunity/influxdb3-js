@@ -100,6 +100,8 @@ describe('Write', () => {
       subject.close()
       collectLogging.after()
     })
+    const defaultTags = {blah: 'foo'}
+
     ;[false, true].map((useGZip) => {
       it(
         useGZip
@@ -110,8 +112,11 @@ describe('Write', () => {
             useGZip
               ? {
                   gzipThreshold: 0,
+                  defaultTags,
                 }
-              : {}
+              : {
+                  defaultTags,
+                }
           )
           let requests = 0
           let failNextRequest = false
@@ -155,7 +160,7 @@ describe('Write', () => {
           expect(logs.error).has.length(0)
           expect(logs.warn).has.length(0)
           expect(messages).to.have.length(1)
-          expect(messages[0]).to.equal('test,t=\\  value=1')
+          expect(messages[0]).to.equal('test,blah=foo,t=\\  value=1')
           expect(requests).to.equal(2)
           messages.splice(0)
           requests = 0
@@ -190,7 +195,7 @@ describe('Write', () => {
           expect(lines).has.length(4)
           expect(messages[0]).to.equal(
             points
-              .map((x) => x.toLineProtocol())
+              .map((x) => x.toLineProtocol(undefined, defaultTags))
               .filter(isDefined)
               .join('\n')
           )
@@ -243,27 +248,6 @@ describe('Write', () => {
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
-    })
-    it('sends consistency param when specified', async () => {
-      useSubject({
-        consistency: 'quorum',
-      })
-      let uri: any
-      nock(clientOptions.host)
-        .post(/.*/)
-        .reply(function (_uri, _requestBody) {
-          uri = this.req.path
-          return [204, '', {}]
-        })
-        .persist()
-      await subject.write(
-        Point.measurement('test').setFloatField('value', 1),
-        DATABASE
-      )
-      await subject.close()
-      expect(logs.error).has.length(0)
-      expect(logs.warn).deep.equals([])
-      expect(uri).match(/.*&consistency=quorum$/)
     })
   })
 })
