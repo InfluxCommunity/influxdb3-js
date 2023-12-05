@@ -61,8 +61,6 @@ export interface WriteOptions {
   headers?: {[key: string]: string}
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
-  /** InfluxDB Enterprise write consistency as explained in https://docs.influxdata.com/enterprise_influxdb/v1.9/concepts/clustering/#write-consistency */
-  consistency?: 'any' | 'one' | 'quorum' | 'all'
   /** default tags
    *
    * @example Default tags using client config

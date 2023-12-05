@@ -26,9 +26,6 @@ export default class WriteApiImpl implements WriteApi {
       `precision=${writeOptions.precision}`,
     ]
     if (org) query.push(`org=${encodeURIComponent(org)}`)
-    const consistency = writeOptions?.consistency
-    if (consistency)
-      query.push(`consistency=${encodeURIComponent(consistency)}`)
 
     const path = `/api/v2/write?${query.join('&')}`
     return path

@@ -249,26 +249,5 @@ describe('Write', () => {
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
     })
-    it('sends consistency param when specified', async () => {
-      useSubject({
-        consistency: 'quorum',
-      })
-      let uri: any
-      nock(clientOptions.host)
-        .post(/.*/)
-        .reply(function (_uri, _requestBody) {
-          uri = this.req.path
-          return [204, '', {}]
-        })
-        .persist()
-      await subject.write(
-        Point.measurement('test').setFloatField('value', 1),
-        DATABASE
-      )
-      await subject.close()
-      expect(logs.error).has.length(0)
-      expect(logs.warn).deep.equals([])
-      expect(uri).match(/.*&consistency=quorum$/)
-    })
   })
 })
