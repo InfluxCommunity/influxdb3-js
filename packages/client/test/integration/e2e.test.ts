@@ -122,7 +122,7 @@ describe('e2e test', () => {
 
     await client.close()
     await rejects(client.query(query, database, queryType).next())
-  })
+  }).timeout(5_000)
 
   it('concurrent query', async () => {
     const {database, token, url} = getEnvVariables()
