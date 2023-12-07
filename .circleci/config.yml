@@ -102,8 +102,8 @@ workflows:
             branches:
               ignore: gh-pages
       - tests:
-          name: 'tests-node-16'
-          image: 'cimg/node:16.20'
+          name: 'tests-node-21'
+          image: 'cimg/node:21.4'
           filters:
             branches:
               ignore: gh-pages
