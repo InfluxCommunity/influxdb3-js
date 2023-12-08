@@ -206,7 +206,7 @@ describe('e2e test', () => {
     })
 
     const testId = getRandomInt(0, 100000000)
-    const values = range(3_000).map(() => ({
+    const values = range(5_000).map(() => ({
       avg: getRandomInt(110, 500),
       max: getRandomInt(900, 1000),
     }))
@@ -237,20 +237,30 @@ describe('e2e test', () => {
 
     const queryType = 'sql'
 
-    const data = client.queryPoints(query, database, queryType)
-
     const queryValues: typeof values = []
-    for await (const row of data) {
-      queryValues.push({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        avg: row.getFloatField('avg')!,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        max: row.getFloatField('max')!,
-      })
+
+    for (let tries = 10; tries--; ) {
+      const data = client.queryPoints(query, database, queryType)
+
+      for await (const row of data) {
+        queryValues.push({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          avg: row.getFloatField('avg')!,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          max: row.getFloatField('max')!,
+        })
+      }
+
+      if (queryValues.length === values.length) break
+      console.log('test failed. retrying')
+
+      queryValues.splice(0)
+      await sleep(1_000)
     }
+
     expect(queryValues.length).to.equal(values.length)
     expect(queryValues).to.deep.equal(values)
 
     await client.close()
-  }).timeout(15_000)
+  }).timeout(20_000)
 })
