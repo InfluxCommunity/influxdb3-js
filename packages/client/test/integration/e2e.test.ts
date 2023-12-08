@@ -218,7 +218,7 @@ describe('e2e test', () => {
         .setFloatField('avg', avg)
         .setFloatField('max', max)
         .setIntegerField('testId', testId)
-        .setTimestamp(time + i * 100)
+        .setTimestamp(time + i * 1_000)
     )
     await client.write(points, database)
 
@@ -252,15 +252,15 @@ describe('e2e test', () => {
       }
 
       if (queryValues.length === values.length) break
-      console.log('test failed. retrying')
+      console.log('query failed. retrying')
 
       queryValues.splice(0)
-      await sleep(1_000)
+      await sleep(2_000)
     }
 
     expect(queryValues.length).to.equal(values.length)
     expect(queryValues).to.deep.equal(values)
 
     await client.close()
-  }).timeout(20_000)
+  }).timeout(40_000)
 })
