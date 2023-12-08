@@ -122,7 +122,7 @@ describe('e2e test', () => {
 
     await client.close()
     await rejects(client.query(query, database, queryType).next())
-  }).timeout(5_000)
+  }).timeout(10_000)
 
   it('concurrent query', async () => {
     const {database, token, url} = getEnvVariables()
@@ -148,9 +148,11 @@ describe('e2e test', () => {
         .setFloatField('avg', avg)
         .setFloatField('max', max)
         .setIntegerField('testId', testId)
-        .setTimestamp(time + i * 100)
+        .setTimestamp(time + i * 1_000)
     )
     await client.write(points, database)
+
+    await sleep(2_000)
 
     const query = `
       SELECT *
@@ -221,7 +223,7 @@ describe('e2e test', () => {
     await client.write(points, database)
 
     // wait for data to be written
-    await sleep(2_500)
+    await sleep(5_000)
 
     const query = `
       SELECT *
@@ -250,5 +252,5 @@ describe('e2e test', () => {
     expect(queryValues).to.deep.equal(values)
 
     await client.close()
-  }).timeout(10_000)
+  }).timeout(15_000)
 })
