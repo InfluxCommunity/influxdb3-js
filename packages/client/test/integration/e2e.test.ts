@@ -252,6 +252,7 @@ describe('e2e test', () => {
       }
 
       if (queryValues.length === values.length) break
+      // eslint-disable-next-line no-console
       console.log('query failed. retrying')
 
       queryValues.splice(0)
