@@ -173,16 +173,26 @@ describe('e2e test', () => {
         .map(() => client.queryPoints(query, database, queryType))
         .map(async (data) => {
           const queryValues: typeof values = []
-          for await (const row of data) {
-            queryValues.push({
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              avg: row.getFloatField('avg')!,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              max: row.getFloatField('max')!,
-            })
-            // Introduce concurrency: try to process more streams at once and switch between them
-            await sleep(10)
+
+          for (let tries = 10; tries--; ) {
+            for await (const row of data) {
+              queryValues.push({
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                avg: row.getFloatField('avg')!,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                max: row.getFloatField('max')!,
+              })
+              // Introduce concurrency: try to process more streams at once and switch between them
+              await sleep(10)
+            }
+            if (queryValues.length === values.length) break
+            // eslint-disable-next-line no-console
+            console.log('query failed. retrying')
+
+            queryValues.splice(0)
+            await sleep(2_000)
           }
+
           return queryValues
         })
     )
@@ -192,7 +202,7 @@ describe('e2e test', () => {
     }
 
     await client.close()
-  }).timeout(10_000)
+  }).timeout(20_000)
 
   it('big query', async () => {
     const {database, token, url} = getEnvVariables()
