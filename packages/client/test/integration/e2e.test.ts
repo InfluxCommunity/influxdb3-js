@@ -122,7 +122,7 @@ describe('e2e test', () => {
 
     await client.close()
     await rejects(client.query(query, database, queryType).next())
-  }).timeout(5_000)
+  }).timeout(10_000)
 
   it('concurrent query', async () => {
     const {database, token, url} = getEnvVariables()
@@ -148,9 +148,11 @@ describe('e2e test', () => {
         .setFloatField('avg', avg)
         .setFloatField('max', max)
         .setIntegerField('testId', testId)
-        .setTimestamp(time + i * 100)
+        .setTimestamp(time + i * 1_000)
     )
     await client.write(points, database)
+
+    await sleep(2_000)
 
     const query = `
       SELECT *
@@ -171,16 +173,26 @@ describe('e2e test', () => {
         .map(() => client.queryPoints(query, database, queryType))
         .map(async (data) => {
           const queryValues: typeof values = []
-          for await (const row of data) {
-            queryValues.push({
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              avg: row.getFloatField('avg')!,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              max: row.getFloatField('max')!,
-            })
-            // Introduce concurrency: try to process more streams at once and switch between them
-            await sleep(10)
+
+          for (let tries = 10; tries--; ) {
+            for await (const row of data) {
+              queryValues.push({
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                avg: row.getFloatField('avg')!,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                max: row.getFloatField('max')!,
+              })
+              // Introduce concurrency: try to process more streams at once and switch between them
+              await sleep(10)
+            }
+            if (queryValues.length === values.length) break
+            // eslint-disable-next-line no-console
+            console.log('query failed. retrying')
+
+            queryValues.splice(0)
+            await sleep(2_000)
           }
+
           return queryValues
         })
     )
@@ -190,7 +202,7 @@ describe('e2e test', () => {
     }
 
     await client.close()
-  }).timeout(10_000)
+  }).timeout(20_000)
 
   it('big query', async () => {
     const {database, token, url} = getEnvVariables()
@@ -216,12 +228,12 @@ describe('e2e test', () => {
         .setFloatField('avg', avg)
         .setFloatField('max', max)
         .setIntegerField('testId', testId)
-        .setTimestamp(time + i * 100)
+        .setTimestamp(time + i * 1_000)
     )
     await client.write(points, database)
 
     // wait for data to be written
-    await sleep(2_500)
+    await sleep(5_000)
 
     const query = `
       SELECT *
@@ -235,20 +247,31 @@ describe('e2e test', () => {
 
     const queryType = 'sql'
 
-    const data = client.queryPoints(query, database, queryType)
-
     const queryValues: typeof values = []
-    for await (const row of data) {
-      queryValues.push({
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        avg: row.getFloatField('avg')!,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        max: row.getFloatField('max')!,
-      })
+
+    for (let tries = 10; tries--; ) {
+      const data = client.queryPoints(query, database, queryType)
+
+      for await (const row of data) {
+        queryValues.push({
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          avg: row.getFloatField('avg')!,
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          max: row.getFloatField('max')!,
+        })
+      }
+
+      if (queryValues.length === values.length) break
+      // eslint-disable-next-line no-console
+      console.log('query failed. retrying')
+
+      queryValues.splice(0)
+      await sleep(2_000)
     }
+
     expect(queryValues.length).to.equal(values.length)
     expect(queryValues).to.deep.equal(values)
 
     await client.close()
-  }).timeout(10_000)
+  }).timeout(40_000)
 })
