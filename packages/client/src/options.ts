@@ -128,9 +128,9 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
-  const url = new URL(connectionString?.trim())
+  const url = new URL(connectionString?.trim(), 'http://localhost') // artificial base is ignored when url is absolute
   const options: ClientOptions = {
-    host: url.origin + url.pathname,
+    host: connectionString.indexOf("://") > 0 ? url.origin + url.pathname : url.pathname,
   }
   if (url.searchParams.has('token')) {
     options.token = url.searchParams.get('token') as string
