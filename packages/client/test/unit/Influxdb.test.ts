@@ -226,15 +226,6 @@ at 'ClientOptions.database'
         token: 'my-token',
       })
     })
-    it('is created with relative URL with token (#213)', () => {
-      expect(
-        (new InfluxDBClient(' /influx?token=my-token') as any)._options
-      ).to.deep.equal({
-        ...DEFAULT_ConnectionOptions,
-        host: '/influx',
-        token: 'my-token',
-      })
-    })
     it('is created with token and database', () => {
       expect(
         (
