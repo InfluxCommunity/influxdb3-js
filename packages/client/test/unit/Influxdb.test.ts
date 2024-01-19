@@ -231,7 +231,7 @@ at 'ClientOptions.database'
         (new InfluxDBClient(' /influx?token=my-token') as any)._options
       ).to.deep.equal({
         ...DEFAULT_ConnectionOptions,
-        host: 'https://localhost:8086',
+        host: '/influx',
         token: 'my-token',
       })
     })
