@@ -131,7 +131,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
   const url = new URL(connectionString?.trim(), 'http://localhost') // artificial base is ignored when url is absolute
   const options: ClientOptions = {
     host:
-      connectionString.indexOf("://") > 0
+      connectionString.indexOf('://') > 0
         ? url.origin + url.pathname
         : url.pathname,
   }
