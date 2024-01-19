@@ -1,8 +1,7 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 import {
-  InfluxDBClient,
-  DEFAULT_ConnectionOptions,
+  InfluxDBClient, DEFAULT_ConnectionOptions,
 } from '../../../../src'
 
 describe('InfluxDB', () => {
