@@ -8,6 +8,11 @@ describe('ClientOptions', () => {
   })
 
   describe('constructor with connection string', () => {
+    it('with empty', () => {
+      expect(() => fromConnectionString('')).to.throw(
+        'Connection string not set!'
+      )
+    })
     it('is created with relative URL with token (#213)', () => {
       expect(
         fromConnectionString('/influx?token=my-token') as ClientOptions
