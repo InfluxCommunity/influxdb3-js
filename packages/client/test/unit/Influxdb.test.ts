@@ -216,6 +216,25 @@ at 'ClientOptions.database'
         token: 'my-token',
       })
     })
+    it('is created with token + has whitespaces around (#194)', () => {
+      expect(
+        (new InfluxDBClient(' https://localhost:8086?token=my-token ') as any)
+          ._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+      })
+    })
+    it('is created with relative URL with token (#213)', () => {
+      expect(
+        (new InfluxDBClient(' /influx?token=my-token') as any)._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+      })
+    })
     it('is created with token and database', () => {
       expect(
         (
@@ -276,7 +295,7 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
-    it('is created with precision and gzip threshold ', () => {
+    it('is created with precision and gzip threshold', () => {
       expect(
         (
           new InfluxDBClient(
@@ -321,6 +340,16 @@ at 'ClientOptions.database'
       clear()
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
       process.env['INFLUX_TOKEN'] = 'my-token'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+      })
+    })
+    it('is created with host and token + has whitespaces around (#194)', () => {
+      clear()
+      process.env['INFLUX_HOST'] = ' https://localhost:8086 '
+      process.env['INFLUX_TOKEN'] = ' my-token '
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
