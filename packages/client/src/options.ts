@@ -128,10 +128,10 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
+  const url = new URL(connectionString?.trim())
   const options: ClientOptions = {
-    host: connectionString.split('?')[0],
+    host: url.origin + url.pathname,
   }
-  const url = new URL(connectionString)
   if (url.searchParams.has('token')) {
     options.token = url.searchParams.get('token') as string
   }
@@ -168,16 +168,16 @@ export function fromEnv(): ClientOptions {
     throw Error('INFLUX_TOKEN variable not set!')
   }
   const options: ClientOptions = {
-    host: process.env.INFLUX_HOST,
+    host: process.env.INFLUX_HOST?.trim(),
   }
   if (process.env.INFLUX_TOKEN) {
-    options.token = process.env.INFLUX_TOKEN
+    options.token = process.env.INFLUX_TOKEN?.trim()
   }
   if (process.env.INFLUX_DATABASE) {
-    options.database = process.env.INFLUX_DATABASE
+    options.database = process.env.INFLUX_DATABASE?.trim()
   }
   if (process.env.INFLUX_TIMEOUT) {
-    options.timeout = parseInt(process.env.INFLUX_TIMEOUT)
+    options.timeout = parseInt(process.env.INFLUX_TIMEOUT?.trim())
   }
   if (process.env.INFLUX_PRECISION) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
