@@ -9,7 +9,7 @@ export interface ConnectionOptions {
   /** authentication token */
   token?: string
   /**
-   * socket timeout, 10000 milliseconds by default in node.js
+   * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
    * @defaultValue 10000
    */
   timeout?: number
