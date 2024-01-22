@@ -1,5 +1,9 @@
 ## 0.6.0 [unreleased]
 
+### Bugfix
+
+1. [#221](https://github.com/InfluxCommunity/influxdb3-js/issues/221): Client options processing
+
 ## 0.5.0 [2023-12-05]
 
 ### Features
