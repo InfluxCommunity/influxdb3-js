@@ -9,7 +9,7 @@ export interface ConnectionOptions {
   /** authentication token */
   token?: string
   /**
-   * socket timeout, 10000 milliseconds by default in node.js
+   * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
    * @defaultValue 10000
    */
   timeout?: number
@@ -128,10 +128,16 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
-  const options: ClientOptions = {
-    host: connectionString.split('?')[0],
+  if (!connectionString) {
+    throw Error('Connection string not set!')
   }
-  const url = new URL(connectionString)
+  const url = new URL(connectionString.trim(), 'http://localhost') // artificial base is ignored when url is absolute
+  const options: ClientOptions = {
+    host:
+      connectionString.indexOf('://') > 0
+        ? url.origin + url.pathname
+        : url.pathname,
+  }
   if (url.searchParams.has('token')) {
     options.token = url.searchParams.get('token') as string
   }
@@ -168,16 +174,16 @@ export function fromEnv(): ClientOptions {
     throw Error('INFLUX_TOKEN variable not set!')
   }
   const options: ClientOptions = {
-    host: process.env.INFLUX_HOST,
+    host: process.env.INFLUX_HOST.trim(),
   }
   if (process.env.INFLUX_TOKEN) {
-    options.token = process.env.INFLUX_TOKEN
+    options.token = process.env.INFLUX_TOKEN.trim()
   }
   if (process.env.INFLUX_DATABASE) {
-    options.database = process.env.INFLUX_DATABASE
+    options.database = process.env.INFLUX_DATABASE.trim()
   }
   if (process.env.INFLUX_TIMEOUT) {
-    options.timeout = parseInt(process.env.INFLUX_TIMEOUT)
+    options.timeout = parseInt(process.env.INFLUX_TIMEOUT.trim())
   }
   if (process.env.INFLUX_PRECISION) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
