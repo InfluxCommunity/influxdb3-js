@@ -1,5 +1,5 @@
 import {RecordBatchReader, Type as ArrowType} from 'apache-arrow'
-import QueryApi from '../QueryApi'
+import QueryApi, {QParamType} from '../QueryApi'
 import {Ticket} from '../generated/flight/Flight'
 import {FlightServiceClient} from '../generated/flight/Flight.client'
 import {ConnectionOptions, QueryType} from '../options'
@@ -7,6 +7,14 @@ import {createInt32Uint8Array} from '../util/common'
 import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
+import {allParamsMatched, queryHasParams} from '../util/sql'
+
+export type TicketDataType = {
+  database: string
+  sql_query: string
+  query_type: QueryType
+  params?: {[name: string]: QParamType | undefined}
+}
 
 export default class QueryApiImpl implements QueryApi {
   private _closed = false
@@ -22,21 +30,40 @@ export default class QueryApiImpl implements QueryApi {
   private async *_queryRawBatches(
     query: string,
     database: string,
-    queryType: QueryType
+    queryType: QueryType,
+    queryParams?: Map<string, QParamType>
   ) {
+    if (queryParams && queryHasParams(query)) {
+      allParamsMatched(query, queryParams)
+    }
+
     if (this._closed) {
       throw new Error('queryApi: already closed!')
     }
     const client = this._flightClient
 
-    const ticketData = {
+    const ticketData: TicketDataType = {
       database: database,
       sql_query: query,
       query_type: queryType,
     }
+
+    if (queryParams) {
+      //   console.log(`DEBUG queryParams ${queryParams}`)
+      const param: {[name: string]: QParamType | undefined} = {}
+      for (const key of queryParams.keys()) {
+        if (queryParams.get(key)) {
+          param[key] = queryParams.get(key)
+        }
+      }
+      ticketData['params'] = param as {[name: string]: QParamType | undefined}
+    }
+
     const ticket = Ticket.create({
       ticket: new TextEncoder().encode(JSON.stringify(ticketData)),
     })
+
+    // console.log(`DEBUG ticket ${JSON.stringify(ticket)}`)
 
     const meta: RpcMetadata = {}
 
@@ -64,9 +91,15 @@ export default class QueryApiImpl implements QueryApi {
   async *query(
     query: string,
     database: string,
-    queryType: QueryType
+    queryType: QueryType,
+    queryParams?: Map<string, QParamType>
   ): AsyncGenerator<Record<string, any>, void, void> {
-    const batches = this._queryRawBatches(query, database, queryType)
+    const batches = this._queryRawBatches(
+      query,
+      database,
+      queryType,
+      queryParams
+    )
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
@@ -85,9 +118,15 @@ export default class QueryApiImpl implements QueryApi {
   async *queryPoints(
     query: string,
     database: string,
-    queryType: QueryType
+    queryType: QueryType,
+    queryParams?: Map<string, QParamType>
   ): AsyncGenerator<PointValues, void, void> {
-    const batches = this._queryRawBatches(query, database, queryType)
+    const batches = this._queryRawBatches(
+      query,
+      database,
+      queryType,
+      queryParams
+    )
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {

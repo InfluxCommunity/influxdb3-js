@@ -15,7 +15,7 @@ const getEnvVariables = () => {
     !TESTING_INFLUXDB_URL
   )
     throw new Error(
-      'env variables has to be set: TESTING_INFLUXDB_DATABASE,TESTING_INFLUXDB_TOKEN,TESTING_INFLUXDB_URL'
+      'env variables have to be set: TESTING_INFLUXDB_DATABASE,TESTING_INFLUXDB_TOKEN,TESTING_INFLUXDB_URL'
     )
   return {
     database: TESTING_INFLUXDB_DATABASE,
