@@ -61,8 +61,7 @@ describe('Query', () => {
     expect(ticketDecode).to.deep.equal(ticketData)
   })
   it('matches all params', () => {
-    const query: string =
-      'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
+    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
     expect(queryHasParams('select * ')).to.be.false
     expect(queryHasParams(query)).to.be.true
     const queryParams: Map<string, QParamType> = new Map<string, QParamType>()
@@ -71,8 +70,7 @@ describe('Query', () => {
     expect(allParamsMatched(query, queryParams)).to.be.true
   })
   it('throws error on missing param', () => {
-    const query: string =
-      'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
+    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
     expect(queryHasParams(query)).to.be.true
     const queryParams: Map<string, QParamType> = new Map<string, QParamType>()
     queryParams.set('id', 42)

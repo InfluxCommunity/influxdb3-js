@@ -1,6 +1,6 @@
 import WriteApi from './WriteApi'
 import WriteApiImpl from './impl/WriteApiImpl'
-import QueryApi, { QParamType } from "./QueryApi";
+import QueryApi, {QParamType} from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
 import {
   ClientOptions,
