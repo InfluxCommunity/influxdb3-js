@@ -4,7 +4,7 @@
 
 ## ConnectionOptions.timeout property
 
-socket timeout, 10000 milliseconds by default in node.js
+socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
 
 **Signature:**
 
