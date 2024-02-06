@@ -1087,12 +1087,12 @@
   integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
 
 "@protobuf-ts/grpc-transport@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@protobuf-ts/grpc-transport/-/grpc-transport-2.9.1.tgz#dd6429fa35dc22c0dcc76c5e3c3c0c10ea1c5c09"
-  integrity sha512-p3o69oQUqMX1dG0QcBsnK7/2h0ReEIfJRbZykMCumTn2uAc9znTfh74xB8aH8I5Q+sWphucG8mPytJ/QIW9WSA==
+  version "2.9.3"
+  resolved "https://registry.yarnpkg.com/@protobuf-ts/grpc-transport/-/grpc-transport-2.9.3.tgz#e7e88dae831f292b9bacafa742747b96d891db8e"
+  integrity sha512-2TarJgLrvhHVBpxgJonPeZzEtqlbQJeSTpFZjkNI5Ye+18r8SUIcvZhl4LLS1q4zjIQl/O7lZt/x27PTNglLpg==
   dependencies:
-    "@protobuf-ts/runtime" "^2.9.1"
-    "@protobuf-ts/runtime-rpc" "^2.9.1"
+    "@protobuf-ts/runtime" "^2.9.3"
+    "@protobuf-ts/runtime-rpc" "^2.9.3"
 
 "@protobuf-ts/grpcweb-transport@^2.9.1":
   version "2.9.3"
@@ -1109,7 +1109,7 @@
   dependencies:
     "@protobuf-ts/runtime" "^2.9.3"
 
-"@protobuf-ts/runtime@^2.9.1", "@protobuf-ts/runtime@^2.9.3":
+"@protobuf-ts/runtime@^2.9.3":
   version "2.9.3"
   resolved "https://registry.yarnpkg.com/@protobuf-ts/runtime/-/runtime-2.9.3.tgz#b906223debaf42c9bd281e985a9f5652729153a4"
   integrity sha512-nivzCpg/qYD0RX2OmHOahJALb8ndjGmUhNBcTJ0BbXoqKwCSM6vYA+vegzS3rhuaPgbyC7Ec8idlnizzUfIRuw==
