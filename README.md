@@ -150,7 +150,7 @@ await client.write(line, database)
 
 ### Query data
 
-To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name.
+To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name. To change to using InfluxQL change the queryType option to 'influxql'.
 
 ```ts
 // Execute query

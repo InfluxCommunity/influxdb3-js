@@ -60,6 +60,7 @@ async function main() {
       AND
       "unit" IN ('temperature')
     `
+    // This query type can either be 'sql' or 'influxql'
     const queryType = 'sql'
 
     // Execute query
