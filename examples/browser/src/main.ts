@@ -44,6 +44,7 @@ const database = import.meta.env.VITE_INFLUXDB_DATABASE
 const token = import.meta.env.VITE_INFLUXDB_TOKEN
 const host = '/influx' // vite proxy
 
+// This query type can either be 'sql' or 'influxql'
 const queryType = 'sql'
 
 const client = new InfluxDBClient({host, token})
