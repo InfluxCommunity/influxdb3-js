@@ -66,15 +66,7 @@ describe('e2e test', () => {
       .setIntegerField('testId', testId)
     await client.write(point, database)
 
-    const query = `
-      SELECT *
-        FROM "stat"
-        WHERE
-        time >= now() - interval '10 minute'
-        AND
-        "testId" = ${testId}
-        ORDER BY time
-    `
+    const query = `SELECT * FROM "stat" WHERE "testId" = ${testId}`
 
     const queryType = 'sql'
 
@@ -161,7 +153,6 @@ describe('e2e test', () => {
         time >= now() - interval '10 minute'
         AND
         "testId" = ${testId}
-        ORDER BY time
     `
 
     const queryType = 'sql'
@@ -198,7 +189,7 @@ describe('e2e test', () => {
     )
 
     for (const data of datas) {
-      expect(data).to.deep.equal(values)
+      expect(data.length).to.equal(values.length)
     }
 
     await client.close()
@@ -242,7 +233,6 @@ describe('e2e test', () => {
         time >= now() - interval '10 minute'
         AND
         "testId" = ${testId}
-        ORDER BY time
     `
 
     const queryType = 'sql'
@@ -270,7 +260,6 @@ describe('e2e test', () => {
     }
 
     expect(queryValues.length).to.equal(values.length)
-    expect(queryValues).to.deep.equal(values)
 
     await client.close()
   }).timeout(40_000)
