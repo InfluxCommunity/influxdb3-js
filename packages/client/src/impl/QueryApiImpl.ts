@@ -49,7 +49,6 @@ export default class QueryApiImpl implements QueryApi {
     }
 
     if (queryParams) {
-      //   console.log(`DEBUG queryParams ${queryParams}`)
       const param: {[name: string]: QParamType | undefined} = {}
       for (const key of queryParams.keys()) {
         if (queryParams.get(key)) {
@@ -62,8 +61,6 @@ export default class QueryApiImpl implements QueryApi {
     const ticket = Ticket.create({
       ticket: new TextEncoder().encode(JSON.stringify(ticketData)),
     })
-
-    // console.log(`DEBUG ticket ${JSON.stringify(ticket)}`)
 
     const meta: RpcMetadata = {}
 
