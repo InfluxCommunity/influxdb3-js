@@ -327,7 +327,12 @@ describe('e2e test', () => {
     let lp = ''
 
     for (let i = 0; i < samples.length; i++) {
-      lp += `${samples[i].measurement},work=${samples[i].work},director=${samples[i].director} reel=${samples[i].reel}i,lumens=${samples[i].lumens},integ=${samples[i].integrity},sound=${samples[i].sound},quality="${samples[i].quality}" ${time - i * 60000}`
+      lp +=
+        `${samples[i].measurement},work=${samples[i].work},` +
+        `director=${samples[i].director} reel=${samples[i].reel}i,` +
+        `lumens=${samples[i].lumens},integ=${samples[i].integrity},` +
+        `sound=${samples[i].sound},quality="${samples[i].quality}"` +
+        ` ${time - i * 60000}`
       if (i < samples.length - 1) {
         lp += '\n'
       }
