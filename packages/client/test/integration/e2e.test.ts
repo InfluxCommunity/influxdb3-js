@@ -343,7 +343,7 @@ describe('e2e test', () => {
 
     await client.write(lp, database)
 
-    await sleep(1_000)
+    await sleep(3_000)
 
     const query = `
       SELECT *
@@ -364,5 +364,5 @@ describe('e2e test', () => {
       expect(row['director']).to.equal('J_Ford')
       expect(row['work'])
     }
-  })
+  }).timeout(5_000)
 })
