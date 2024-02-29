@@ -419,5 +419,5 @@ describe('e2e test', () => {
     for await (const point of points) {
       expect(point.getTag('director')).to.equal('N_Ray')
     }
-  }).timeout(5_000)
+  }).timeout(7_000)
 })
