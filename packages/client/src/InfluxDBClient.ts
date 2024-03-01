@@ -1,6 +1,6 @@
 import WriteApi from './WriteApi'
 import WriteApiImpl from './impl/WriteApiImpl'
-import QueryApi from './QueryApi'
+import QueryApi, {QParamType} from './QueryApi'
 import QueryApiImpl from './impl/QueryApiImpl'
 import {
   ClientOptions,
@@ -136,19 +136,22 @@ export default class InfluxDBClient {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryType - The type of query (default: 'sql').
+   * @param namedParams - for sql queries parameters to be used
    * @returns An async generator that yields maps of string keys to any values.
    */
   query(
     query: string,
     database?: string,
-    queryType: QueryType = 'sql'
+    queryType: QueryType = 'sql',
+    namedParams?: Map<string, QParamType>
   ): AsyncGenerator<Record<string, any>, void, void> {
     return this._queryApi.query(
       query,
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      queryType
+      queryType,
+      namedParams
     )
   }
 
@@ -158,19 +161,22 @@ export default class InfluxDBClient {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryType - The type of query (default: 'sql').
+   * @param namedParams - for sql queries parameters to be used
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database?: string,
-    queryType: QueryType = 'sql'
+    queryType: QueryType = 'sql',
+    namedParams?: Map<string, QParamType>
   ): AsyncGenerator<PointValues, void, void> {
     return this._queryApi.queryPoints(
       query,
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      queryType
+      queryType,
+      namedParams
     )
   }
 

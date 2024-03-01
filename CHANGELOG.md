@@ -1,5 +1,9 @@
 ## 0.7.0 [unreleased]
 
+### Features
+
+1. [#256](https://github.com/InfluxCommunity/influxdb3-js/pull/256): Adds support for named query parameters
+
 ## 0.6.0 [2024-01-30]
 
 ### Bugfix
