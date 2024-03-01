@@ -2,7 +2,7 @@
 
 [Home](./index.md) &gt; [@influxdata/influxdb3-client](./influxdb3-client.md) &gt; [writableDataToLineProtocol](./influxdb3-client.writabledatatolineprotocol.md)
 
-## writableDataToLineProtocol variable
+## writableDataToLineProtocol() function
 
 **Signature:**
 
@@ -11,3 +11,15 @@ writableDataToLineProtocol: (data: WritableData, defaultTags?: {
     [key: string]: string;
 } | undefined) => string[]
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  data | [WritableData](./influxdb3-client.writabledata.md) |  |
+|  defaultTags | { \[key: string\]: string; } \| undefined | _(Optional)_ |
+
+**Returns:**
+
+string\[\]
+

@@ -2,10 +2,22 @@
 
 [Home](./index.md) &gt; [@influxdata/influxdb3-client](./influxdb3-client.md) &gt; [convertTime](./influxdb3-client.converttime.md)
 
-## convertTime variable
+## convertTime() function
 
 **Signature:**
 
 ```typescript
 convertTime: (value: string | number | Date | undefined, precision?: WritePrecision) => string | undefined
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  value | string \| number \| Date \| undefined |  |
+|  precision | [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ |
+
+**Returns:**
+
+string \| undefined
+

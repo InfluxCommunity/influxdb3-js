@@ -9,7 +9,7 @@ Execute a query and return the results as an async generator.
 **Signature:**
 
 ```typescript
-queryPoints(query: string, database?: string, queryType?: QueryType): AsyncGenerator<PointValues, void, void>;
+queryPoints(query: string, database?: string, queryType?: QueryType, namedParams?: Map<string, QParamType>): AsyncGenerator<PointValues, void, void>;
 ```
 
 ## Parameters
@@ -19,6 +19,7 @@ queryPoints(query: string, database?: string, queryType?: QueryType): AsyncGener
 |  query | string | The query string. |
 |  database | string | _(Optional)_ The name of the database to query. |
 |  queryType | [QueryType](./influxdb3-client.querytype.md) | _(Optional)_ The type of query (default: 'sql'). |
+|  namedParams | Map&lt;string, [QParamType](./influxdb3-client.qparamtype.md)<!-- -->&gt; | _(Optional)_ for sql queries parameters to be used |
 
 **Returns:**
 

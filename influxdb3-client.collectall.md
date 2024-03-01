@@ -2,10 +2,21 @@
 
 [Home](./index.md) &gt; [@influxdata/influxdb3-client](./influxdb3-client.md) &gt; [collectAll](./influxdb3-client.collectall.md)
 
-## collectAll variable
+## collectAll() function
 
 **Signature:**
 
 ```typescript
 collectAll: <T>(generator: AsyncGenerator<T, any, any>) => Promise<T[]>
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  generator | AsyncGenerator&lt;T, any, any&gt; |  |
+
+**Returns:**
+
+Promise&lt;T\[\]&gt;
+

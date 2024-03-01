@@ -21,12 +21,15 @@
 
 |  Function | Description |
 |  --- | --- |
+|  [collectAll(generator)](./influxdb3-client.collectall.md) |  |
+|  [convertTime(value, precision)](./influxdb3-client.converttime.md) |  |
 |  [convertTimeToNanos(value)](./influxdb3-client.converttimetonanos.md) | convertTimeToNanos converts Point's timestamp to a string. |
 |  [createTextDecoderCombiner()](./influxdb3-client.createtextdecodercombiner.md) | Creates a chunk combiner instance that uses UTF-8 TextDecoder to decode Uint8Arrays into strings. |
 |  [fromConnectionString(connectionString)](./influxdb3-client.fromconnectionstring.md) | Parses connection string into <code>ClientOptions</code>. |
 |  [fromEnv()](./influxdb3-client.fromenv.md) | Creates <code>ClientOptions</code> from environment variables. |
 |  [setLogger(logger)](./influxdb3-client.setlogger.md) | Sets custom logger. |
 |  [useProcessHrtime(use)](./influxdb3-client.useprocesshrtime.md) |  |
+|  [writableDataToLineProtocol(data, defaultTags)](./influxdb3-client.writabledatatolineprotocol.md) |  |
 
 ## Interfaces
 
@@ -47,16 +50,13 @@
 
 |  Variable | Description |
 |  --- | --- |
-|  [collectAll](./influxdb3-client.collectall.md) |  |
 |  [consoleLogger](./influxdb3-client.consolelogger.md) | Logger that logs to console.out |
-|  [convertTime](./influxdb3-client.converttime.md) |  |
 |  [currentTime](./influxdb3-client.currenttime.md) | Exposes functions that creates strings that represent a timestamp that can be used in the line protocol. Micro and nano timestamps are emulated depending on the js platform in use. |
 |  [dateToProtocolTimestamp](./influxdb3-client.datetoprotocoltimestamp.md) | dateToProtocolTimestamp provides converters for JavaScript Date to InfluxDB Write Protocol Timestamp. Keys are supported precisions. |
 |  [DEFAULT\_ConnectionOptions](./influxdb3-client.default_connectionoptions.md) | default connection options |
 |  [DEFAULT\_WriteOptions](./influxdb3-client.default_writeoptions.md) | default writeOptions |
 |  [escape\_2](./influxdb3-client.escape_2.md) | Provides functions escape specific parts in InfluxDB line protocol. |
 |  [Log](./influxdb3-client.log.md) |  |
-|  [writableDataToLineProtocol](./influxdb3-client.writabledatatolineprotocol.md) |  |
 
 ## Type Aliases
 
@@ -64,6 +64,7 @@
 |  --- | --- |
 |  [HttpHeaders](./influxdb3-client.httpheaders.md) | Type of HTTP headers. |
 |  [PointFieldType](./influxdb3-client.pointfieldtype.md) |  |
+|  [QParamType](./influxdb3-client.qparamtype.md) |  |
 |  [QueryType](./influxdb3-client.querytype.md) |  |
 |  [ResponseStartedFn](./influxdb3-client.responsestartedfn.md) | Informs about a start of response processing. |
 |  [WritableData](./influxdb3-client.writabledata.md) | <p>The <code>WritableData</code> type represents different types of data that can be written. The data can either be a uniform ArrayLike collection or a single value of the following types:</p><p>- <code>Point</code>: Represents a [Point](./influxdb3-client.point.md) object.</p><p>- <code>string</code>: Represents lines of the [Line Protocol](https://bit.ly/2QL99fu)<!-- -->.</p> |
