@@ -1,0 +1,378 @@
+import * as fsv from './generated/flight/Flight.grpc-server'
+import * as grpc from '@grpc/grpc-js'
+import * as flt from '../src/generated/flight/Flight'
+import {MetadataVersion} from 'apache-arrow/fb/metadata-version'
+import {FieldNode, Message} from 'apache-arrow/ipc/metadata/message'
+import {MessageHeader} from 'apache-arrow/fb/message-header'
+import {Schema} from 'apache-arrow/Arrow.node'
+
+// todo - when run in parallel can get conflicts?
+// so may need to increment port number or isolate runs
+const DEFAULT_PORT: number = 44404
+export class MockService {
+  static callMeta: Map<string, Map<string, string[]>> = new Map()
+  static callTickets: Map<string, flt.Ticket> = new Map()
+
+  static callCount: {[key: string]: any} = {
+    doAction: 0,
+    doExchange: 0,
+    doGet: 0,
+    doPut: 0,
+    getFlightInfo: 0,
+    getSchema: 0,
+    handshake: 0,
+    listActions: 0,
+    listFlights: 0,
+    pollFlightInfo: 0,
+  }
+
+  public static genCallId(methodName: string, count: number): string {
+    return `${methodName}${String(count).padStart(3, '0')}`
+  }
+
+  public static resetCallCount(): void {
+    for (const key of Object.keys(this.callCount)) {
+      this.callCount[key] = 0
+    }
+  }
+
+  public static resetCallMeta(): void {
+    this.callMeta = new Map()
+  }
+
+  public static resetCallTickets(): void {
+    this.callTickets = new Map()
+  }
+
+  public static getCallMeta(
+    callId: string,
+    metaKey: string
+  ): string[] | undefined {
+    const callMap = this.callMeta.get(callId)
+    if (callMap == null) {
+      return undefined
+    }
+    return callMap.get(metaKey)
+  }
+
+  public static getCallTicket(callId: string): flt.Ticket | undefined {
+    return this.callTickets.get(callId)
+  }
+
+  public static getCallTicketDecoded(callId: string): any | undefined {
+    const decoder = new TextDecoder()
+    const ticket = this.getCallTicket(callId)
+    if (ticket) {
+      return JSON.parse(decoder.decode(ticket.ticket))
+    }
+    return undefined
+  }
+
+  public static resetAll(): void {
+    this.resetCallCount()
+    this.resetCallMeta()
+    this.resetCallTickets()
+  }
+
+  public static sendEmptySchema(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+  ): void {
+    call.write(
+      {
+        flight_descriptor: {
+          type: 2,
+          path: call.getPath(),
+        },
+        dataHeader: Message.encode(
+          new Message(0, MetadataVersion.V5, MessageHeader.Schema, new Schema())
+        ),
+        appMetadata: new Uint8Array(0),
+        dataBody: new Uint8Array(0),
+      } as flt.FlightData,
+      (arg: Error) => {
+        if (arg) {
+          console.error(`SERVER DEBUG got arg ${arg}`)
+        }
+      }
+    )
+  }
+
+  /*
+   FYI - dataHeader in FlightData needs to match Message.fsb :: Message in project Arrow - arrow/format
+
+   table Message {
+       version: org.apache.arrow.flatbuf.MetadataVersion;
+       header: MessageHeader; // n.b. ideally should be RecordBatch
+       bodyLength: long;
+       custom_metadata: [ KeyValue ];
+   }
+
+   table RecordBatch {
+      length: long // number of records/rows
+      nodes: [FieldNode]
+      buffers: [Buffer]
+      compression: BodyCompression // optional
+      variadicBufferCounts: [long] // optional
+   }
+ */
+
+  public static sendEmptyResponseBody(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+  ): void {
+    call.write(
+      {
+        flight_descriptor: {
+          type: 2,
+          path: call.getPath(),
+        },
+        dataHeader: Message.encode(
+          new Message(0, MetadataVersion.V5, MessageHeader.RecordBatch, {
+            length: 1,
+            nodes: [new FieldNode(0, 0)],
+            buffers: [{offset: 0, length: 0}],
+          })
+        ),
+        appMetadata: new Uint8Array(0),
+        dataBody: new Uint8Array(0),
+      } as flt.FlightData,
+      (arg: Error) => {
+        if (arg) {
+          console.error(`SERVER DEBUG got arg ${arg}`)
+        }
+      }
+    )
+  }
+
+  public static sendMetadata(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    metaItems: {key: string; value: string}[]
+  ): void {
+    const metadata = new grpc.Metadata()
+    for (const item of metaItems) {
+      metadata.set(item.key, item.value)
+    }
+    call.sendMetadata(metadata)
+  }
+
+  public static echoMetadata(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+  ): void {
+    call.sendMetadata(call.metadata)
+  }
+
+  public static pushCallMetadata(
+    callId: string,
+    call: {metadata: grpc.Metadata}
+  ): void {
+    const mData: Map<string, string[]> = new Map()
+    for (const key of Object.keys(call.metadata.getMap())) {
+      const values: string[] = []
+      for (const value of call.metadata.get(key)) {
+        values.push(value.toString())
+      }
+      mData.set(key, values)
+    }
+    this.callMeta.set(callId, mData)
+  }
+
+  public static pushCallTicket(callId: string, ticket: flt.Ticket): void {
+    this.callTickets.set(callId, ticket)
+  }
+
+  public static service: fsv.IFlightService = {
+    doAction(call: grpc.ServerWritableStream<flt.Action, flt.Result>): void {
+      MockService.callCount.doAction++
+      MockService.pushCallMetadata(
+        MockService.genCallId('doAction', MockService.callCount.doAction),
+        call
+      )
+      // console.log(`SERVER DEBUG doAction call: ${call}`)
+    },
+    doExchange(
+      call: grpc.ServerDuplexStream<flt.FlightData, flt.FlightData>
+    ): void {
+      MockService.callCount.doExchange++
+      MockService.pushCallMetadata(
+        MockService.genCallId('doExchange', MockService.callCount.doExchange),
+        call
+      )
+      // console.log(`SERVER DEBUG doExchange call: ${call}`)
+    },
+    doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
+      MockService.callCount.doGet++
+      // console.log(
+      //  `SERVER DEBUG doGet call.path: ${JSON.stringify(call.getPath())}`
+      // )
+      MockService.pushCallMetadata(
+        MockService.genCallId('doGet', MockService.callCount.doGet),
+        call
+      )
+      MockService.pushCallTicket(
+        MockService.genCallId('doGet', MockService.callCount.doGet),
+        call.request
+      )
+      call.on('error', (args) => {
+        console.log(`SERVER ERROR doGet() ${args}`)
+      })
+      const responseTrailers = new grpc.Metadata()
+      // echo metadata back
+      MockService.echoMetadata(call)
+      // Send empty responses
+      // Send Schema
+      MockService.sendEmptySchema(call)
+      // Send ResponseBody
+      MockService.sendEmptyResponseBody(call)
+      call.end(responseTrailers)
+    },
+    doPut(call: grpc.ServerDuplexStream<flt.FlightData, flt.PutResult>): void {
+      MockService.callCount.doPut++
+      MockService.pushCallMetadata(
+        MockService.genCallId('doPut', MockService.callCount.doPut),
+        call
+      )
+      // console.log(`SERVER DEBUG doPut call: ${call}`)
+    },
+    getFlightInfo(
+      call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.FlightInfo>,
+      callback: grpc.sendUnaryData<flt.FlightInfo>
+    ): void {
+      MockService.callCount.getFlightInfo++
+      MockService.pushCallMetadata(
+        MockService.genCallId(
+          'getFlightInfo',
+          MockService.callCount.getFlightInfo
+        ),
+        call
+      )
+      // console.log(`SERVER DEBUG getFlightInfo call: ${call}`)
+      // console.log(`SERVER DEBUG getFlightInfo callback: ${callback}`)
+    },
+    getSchema(
+      call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.SchemaResult>,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      callback: grpc.sendUnaryData<flt.SchemaResult>
+    ): void {
+      MockService.callCount.getSchema++
+      MockService.pushCallMetadata(
+        MockService.genCallId('getSchema', MockService.callCount.getSchema),
+        call
+      )
+      // console.log(`SERVER DEBUG getSchema call: ${call}`)
+      // console.log(`SERVER DEBUG getSchema callback: ${callback}`)
+    },
+    handshake(
+      call: grpc.ServerDuplexStream<flt.HandshakeRequest, flt.HandshakeResponse>
+    ): void {
+      MockService.callCount.handshake++
+      MockService.pushCallMetadata(
+        MockService.genCallId('handshake', MockService.callCount.handshake),
+        call
+      )
+      // console.log(`SERVER DEBUG handshake call: ${call}`)
+    },
+    listActions(
+      call: grpc.ServerWritableStream<flt.Empty, flt.ActionType>
+    ): void {
+      MockService.callCount.listActions++
+      MockService.pushCallMetadata(
+        MockService.genCallId('listActions', MockService.callCount.listActions),
+        call
+      )
+      // console.log(`SERVER DEBUG listActions call: ${call}`)
+    },
+    listFlights(
+      call: grpc.ServerWritableStream<flt.Criteria, flt.FlightInfo>
+    ): void {
+      MockService.callCount.listFlights++
+      MockService.pushCallMetadata(
+        MockService.genCallId('listFlights', MockService.callCount.listFlights),
+        call
+      )
+      // console.log(`SERVER DEBUG listFlights call: ${call}`)
+    },
+    pollFlightInfo(
+      call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.PollInfo>,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      callback: grpc.sendUnaryData<flt.PollInfo>
+    ): void {
+      MockService.callCount.pollFlightInfo++
+      MockService.pushCallMetadata(
+        MockService.genCallId(
+          'pollFlightInfo',
+          MockService.callCount.pollFlightInfo
+        ),
+        call
+      )
+      // console.log(`SERVER DEBUG getSchema call: ${call}`)
+      // console.log(`SERVER DEBUG getSchema callback: ${callback}`)
+    },
+  }
+}
+
+/*
+    Since this is to be used only for testing for now use insecure
+    todo - implement security - should be able to check TLS
+ */
+export class TestServer {
+  service: fsv.IFlightService
+  port: number
+
+  server: grpc.Server
+
+  constructor()
+
+  constructor(svc: fsv.IFlightService)
+
+  constructor(port: number)
+
+  constructor(...args: Array<any>) {
+    switch (args.length) {
+      case 0:
+        this.service = MockService.service
+        this.port = DEFAULT_PORT
+        break
+      case 1:
+        if (args[0] == null) {
+          throw Error('Attempt to create null service')
+        }
+        if (typeof args[0] == 'number') {
+          this.port = args[0]
+        } else {
+          // todo add type guard
+          this.service = args[0]
+        }
+        break
+      default:
+        throw Error(`Unsupported arguments in ${args}`)
+    }
+    this.server = new grpc.Server()
+  }
+
+  start = async (): Promise<void> => {
+    await this.server.addService(fsv.flightServiceDefinition, this.service)
+    await this.server.bindAsync(
+      `0.0.0.0:${this.port}`,
+      grpc.ServerCredentials.createInsecure(),
+      (err, port) => {
+        if (err) {
+          console.error(`Failed to start server: ${err}`)
+          return Promise.reject(err)
+        } else {
+          console.log(`Server start: ${port}`)
+        }
+      }
+    )
+    return Promise.resolve()
+  }
+
+  shutdown = async (): Promise<void> => {
+    await this.server.tryShutdown((err) => {
+      if (err) {
+        console.error(`Failed to shutdown server: ${err}`)
+        return Promise.reject(err)
+      }
+    })
+    console.log('Server shutdown')
+    return Promise.resolve()
+  }
+}
