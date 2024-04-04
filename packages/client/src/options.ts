@@ -53,12 +53,26 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 
 /**
  * Options used by {@link InfluxDBClient.write} .
+ *
+ * @example WriteOptions in write call
+ * ```typescript
+ *       client
+ *         .write(point, DATABASE, 'myOrg', {
+ *           headers: {
+ *             'channel-lane': 'reserved',
+ *             'notify-central': '30m',
+ *           },
+ *           precision: 'ns',
+ *           gzipThreshold: 1000,
+ *         })
+ * ```
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
   precision?: WritePrecision
   /** HTTP headers that will be sent with every write request */
-  headers?: {[key: string]: string}
+  //headers?: {[key: string]: string}
+  headers?: Record<string, string>
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
   /** default tags

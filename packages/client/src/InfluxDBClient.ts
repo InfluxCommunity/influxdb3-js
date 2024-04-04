@@ -99,10 +99,16 @@ export default class InfluxDBClient {
   }
 
   private _mergeWriteOptions = (writeOptions?: Partial<WriteOptions>) => {
-    return {
+    const headerMerge: Record<string, string> = {
+      ...this._options.writeOptions?.headers,
+      ...writeOptions?.headers,
+    }
+    const result = {
       ...this._options.writeOptions,
       ...writeOptions,
     }
+    result.headers = headerMerge
+    return result
   }
 
   /**
