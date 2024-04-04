@@ -8,6 +8,7 @@ import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
+import { CLIENT_LIB_VERSION } from "./version";
 
 export type TicketDataType = {
   database: string
@@ -21,27 +22,21 @@ export default class QueryApiImpl implements QueryApi {
   private _flightClient: FlightServiceClient
   private _transport: ReturnType<typeof impl.queryTransport>
 
+  private _defaultHeaders: Record<string, string> | undefined
+
   constructor(private _options: ConnectionOptions) {
     const {host, queryTimeout: timeout} = this._options
+    this._defaultHeaders = this._options.headers
     this._transport = impl.queryTransport({host, timeout})
     this._flightClient = new FlightServiceClient(this._transport)
   }
 
-  private async *_queryRawBatches(
-    query: string,
+  prepareTicket(
     database: string,
+    query: string,
     queryType: QueryType,
-    queryParams?: Map<string, QParamType>
-  ) {
-    if (queryParams && queryHasParams(query)) {
-      allParamsMatched(query, queryParams)
-    }
-
-    if (this._closed) {
-      throw new Error('queryApi: already closed!')
-    }
-    const client = this._flightClient
-
+    queryParams: Map<string, QParamType> | undefined
+  ): Ticket {
     const ticketData: TicketDataType = {
       database: database,
       sql_query: query,
@@ -58,14 +53,43 @@ export default class QueryApiImpl implements QueryApi {
       ticketData['params'] = param as {[name: string]: QParamType | undefined}
     }
 
-    const ticket = Ticket.create({
+    return Ticket.create({
       ticket: new TextEncoder().encode(JSON.stringify(ticketData)),
     })
+  }
 
-    const meta: RpcMetadata = {}
+  prepareMetadata(headers?: Record<string, string>): RpcMetadata {
+    const meta: RpcMetadata = {
+      'User-Agent': `influxdb-client-js/${CLIENT_LIB_VERSION}`,
+      ...this._defaultHeaders,
+      ...headers,
+    }
 
     const token = this._options.token
     if (token) meta['authorization'] = `Bearer ${token}`
+
+    return meta
+  }
+
+  private async *_queryRawBatches(
+    query: string,
+    database: string,
+    queryType: QueryType,
+    queryParams?: Map<string, QParamType>,
+    queryHeaders?: Record<string, string>
+  ) {
+    if (queryParams && queryHasParams(query)) {
+      allParamsMatched(query, queryParams)
+    }
+
+    if (this._closed) {
+      throw new Error('queryApi: already closed!')
+    }
+    const client = this._flightClient
+
+    const ticket = this.prepareTicket(database, query, queryType, queryParams)
+
+    const meta = this.prepareMetadata(queryHeaders)
     const options: RpcOptions = {meta}
 
     const flightDataStream = client.doGet(ticket, options)

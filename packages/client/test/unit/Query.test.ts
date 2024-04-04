@@ -1,8 +1,10 @@
 import {expect} from 'chai'
-import {TicketDataType} from '../../src/impl/QueryApiImpl'
+import QueryApiImpl, {TicketDataType} from '../../src/impl/QueryApiImpl'
+import {ConnectionOptions} from '../../src/options'
 import {Ticket} from '../../src/generated/flight/Flight'
 import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
+import { RpcMetadata } from "@protobuf-ts/runtime-rpc";
 
 const testSQLTicket = {
   db: 'TestDB',
@@ -78,5 +80,52 @@ describe('Query', () => {
     expect(() => {
       allParamsMatched(query, queryParams)
     }).to.throw('No parameter matching  $name provided in the query params map')
+  })
+  it('sets header metadata in request', async () => {
+    const options: ConnectionOptions = {
+      host: 'http://localhost:8086',
+      token: 'TEST_TOKEN',
+    }
+    const qApi = new QueryApiImpl(options)
+    const testMeta: Record<string, string> = {
+      route: 'CZ66',
+    }
+    const meta: RpcMetadata = qApi.prepareMetadata(testMeta)
+    expect(meta['authorization']).to.equal('Bearer TEST_TOKEN')
+    expect(meta['route']).to.equal('CZ66')
+  })
+  it('gets header metadata from config', async () => {
+    const options: ConnectionOptions = {
+      host: 'http://localhost:8086',
+      token: 'TEST_TOKEN',
+      headers: {
+        hunter: 'Herbie Hancock',
+        feeder: 'Jefferson Airplane',
+      },
+    }
+    const qApi = new QueryApiImpl(options)
+    const meta: RpcMetadata = qApi.prepareMetadata()
+    expect(meta['authorization']).to.equal('Bearer TEST_TOKEN')
+    expect(meta['hunter']).to.equal('Herbie Hancock')
+    expect(meta['feeder']).to.equal('Jefferson Airplane')
+  })
+  it('prefers request header metadata to config', async () => {
+    const options: ConnectionOptions = {
+      host: 'http://localhost:8086',
+      token: 'TEST_TOKEN',
+      headers: {
+        hunter: 'Maori',
+        feeder: 'Lewis Carol',
+      },
+    }
+    const qApi = new QueryApiImpl(options)
+    const testMeta: Record<string, string> = {
+      hunter: 'Herbie Hancock',
+      feeder: 'Jefferson Airplane',
+    }
+    const meta: RpcMetadata = qApi.prepareMetadata(testMeta)
+    expect(meta['authorization']).to.equal('Bearer TEST_TOKEN')
+    expect(meta['hunter']).to.equal('Herbie Hancock')
+    expect(meta['feeder']).to.equal('Jefferson Airplane')
   })
 })
