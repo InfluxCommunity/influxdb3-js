@@ -5,6 +5,16 @@ import {MetadataVersion} from 'apache-arrow/fb/metadata-version'
 import {FieldNode, Message} from 'apache-arrow/ipc/metadata/message'
 import {MessageHeader} from 'apache-arrow/fb/message-header'
 import {Schema} from 'apache-arrow/Arrow.node'
+import {Log, setLogger, consoleLogger} from '../src'
+
+setLogger({
+  error(message: string, error) {
+    consoleLogger.error(message, error)
+  },
+  warn(message: string, error) {
+    consoleLogger.warn(message, error)
+  },
+})
 
 // todo - when run in parallel can get conflicts?
 // so may need to increment port number or isolate runs
@@ -89,9 +99,9 @@ export class MockService {
         appMetadata: new Uint8Array(0),
         dataBody: new Uint8Array(0),
       } as flt.FlightData,
-      (arg: Error) => {
-        if (arg) {
-          console.error(`SERVER DEBUG got arg ${arg}`)
+      (err: Error) => {
+        if (err) {
+          Log.error.call(Log, `Failed to send Empty Schema`, err)
         }
       }
     )
@@ -135,9 +145,9 @@ export class MockService {
         appMetadata: new Uint8Array(0),
         dataBody: new Uint8Array(0),
       } as flt.FlightData,
-      (arg: Error) => {
-        if (arg) {
-          console.error(`SERVER DEBUG got arg ${arg}`)
+      (err: Error) => {
+        if (err) {
+          Log.error.call(Log, `Failed to write empty response body`, err)
         }
       }
     )
@@ -186,7 +196,6 @@ export class MockService {
         MockService.genCallId('doAction', MockService.callCount.doAction),
         call
       )
-      // console.log(`SERVER DEBUG doAction call: ${call}`)
     },
     doExchange(
       call: grpc.ServerDuplexStream<flt.FlightData, flt.FlightData>
@@ -196,13 +205,9 @@ export class MockService {
         MockService.genCallId('doExchange', MockService.callCount.doExchange),
         call
       )
-      // console.log(`SERVER DEBUG doExchange call: ${call}`)
     },
     doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
       MockService.callCount.doGet++
-      // console.log(
-      //  `SERVER DEBUG doGet call.path: ${JSON.stringify(call.getPath())}`
-      // )
       MockService.pushCallMetadata(
         MockService.genCallId('doGet', MockService.callCount.doGet),
         call
@@ -212,7 +217,7 @@ export class MockService {
         call.request
       )
       call.on('error', (args) => {
-        console.log(`SERVER ERROR doGet() ${args}`)
+        Log.error.call(Log, `MockService ERROR on doGet() ${args}`)
       })
       const responseTrailers = new grpc.Metadata()
       // echo metadata back
@@ -230,10 +235,10 @@ export class MockService {
         MockService.genCallId('doPut', MockService.callCount.doPut),
         call
       )
-      // console.log(`SERVER DEBUG doPut call: ${call}`)
     },
     getFlightInfo(
       call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.FlightInfo>,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       callback: grpc.sendUnaryData<flt.FlightInfo>
     ): void {
       MockService.callCount.getFlightInfo++
@@ -244,8 +249,6 @@ export class MockService {
         ),
         call
       )
-      // console.log(`SERVER DEBUG getFlightInfo call: ${call}`)
-      // console.log(`SERVER DEBUG getFlightInfo callback: ${callback}`)
     },
     getSchema(
       call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.SchemaResult>,
@@ -257,8 +260,6 @@ export class MockService {
         MockService.genCallId('getSchema', MockService.callCount.getSchema),
         call
       )
-      // console.log(`SERVER DEBUG getSchema call: ${call}`)
-      // console.log(`SERVER DEBUG getSchema callback: ${callback}`)
     },
     handshake(
       call: grpc.ServerDuplexStream<flt.HandshakeRequest, flt.HandshakeResponse>
@@ -268,7 +269,6 @@ export class MockService {
         MockService.genCallId('handshake', MockService.callCount.handshake),
         call
       )
-      // console.log(`SERVER DEBUG handshake call: ${call}`)
     },
     listActions(
       call: grpc.ServerWritableStream<flt.Empty, flt.ActionType>
@@ -278,7 +278,6 @@ export class MockService {
         MockService.genCallId('listActions', MockService.callCount.listActions),
         call
       )
-      // console.log(`SERVER DEBUG listActions call: ${call}`)
     },
     listFlights(
       call: grpc.ServerWritableStream<flt.Criteria, flt.FlightInfo>
@@ -288,7 +287,6 @@ export class MockService {
         MockService.genCallId('listFlights', MockService.callCount.listFlights),
         call
       )
-      // console.log(`SERVER DEBUG listFlights call: ${call}`)
     },
     pollFlightInfo(
       call: grpc.ServerUnaryCall<flt.FlightDescriptor, flt.PollInfo>,
@@ -303,8 +301,6 @@ export class MockService {
         ),
         call
       )
-      // console.log(`SERVER DEBUG getSchema call: ${call}`)
-      // console.log(`SERVER DEBUG getSchema callback: ${callback}`)
     },
   }
 }
@@ -355,10 +351,10 @@ export class TestServer {
       grpc.ServerCredentials.createInsecure(),
       (err, port) => {
         if (err) {
-          console.error(`Failed to start server: ${err}`)
+          Log.error.call(Log, `Failed to start server: ${err}`)
           return Promise.reject(err)
         } else {
-          console.log(`Server start: ${port}`)
+          Log.warn.call(Log, `Server start: ${port}`)
         }
       }
     )
@@ -368,11 +364,11 @@ export class TestServer {
   shutdown = async (): Promise<void> => {
     await this.server.tryShutdown((err) => {
       if (err) {
-        console.error(`Failed to shutdown server: ${err}`)
+        Log.error.call(Log, `Failed to shutdown server:`, err)
         return Promise.reject(err)
       }
     })
-    console.log('Server shutdown')
+    Log.warn.call(Log, `Server shutdown`)
     return Promise.resolve()
   }
 }
