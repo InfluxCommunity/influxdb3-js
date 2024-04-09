@@ -8,13 +8,13 @@ export function queryHasParams(query: string): boolean {
 
 export function allParamsMatched(
   query: string,
-  qParams: Map<string, QParamType>
+  qParams: Record<string, QParamType>
 ): boolean {
   const matches = query.match(rgxParam)
 
   if (matches) {
     for (const match of matches) {
-      if (!qParams.get(match.trim().replace('$', ''))) {
+      if (!qParams[match.trim().replace('$', '')]) {
         throwReturn(
           new Error(
             `No parameter matching ${match} provided in the query params map`

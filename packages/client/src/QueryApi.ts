@@ -1,5 +1,5 @@
 import {PointValues} from './PointValues'
-import {QueryType} from './options'
+import {QueryOptions} from './options'
 
 export type QParamType = string | number | boolean
 
@@ -12,15 +12,13 @@ export default interface QueryApi {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryType - The type of query (default: 'sql').
-   * @param queryParams - for sql queries parameters to be used
+   * @param options - options applied to the query (default: { type: 'sql'}).
    * @returns An async generator that yields maps of string keys to any values.
    */
   query(
     query: string,
     database: string,
-    queryType: QueryType,
-    queryParams?: Map<string, QParamType>
+    options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void>
 
   /**
@@ -28,15 +26,13 @@ export default interface QueryApi {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryType - The type of query (default: 'sql').
-   * @param queryParams - for sql queries parameters to be used
+   * @param options - Options for the query (default: {type: 'sql'}).
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database: string,
-    queryType: QueryType,
-    queryParams?: Map<string, QParamType>
+    options: QueryOptions
   ): AsyncGenerator<PointValues, void, void>
 
   close(): Promise<void>

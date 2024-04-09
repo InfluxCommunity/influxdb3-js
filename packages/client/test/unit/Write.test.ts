@@ -231,13 +231,18 @@ describe('Write', () => {
     })
     it('sends custom http header', async () => {
       useSubject({
-        headers: {authorization: 'Token customToken'},
+        headers: {
+          authorization: 'Token customToken',
+          'channel-lane': 'reserved',
+        },
       })
       let authorization: any
+      let channelLane: string = ''
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
+          channelLane = this.req.headers['channel-lane']
           return [204, '', {}]
         })
         .persist()
@@ -248,6 +253,10 @@ describe('Write', () => {
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
+      expect(channelLane).equals('reserved')
+    })
+    it('sends custom header from client config', async () => {
+      // Todo -
     })
   })
 })

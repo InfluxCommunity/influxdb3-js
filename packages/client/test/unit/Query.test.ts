@@ -4,7 +4,7 @@ import {ConnectionOptions} from '../../src/options'
 import {Ticket} from '../../src/generated/flight/Flight'
 import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
-import { RpcMetadata } from "@protobuf-ts/runtime-rpc";
+import {RpcMetadata} from '@protobuf-ts/runtime-rpc'
 
 const testSQLTicket = {
   db: 'TestDB',
@@ -66,17 +66,17 @@ describe('Query', () => {
     const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
     expect(queryHasParams('select * ')).to.be.false
     expect(queryHasParams(query)).to.be.true
-    const queryParams: Map<string, QParamType> = new Map<string, QParamType>()
-    queryParams.set('id', 42)
-    queryParams.set('name', 'Zaphrod')
+    const queryParams: Record<string, QParamType> = {}
+    queryParams['id'] = 42
+    queryParams['name'] = 'Zaphrod'
     expect(allParamsMatched(query, queryParams)).to.be.true
   })
   it('throws error on missing param', () => {
     const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
     expect(queryHasParams(query)).to.be.true
-    const queryParams: Map<string, QParamType> = new Map<string, QParamType>()
-    queryParams.set('id', 42)
-    queryParams.set('key', 'Zaphrod')
+    const queryParams: Record<string, QParamType> = {}
+    queryParams['id'] = 42
+    queryParams['key'] = 'Zaphrod'
     expect(() => {
       allParamsMatched(query, queryParams)
     }).to.throw('No parameter matching  $name provided in the query params map')

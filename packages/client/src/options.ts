@@ -1,4 +1,5 @@
 import {Transport} from './transport'
+import {QParamType} from './QueryApi'
 
 /**
  * Option for the communication with InfluxDB server.
@@ -121,10 +122,21 @@ export const DEFAULT_WriteOptions: WriteOptions = {
 
 export type QueryType = 'sql' | 'influxql'
 
+export interface QueryOptions {
+  type: QueryType
+  headers?: Record<string, string>
+  params?: Record<string, QParamType>
+}
+
+export const DEFAULT_QueryOptions: QueryOptions = {
+  type: 'sql',
+}
+
 /**
  * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
+  queryOptions?: Partial<QueryOptions>
   /** supplies and overrides default writing options */
   writeOptions?: Partial<WriteOptions>
   /** specifies custom transport */

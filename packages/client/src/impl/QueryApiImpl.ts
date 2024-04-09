@@ -2,13 +2,13 @@ import {RecordBatchReader, Type as ArrowType} from 'apache-arrow'
 import QueryApi, {QParamType} from '../QueryApi'
 import {Ticket} from '../generated/flight/Flight'
 import {FlightServiceClient} from '../generated/flight/Flight.client'
-import {ConnectionOptions, QueryType} from '../options'
+import {ConnectionOptions, QueryOptions, QueryType} from '../options'
 import {createInt32Uint8Array} from '../util/common'
 import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
-import { CLIENT_LIB_VERSION } from "./version";
+import {CLIENT_LIB_VERSION} from './version'
 
 export type TicketDataType = {
   database: string
@@ -34,20 +34,19 @@ export default class QueryApiImpl implements QueryApi {
   prepareTicket(
     database: string,
     query: string,
-    queryType: QueryType,
-    queryParams: Map<string, QParamType> | undefined
+    options: QueryOptions
   ): Ticket {
     const ticketData: TicketDataType = {
       database: database,
       sql_query: query,
-      query_type: queryType,
+      query_type: options.type,
     }
 
-    if (queryParams) {
+    if (options.params) {
       const param: {[name: string]: QParamType | undefined} = {}
-      for (const key of queryParams.keys()) {
-        if (queryParams.get(key)) {
-          param[key] = queryParams.get(key)
+      for (const key of Object.keys(options.params)) {
+        if (options.params[key]) {
+          param[key] = options.params[key]
         }
       }
       ticketData['params'] = param as {[name: string]: QParamType | undefined}
@@ -74,12 +73,10 @@ export default class QueryApiImpl implements QueryApi {
   private async *_queryRawBatches(
     query: string,
     database: string,
-    queryType: QueryType,
-    queryParams?: Map<string, QParamType>,
-    queryHeaders?: Record<string, string>
+    options: QueryOptions
   ) {
-    if (queryParams && queryHasParams(query)) {
-      allParamsMatched(query, queryParams)
+    if (options.params && queryHasParams(query)) {
+      allParamsMatched(query, options.params)
     }
 
     if (this._closed) {
@@ -87,12 +84,12 @@ export default class QueryApiImpl implements QueryApi {
     }
     const client = this._flightClient
 
-    const ticket = this.prepareTicket(database, query, queryType, queryParams)
+    const ticket = this.prepareTicket(database, query, options) // queryType, queryParams)
 
-    const meta = this.prepareMetadata(queryHeaders)
-    const options: RpcOptions = {meta}
+    const meta = this.prepareMetadata(options.headers)
+    const rpcOptions: RpcOptions = {meta}
 
-    const flightDataStream = client.doGet(ticket, options)
+    const flightDataStream = client.doGet(ticket, rpcOptions)
 
     const binaryStream = (async function* () {
       for await (const flightData of flightDataStream.responses) {
@@ -112,14 +109,14 @@ export default class QueryApiImpl implements QueryApi {
   async *query(
     query: string,
     database: string,
-    queryType: QueryType,
-    queryParams?: Map<string, QParamType>
+    options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
     const batches = this._queryRawBatches(
       query,
       database,
-      queryType,
-      queryParams
+      options
+      // queryType,
+      //queryParams
     )
 
     for await (const batch of batches) {
@@ -139,14 +136,14 @@ export default class QueryApiImpl implements QueryApi {
   async *queryPoints(
     query: string,
     database: string,
-    queryType: QueryType,
-    queryParams?: Map<string, QParamType>
+    options: QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
     const batches = this._queryRawBatches(
       query,
       database,
-      queryType,
-      queryParams
+      options
+      // options.type,
+      // options.params
     )
 
     for await (const batch of batches) {

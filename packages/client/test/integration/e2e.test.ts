@@ -70,9 +70,7 @@ describe('e2e test', () => {
 
     const query = `SELECT * FROM "stat" WHERE "testId" = ${testId}`
 
-    const queryType = 'sql'
-
-    const data = client.query(query, database, queryType)
+    const data = client.query(query, database)
 
     let row: IteratorResult<Record<string, any>, void>
     row = await data.next()
@@ -85,7 +83,7 @@ describe('e2e test', () => {
     row = await data.next()
     expect(row.done).to.equal(true)
 
-    let dataPoints = client.queryPoints(query, database, queryType)
+    let dataPoints = client.queryPoints(query, database)
 
     let pointRow: IteratorResult<PointValues, void>
     pointRow = await dataPoints.next()
@@ -106,7 +104,7 @@ describe('e2e test', () => {
         WHERE "testId" = ${testId}
     `
 
-    dataPoints = client.queryPoints(queryAggregation, database, queryType)
+    dataPoints = client.queryPoints(queryAggregation, database)
 
     pointRow = await dataPoints.next()
 
@@ -115,7 +113,7 @@ describe('e2e test', () => {
     expect(pointRow.value?.getField('sum_max')).to.equal(max1)
 
     await client.close()
-    await rejects(client.query(query, database, queryType).next())
+    await rejects(client.query(query, database).next())
   }).timeout(10_000)
 
   it('concurrent query', async () => {
@@ -156,14 +154,11 @@ describe('e2e test', () => {
         AND
         "testId" = ${testId}
     `
-
-    const queryType = 'sql'
-
     const paralelQueries = 8
 
     const datas = await Promise.all(
       range(paralelQueries)
-        .map(() => client.queryPoints(query, database, queryType))
+        .map(() => client.queryPoints(query, database))
         .map(async (data) => {
           const queryValues: typeof values = []
 
@@ -236,13 +231,10 @@ describe('e2e test', () => {
         AND
         "testId" = ${testId}
     `
-
-    const queryType = 'sql'
-
     const queryValues: typeof values = []
 
     for (let tries = 10; tries--; ) {
-      const data = client.queryPoints(query, database, queryType)
+      const data = client.queryPoints(query, database)
 
       for await (const row of data) {
         queryValues.push({
@@ -358,12 +350,10 @@ describe('e2e test', () => {
         AND
         "director" = $director    
     `
-    const data = client.query(
-      query,
-      database,
-      'sql',
-      new Map([['director', 'J_Ford']])
-    )
+    const data = client.query(query, database, {
+      type: 'sql',
+      params: {director: 'J_Ford'},
+    })
 
     for await (const row of data) {
       expect(row['director']).to.equal('J_Ford')
@@ -409,12 +399,10 @@ describe('e2e test', () => {
         AND
         "director" = $director    
     `
-    const points = client.queryPoints(
-      query,
-      database,
-      'sql',
-      new Map([['director', 'N_Ray']])
-    )
+    const points = client.queryPoints(query, database, {
+      type: 'sql',
+      params: {director: 'N_Ray'},
+    })
 
     for await (const point of points) {
       expect(point.getTag('director')).to.equal('N_Ray')
