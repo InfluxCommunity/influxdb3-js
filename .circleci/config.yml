@@ -30,6 +30,7 @@ jobs:
       - run:
           name: Run tests
           command: |
+            yarn flight:test
             yarn build
             yarn test:ci
             yarn apidoc:ci
