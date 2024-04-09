@@ -161,7 +161,7 @@ export default class InfluxDBClient {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryOptions - The options for the query (default: { type: 'sql' }).
+   * @param queryOptions - The options for the query (default: \{ type: 'sql' \}).
    * @example
    * ```typescript
    *    client.query('SELECT * from testData', 'CI_TEST', {
@@ -194,7 +194,7 @@ export default class InfluxDBClient {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryOptions - The type of query (default: {type: 'sql'}).
+   * @param queryOptions - The type of query (default: \{type: 'sql'\}).
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
