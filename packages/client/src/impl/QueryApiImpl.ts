@@ -115,8 +115,6 @@ export default class QueryApiImpl implements QueryApi {
       query,
       database,
       options
-      // queryType,
-      //queryParams
     )
 
     for await (const batch of batches) {
@@ -142,8 +140,6 @@ export default class QueryApiImpl implements QueryApi {
       query,
       database,
       options
-      // options.type,
-      // options.params
     )
 
     for await (const batch of batches) {
