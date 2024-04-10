@@ -211,7 +211,7 @@ To regenerate the Flight client, use the `yarn flight` command to execute the pr
 
 ### Generate files for mock server
 
-To generate files needed for the mock server used in some tests, run the `yarn flight:test` command. 
+To generate files needed for the mock server used in some tests, run the `yarn flight:test` command.
 
 ## License
 
