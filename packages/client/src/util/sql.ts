@@ -1,7 +1,7 @@
 import {QParamType} from '../QueryApi'
 import {throwReturn} from './common'
 
-const rgxParam = /(?:^|\W)\$(\w+)(?!\w)/g
+const rgxParam = /\$(\w+)/g
 export function queryHasParams(query: string): boolean {
   return !!query.match(rgxParam)
 }

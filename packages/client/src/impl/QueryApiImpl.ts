@@ -111,11 +111,7 @@ export default class QueryApiImpl implements QueryApi {
     database: string,
     options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
-    const batches = this._queryRawBatches(
-      query,
-      database,
-      options
-    )
+    const batches = this._queryRawBatches(query, database, options)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {
@@ -136,11 +132,7 @@ export default class QueryApiImpl implements QueryApi {
     database: string,
     options: QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
-    const batches = this._queryRawBatches(
-      query,
-      database,
-      options
-    )
+    const batches = this._queryRawBatches(query, database, options)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {

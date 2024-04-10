@@ -63,23 +63,23 @@ describe('Query', () => {
     expect(ticketDecode).to.deep.equal(ticketData)
   })
   it('matches all params', () => {
-    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
+    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name=$_name'
     expect(queryHasParams('select * ')).to.be.false
     expect(queryHasParams(query)).to.be.true
     const queryParams: Record<string, QParamType> = {}
     queryParams['id'] = 42
-    queryParams['name'] = 'Zaphrod'
+    queryParams['_name'] = 'Zaphrod'
     expect(allParamsMatched(query, queryParams)).to.be.true
   })
   it('throws error on missing param', () => {
-    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name = $name'
+    const query = 'SELECT a, b, c FROM my_table WHERE id = $id AND name=$_name'
     expect(queryHasParams(query)).to.be.true
     const queryParams: Record<string, QParamType> = {}
     queryParams['id'] = 42
-    queryParams['key'] = 'Zaphrod'
+    queryParams['_key'] = 'Zaphrod'
     expect(() => {
       allParamsMatched(query, queryParams)
-    }).to.throw('No parameter matching  $name provided in the query params map')
+    }).to.throw('No parameter matching $_name provided in the query params map')
   })
   it('sets header metadata in request', async () => {
     const options: ConnectionOptions = {
