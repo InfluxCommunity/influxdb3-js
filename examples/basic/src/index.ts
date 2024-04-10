@@ -18,13 +18,14 @@ async function main() {
   const host = getEnv('INFLUX_HOST')
   const token = getEnv('INFLUX_TOKEN')
   const database = getEnv('INFLUX_DATABASE')
+  const measurement = 'demoBasic'
 
   // Create a new client using an InfluxDB server base URL and an authentication token
   const client = new InfluxDBClient({host, token})
 
   try {
     // Write point
-    const p = Point.measurement('stat')
+    const p = Point.measurement(measurement)
       .setTag('unit', 'temperature')
       .setFloatField('avg', 24.5)
       .setFloatField('max', 45.0)
@@ -33,7 +34,7 @@ async function main() {
 
     // Write point as template with anonymous fields object
     const pointTemplate = Object.freeze(
-      Point.measurement('stat').setTag('unit', 'temperature')
+      Point.measurement(measurement).setTag('unit', 'temperature')
     )
 
     const sensorData = {
@@ -48,23 +49,22 @@ async function main() {
     await client.write(p2, database)
 
     // Or write directly line protocol
-    const lp = `stat,unit=temperature avg=20.5,max=43.0`
+    const lp = `${measurement},unit=temperature avg=20.5,max=43.0`
     await client.write(lp, database)
 
     // Prepare flightsql query
     const query = `
       SELECT *
-      FROM "stat"
+      FROM "${measurement}"
       WHERE
       time >= now() - interval '5 minute'
       AND
       "unit" IN ('temperature')
     `
-    // This query type can either be 'sql' or 'influxql'
-    const queryType = 'sql'
 
     // Execute query
-    const queryResult = client.query(query, database, queryType)
+    // This query type can either be 'sql' or 'influxql'
+    const queryResult = client.query(query, database, {type: 'sql'})
 
     for await (const row of queryResult) {
       console.log(`avg is ${row.avg}`)
@@ -72,7 +72,8 @@ async function main() {
     }
 
     // Execute query again as points
-    const queryPointsResult = client.queryPoints(query, database, queryType)
+    // can also rely on default queryOptions { type: 'sql }
+    const queryPointsResult = client.queryPoints(query, database)
 
     for await (const row of queryPointsResult) {
       console.log(`avg is ${row.getField('avg', 'float')}`)

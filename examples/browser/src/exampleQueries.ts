@@ -4,13 +4,15 @@ type ExampleQuery = {
   desc: string
 }
 
+export const measurement = 'demoBrowser'
+
 export const EXAMPLE_QUERIES: ExampleQuery[] = [
   {
     name: 'Raw',
     query: `\
 SELECT 
   "Temperature", "Humidity", "time"
-FROM "stat"
+FROM "${measurement}"
 WHERE
   time >= now() - interval '1 hour'`,
     desc: `\
@@ -30,7 +32,7 @@ calculate:
     query: `\
 SELECT 
   MIN("CO2") as minCO2, AVG("CO2") as avgCO2, MAX("CO2") as maxCO2
-FROM "stat"
+FROM "${measurement}"
 WHERE
   time >= now() - interval '1 hour';`,
   },
@@ -44,7 +46,7 @@ and sort by it`,
     query: `\
 SELECT 
   "Device", AVG("Temperature") as avgTemperature
-FROM "stat"
+FROM "${measurement}"
 WHERE
   time >= now() - interval '1 hour'
 GROUP BY "Device"
@@ -61,7 +63,7 @@ for each window calculate
 SELECT
   date_bin('5 minutes', "time") as window_start,
   AVG("Humidity") as avgHumidity
-FROM "stat"
+FROM "${measurement}"
 WHERE
   "time" >= now() - interval '1 hour'
 GROUP BY window_start
@@ -78,7 +80,7 @@ from past 1 hour`,
 SELECT 
   "Device",
   CORR("Humidity", "Temperature") AS correlation
-FROM "stat"
+FROM "${measurement}"
 WHERE
   time >= now() - interval '1 hour'
 GROUP BY "Device";`,
