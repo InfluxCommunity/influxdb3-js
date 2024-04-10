@@ -90,7 +90,7 @@ import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 ```
 
 Assign values for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function.
-Please note that token is mandatory parameter.
+Please note that token is a mandatory parameter.
 Make sure to `close` the client when it's no longer needed for writing or querying.
 
 ```ts
@@ -109,7 +109,7 @@ async function main() {
 main()
 ```
 
-You can use provided constructor for `InfluxDBClient` instantiation using environment variables:
+You can also use a provided no argument constructor for `InfluxDBClient` instantiation using environment variables:
 
 ```ts
 
@@ -124,7 +124,7 @@ async function main() {
 main()
 ```
 
-You can also instantiate `InfluxDBClient` with connections string:
+You can also instantiate `InfluxDBClient` with a connection string:
 
 ```ts
 
@@ -150,7 +150,7 @@ await client.write(line, database)
 
 ### Query data
 
-To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name. To change to using InfluxQL change the queryType option to 'influxql'.
+To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name. To change to using InfluxQL add a QueryOptions object with the type 'influxql' (e.g. `client.query(query, database, { type: 'influxql'})`).
 
 ```ts
 // Execute query
@@ -170,14 +170,13 @@ for await (const row of queryResult) {
 }
 ```
 
-or use typesafe `PointValues` structure with `client.queryPoints`
+or use a typesafe `PointValues` structure with `client.queryPoints`
 
 ```ts
 const queryPointsResult = client.queryPoints(
     query,
     database,
-    queryType,
-    'stat'
+    queryOptions
 )
 
 for await (const row of queryPointsResult) {
@@ -209,6 +208,10 @@ To contribute to this project, fork the GitHub repository and send a pull reques
 For now, we're responsible for generating the Flight client. However, its Protobuf interfaces may undergo changes over time.
 
 To regenerate the Flight client, use the `yarn flight` command to execute the provided script. The script will clone the Flight Protobuf repository and generate new TypeScript files in `./src/generated/flight`.
+
+### Generate files for mock server
+
+To generate files needed for the mock server used in some tests, run the `yarn flight:test` command. 
 
 ## License
 
