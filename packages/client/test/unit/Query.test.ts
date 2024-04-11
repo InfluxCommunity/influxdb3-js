@@ -81,6 +81,14 @@ describe('Query', () => {
       allParamsMatched(query, queryParams)
     }).to.throw('No parameter matching $_name provided in the query params map')
   })
+  it('ignores params for query without params', () => {
+    const query = `SELECT a, b, c FROM my_table WHERE a = '123' AND c='chat'`
+    expect(queryHasParams(query)).to.be.false
+    const queryParams: Record<string, QParamType> = {}
+    queryParams['b'] = 42
+    queryParams['c'] = 'Zaphrod'
+    expect(allParamsMatched(query, queryParams)).to.be.true
+  })
   it('sets header metadata in request', async () => {
     const options: ConnectionOptions = {
       host: 'http://localhost:8086',
