@@ -310,10 +310,7 @@ describe('e2e test', () => {
       quality: 'Excellent',
     },
   ]
-
-  it('queries with parameters', async () => {
-    const {database, token, url} = getEnvVariables()
-
+  async function writeFrameSamples(client: InfluxDBClient, database: string) {
     const time = Date.now()
 
     let lp = ''
@@ -330,6 +327,12 @@ describe('e2e test', () => {
       }
     }
 
+    await client.write(lp, database)
+  }
+
+  it('queries with parameters', async () => {
+    const {database, token, url} = getEnvVariables()
+
     const client = new InfluxDBClient({
       host: url,
       token,
@@ -338,7 +341,7 @@ describe('e2e test', () => {
       },
     })
 
-    await client.write(lp, database)
+    await writeFrameSamples(client, database)
 
     await sleep(3_000)
 
@@ -355,29 +358,16 @@ describe('e2e test', () => {
       params: {director: 'J_Ford'},
     })
 
+    let count = 0
     for await (const row of data) {
+      count++
       expect(row['director']).to.equal('J_Ford')
     }
+    expect(count).to.be.greaterThan(0)
   }).timeout(5_000)
 
   it('queries to points with parameters', async () => {
     const {database, token, url} = getEnvVariables()
-
-    const time = Date.now()
-
-    let lp = ''
-
-    for (let i = 0; i < samples.length; i++) {
-      lp +=
-        `${samples[i].measurement},work=${samples[i].work},` +
-        `director=${samples[i].director} reel=${samples[i].reel}i,` +
-        `lumens=${samples[i].lumens},integ=${samples[i].integrity},` +
-        `sound=${samples[i].sound},quality="${samples[i].quality}"` +
-        ` ${time - i * 60000}`
-      if (i < samples.length - 1) {
-        lp += '\n'
-      }
-    }
 
     const client = new InfluxDBClient({
       host: url,
@@ -387,7 +377,7 @@ describe('e2e test', () => {
       },
     })
 
-    await client.write(lp, database)
+    await writeFrameSamples(client, database)
 
     await sleep(3_000)
 
@@ -404,8 +394,44 @@ describe('e2e test', () => {
       params: {director: 'N_Ray'},
     })
 
+    let count = 0
     for await (const point of points) {
+      count++
       expect(point.getTag('director')).to.equal('N_Ray')
     }
+    expect(count).to.be.greaterThan(0)
+  }).timeout(7_000)
+
+  it('queryies to points using influxql', async () => {
+    const {database, token, url} = getEnvVariables()
+    const client = new InfluxDBClient({
+      host: url,
+      token,
+      writeOptions: {
+        precision: 'ms',
+      },
+      queryOptions: {
+        type: 'influxql',
+      },
+    })
+    await writeFrameSamples(client, database)
+
+    await sleep(3_000)
+
+    const query = `SELECT *
+FROM "frame"
+WHERE
+time > now() - 1h
+AND
+"director" = 'H_Hathaway'`
+
+    const points = client.queryPoints(query, database)
+
+    let count = 0
+    for await (const point of points) {
+      count++
+      expect(point.getTag('director')).to.equal('H_Hathaway')
+    }
+    expect(count).to.be.greaterThan(0)
   }).timeout(7_000)
 })

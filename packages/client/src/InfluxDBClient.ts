@@ -177,7 +177,8 @@ export default class InfluxDBClient {
   query(
     query: string,
     database?: string,
-    queryOptions: QueryOptions = DEFAULT_QueryOptions
+    queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
+      DEFAULT_QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.query(
@@ -195,12 +196,22 @@ export default class InfluxDBClient {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryOptions - The type of query (default: \{type: 'sql'\}).
+   * @example
+   *
+   * ```typescript
+   * client.queryPoints(query, database, {
+   *       type: 'sql',
+   *       params: {location: 'N_Ray_11'},
+   *     })
+   * ```
+   *
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database?: string,
-    queryOptions: QueryOptions = DEFAULT_QueryOptions,
+    queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
+      DEFAULT_QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.queryPoints(

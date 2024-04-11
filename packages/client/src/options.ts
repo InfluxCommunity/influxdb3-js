@@ -122,12 +122,34 @@ export const DEFAULT_WriteOptions: WriteOptions = {
 
 export type QueryType = 'sql' | 'influxql'
 
+/**
+ * Options used by {@link InfluxDBClient.query} and by {@link InfluxDBClient.queryPoints}.
+ *
+ * @example QueryOptions in queryCall
+ * ```typescript
+ * const data = client.query(query, 'CICD', {
+ *       type: 'sql',
+ *       headers: {
+ *         'one-off': 'totl', // one-off query header
+ *         'change-on': 'bltr', // over-write universal value
+ *       },
+ *       params: {
+ *         point: 'flg',
+ *         action: 'reverse',
+ *       },
+ *     })
+ * ```
+ */
 export interface QueryOptions {
+  /** Type of query being sent, e.g. 'sql' or 'influxql'.*/
   type: QueryType
+  /** Custom headers to add to the request.*/
   headers?: Record<string, string>
+  /** Parameters to accompany a query using them.*/
   params?: Record<string, QParamType>
 }
 
+/** Default QueryOptions */
 export const DEFAULT_QueryOptions: QueryOptions = {
   type: 'sql',
 }
@@ -136,8 +158,9 @@ export const DEFAULT_QueryOptions: QueryOptions = {
  * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
+  /** supplies query options to be use with each and every query.*/
   queryOptions?: Partial<QueryOptions>
-  /** supplies and overrides default writing options */
+  /** supplies and overrides default writing options.*/
   writeOptions?: Partial<WriteOptions>
   /** specifies custom transport */
   transport?: Transport

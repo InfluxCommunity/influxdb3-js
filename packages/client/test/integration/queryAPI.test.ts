@@ -215,4 +215,30 @@ describe('query api tests', () => {
     expect(auth).to.equal('Bearer TEST_TOKEN')
     expect(agent).to.equal(USER_AGENT)
   })
+  it('sends a query with influxql type', async () => {
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryOptions: {
+        type: 'influxql',
+      },
+    })
+    const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+    try {
+      await data.next()
+    } catch (e: any) {
+      assert.fail(`failed to get next data value from test server: ${e}`)
+    }
+    expect(MockService.callCount.doGet).to.equal(1)
+    const ticket = MockService.getCallTicketDecoded(
+      MockService.genCallId('doGet', 1)
+    )
+    expect(ticket).to.deep.equal({
+      database: 'CI_TEST',
+      sql_query: 'SELECT * FROM wumpus',
+      query_type: 'influxql',
+      params: {},
+    })
+  })
 })
