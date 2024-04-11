@@ -82,7 +82,7 @@ view.setOnWrite(async () => {
 view.setOnQuery(async () => {
   const query = view.getQuery()
   // Query type can either be 'sql' or 'influxql'
-  const queryResult = client.query(query, database, { type: 'sql', })
+  const queryResult = client.query(query, database, {type: 'sql'})
 
   try {
     const firstRow = (await queryResult.next()).value

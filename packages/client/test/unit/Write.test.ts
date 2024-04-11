@@ -237,7 +237,7 @@ describe('Write', () => {
         },
       })
       let authorization: any
-      let channelLane: string = ''
+      let channelLane = ''
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
