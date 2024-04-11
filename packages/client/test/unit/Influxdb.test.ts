@@ -594,5 +594,62 @@ at 'ClientOptions.database'
         },
       })
     })
+    it('merges undefined options in method', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        queryOptions: {
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+          },
+          params: {
+            location: 'tower1',
+          },
+        },
+      })
+      const options = client['_mergeQueryOptions'](undefined)
+      expect(options).to.deep.equal({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+    })
+    it('merges undefined options in client options', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+      })
+      const options = client['_mergeQueryOptions']({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+      expect(options).to.deep.equal({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+    })
+    it('handles undefined query options', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+      })
+      const options = client['_mergeQueryOptions'](undefined)
+      expect(options).to.deep.equal({headers: {}, params: {}})
+    })
   })
 })
