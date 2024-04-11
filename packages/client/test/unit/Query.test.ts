@@ -1,11 +1,10 @@
 import {expect} from 'chai'
 import QueryApiImpl, {TicketDataType} from '../../src/impl/QueryApiImpl'
-import {ConnectionOptions} from '../../src/options'
+import {ConnectionOptions, DEFAULT_QueryOptions} from '../../src/options'
 import {Ticket} from '../../src/generated/flight/Flight'
 import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
 import {RpcMetadata} from '@protobuf-ts/runtime-rpc'
-import {DEFAULT_QueryOptions} from '@influxdata/influxdb3-client-browser'
 
 const testSQLTicket = {
   db: 'TestDB',
