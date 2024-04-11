@@ -5,6 +5,7 @@ import {Ticket} from '../../src/generated/flight/Flight'
 import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
 import {RpcMetadata} from '@protobuf-ts/runtime-rpc'
+import {DEFAULT_QueryOptions} from '@influxdata/influxdb3-client-browser'
 
 const testSQLTicket = {
   db: 'TestDB',
@@ -88,6 +89,50 @@ describe('Query', () => {
     queryParams['b'] = 42
     queryParams['c'] = 'Zaphrod'
     expect(allParamsMatched(query, queryParams)).to.be.true
+  })
+  it('prepares a ticket', async () => {
+    const options: ConnectionOptions = {
+      host: 'http://localhost:8086',
+      token: 'TEST_TOKEN',
+    }
+    const qApi = new QueryApiImpl(options)
+    const ticket: Ticket = qApi.prepareTicket(
+      'TEST_DB',
+      'SELECT * FROM cpu',
+      DEFAULT_QueryOptions
+    )
+    const decoder = new TextDecoder()
+    expect(JSON.parse(decoder.decode(ticket.ticket))).to.deep.equal({
+      database: 'TEST_DB',
+      sql_query: 'SELECT * FROM cpu',
+      query_type: 'sql',
+    })
+  })
+  it('prepares a ticket with params', async () => {
+    const options: ConnectionOptions = {
+      host: 'http://localhost:8086',
+      token: 'TEST_TOKEN',
+    }
+    const qApi = new QueryApiImpl(options)
+    const ticket = qApi.prepareTicket(
+      'TEST_DB',
+      'SELECT * FROM cpu WHERE "reg" = $reg',
+      {
+        ...DEFAULT_QueryOptions,
+        params: {
+          reg: 'CX',
+        },
+      }
+    )
+    const decoder = new TextDecoder()
+    expect(JSON.parse(decoder.decode(ticket.ticket))).to.deep.equal({
+      database: 'TEST_DB',
+      sql_query: 'SELECT * FROM cpu WHERE "reg" = $reg',
+      query_type: 'sql',
+      params: {
+        reg: 'CX',
+      },
+    })
   })
   it('sets header metadata in request', async () => {
     const options: ConnectionOptions = {
