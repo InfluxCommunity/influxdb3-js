@@ -58,7 +58,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
  * @example WriteOptions in write call
  * ```typescript
  *       client
- *         .write(point, DATABASE, 'myOrg', {
+ *         .write(point, DATABASE, 'cpu', {
  *           headers: {
  *             'channel-lane': 'reserved',
  *             'notify-central': '30m',
@@ -81,10 +81,10 @@ export interface WriteOptions {
    * @example Default tags using client config
    * ```typescript
    * const client = new InfluxDBClient({
-   *            host: 'my-host',
+   *            host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
    *            writeOptions: {
    *              defaultTags: {
-   *                device: 'device-a',
+   *                device: 'nrdc-th-52-fd889e03',
    *              },
    *            },
    * })
@@ -98,11 +98,11 @@ export interface WriteOptions {
    * @example Default tags using writeOptions argument
    * ```typescript
    * const client = new InfluxDBClient({
-   *            host: 'my-host',
+   *            host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
    * })
    *
    * const defaultTags = {
-   *            device: 'device-a',
+   *            device: 'rpi5_0_0599e8d7',
    * }
    *
    * const p = Point.measurement('measurement').setField('num', 3)
@@ -127,14 +127,14 @@ export type QueryType = 'sql' | 'influxql'
  *
  * @example QueryOptions in queryCall
  * ```typescript
- * const data = client.query(query, 'CICD', {
+ * const data = client.query('SELECT * FROM drive', 'ev_onboard_45ae770c', {
  *       type: 'sql',
  *       headers: {
  *         'one-off': 'totl', // one-off query header
- *         'change-on': 'bltr', // over-write universal value
+ *         'change-on': 'shift1', // over-write universal value
  *       },
  *       params: {
- *         point: 'flg',
+ *         point: 'a7',
  *         action: 'reverse',
  *       },
  *     })

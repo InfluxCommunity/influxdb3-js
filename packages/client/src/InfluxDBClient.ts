@@ -164,11 +164,11 @@ export default class InfluxDBClient {
    * @param queryOptions - The options for the query (default: \{ type: 'sql' \}).
    * @example
    * ```typescript
-   *    client.query('SELECT * from testData', 'CI_TEST', {
+   *    client.query('SELECT * from net', 'traffic_db', {
    *       type: 'sql',
    *       headers: {
-   *         'channel-pref': 'eu-123',
-   *         'notify': 'balthazar',
+   *         'channel-pref': 'eu-west-7',
+   *         'notify': 'central',
    *       },
    *     })
    * ```
@@ -199,9 +199,9 @@ export default class InfluxDBClient {
    * @example
    *
    * ```typescript
-   * client.queryPoints(query, database, {
+   * client.queryPoints('SELECT * FROM cpu', 'performance_db', {
    *       type: 'sql',
-   *       params: {location: 'N_Ray_11'},
+   *       params: {register: 'rax'},
    *     })
    * ```
    *
