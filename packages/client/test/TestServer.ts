@@ -16,8 +16,6 @@ setLogger({
   },
 })
 
-// todo - when run in parallel can get conflicts?
-// so may need to increment port number or isolate runs
 const DEFAULT_PORT = 44404
 export class MockService {
   static callMeta: Map<string, Map<string, string[]>> = new Map()
