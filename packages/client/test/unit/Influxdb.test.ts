@@ -44,23 +44,19 @@ describe('InfluxDB', () => {
     const query = 'select *'
     client.query(query)
 
-    // expect(queryStub.calledOnceWith(query, database, 'sql')).to.be.true
     expect(queryStub.calledOnceWith(query, database)).to.be.true
     queryStub.resetHistory()
 
     client.query(query, 'another')
-    // expect(queryStub.calledOnceWith(query, 'another', 'sql')).to.be.true
     expect(queryStub.calledOnceWith(query, 'another')).to.be.true
 
     // queryPoints
     client.queryPoints(query)
 
-    // expect(queryPointsStub.calledOnceWith(query, database, 'sql')).to.be.true
     expect(queryPointsStub.calledOnceWith(query, database)).to.be.true
     queryPointsStub.resetHistory()
 
     client.queryPoints(query, 'another')
-    // expect(queryPointsStub.calledOnceWith(query, 'another', 'sql')).to.be.true
     expect(queryPointsStub.calledOnceWith(query, 'another')).to.be.true
   })
 
