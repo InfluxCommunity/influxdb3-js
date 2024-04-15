@@ -1687,9 +1687,9 @@ anymatch@~3.1.2:
     picomatch "^2.0.4"
 
 apache-arrow@^15.0.0:
-  version "15.0.1"
-  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-15.0.1.tgz#a31358e3d5b06762604b4269c26e13ff23798c2d"
-  integrity sha512-d2vb9LJFfVoWJqsQFxhXrrIwqqR+6T1m7+t7MVTC9Hth1Z0+IGa8EA9Bfv9M4L1Ttr0bjfvl5+d9LwZK6VYvaQ==
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-15.0.2.tgz#d87c6447d64d6fab34aa70119362680b6617ce63"
+  integrity sha512-RvwlFxLRpO405PLGffx4N2PYLiF7FD86Q1hHl6J2XCWiq+tTCzpb9ngFw0apFDcXZBMpCzMuwAvA7hjyL1/73A==
   dependencies:
     "@swc/helpers" "^0.5.2"
     "@types/command-line-args" "^5.2.1"
