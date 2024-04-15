@@ -231,13 +231,18 @@ describe('Write', () => {
     })
     it('sends custom http header', async () => {
       useSubject({
-        headers: {authorization: 'Token customToken'},
+        headers: {
+          authorization: 'Token customToken',
+          'channel-lane': 'reserved',
+        },
       })
       let authorization: any
+      let channelLane = ''
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
+          channelLane = this.req.headers['channel-lane']
           return [204, '', {}]
         })
         .persist()
@@ -248,6 +253,38 @@ describe('Write', () => {
       expect(logs.error).has.length(0)
       expect(logs.warn).has.length(0)
       expect(authorization).equals(`Token customToken`)
+      expect(channelLane).equals('reserved')
+    })
+    it('sends custom header from client config', async () => {
+      subject = new InfluxDBClient({
+        ...clientOptions,
+        headers: {
+          universal: 'substance',
+        },
+        writeOptions: {
+          headers: {
+            particular: 'attribute',
+          },
+        },
+      })
+      let universal: any
+      let particular: any
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, _requestBody) {
+          universal = this.req.headers.universal
+          particular = this.req.headers.particular
+          return [204, '', {}]
+        })
+        .persist()
+      await subject.write(
+        Point.measurement('test').setFloatField('value', 1),
+        DATABASE
+      )
+      expect(logs.error).has.length(0)
+      expect(logs.warn).has.length(0)
+      expect(universal).equals('substance')
+      expect(particular).equals('attribute')
     })
   })
 })

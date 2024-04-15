@@ -1,4 +1,5 @@
 import {Transport} from './transport'
+import {QParamType} from './QueryApi'
 
 /**
  * Option for the communication with InfluxDB server.
@@ -53,12 +54,26 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 
 /**
  * Options used by {@link InfluxDBClient.write} .
+ *
+ * @example WriteOptions in write call
+ * ```typescript
+ *       client
+ *         .write(point, DATABASE, 'cpu', {
+ *           headers: {
+ *             'channel-lane': 'reserved',
+ *             'notify-central': '30m',
+ *           },
+ *           precision: 'ns',
+ *           gzipThreshold: 1000,
+ *         })
+ * ```
  */
 export interface WriteOptions {
   /** Precision to use in writes for timestamp. default ns */
   precision?: WritePrecision
   /** HTTP headers that will be sent with every write request */
-  headers?: {[key: string]: string}
+  //headers?: {[key: string]: string}
+  headers?: Record<string, string>
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
   /** default tags
@@ -66,10 +81,10 @@ export interface WriteOptions {
    * @example Default tags using client config
    * ```typescript
    * const client = new InfluxDBClient({
-   *            host: 'my-host',
+   *            host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
    *            writeOptions: {
    *              defaultTags: {
-   *                device: 'device-a',
+   *                device: 'nrdc-th-52-fd889e03',
    *              },
    *            },
    * })
@@ -83,11 +98,11 @@ export interface WriteOptions {
    * @example Default tags using writeOptions argument
    * ```typescript
    * const client = new InfluxDBClient({
-   *            host: 'my-host',
+   *            host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
    * })
    *
    * const defaultTags = {
-   *            device: 'device-a',
+   *            device: 'rpi5_0_0599e8d7',
    * }
    *
    * const p = Point.measurement('measurement').setField('num', 3)
@@ -108,10 +123,44 @@ export const DEFAULT_WriteOptions: WriteOptions = {
 export type QueryType = 'sql' | 'influxql'
 
 /**
+ * Options used by {@link InfluxDBClient.query} and by {@link InfluxDBClient.queryPoints}.
+ *
+ * @example QueryOptions in queryCall
+ * ```typescript
+ * const data = client.query('SELECT * FROM drive', 'ev_onboard_45ae770c', {
+ *       type: 'sql',
+ *       headers: {
+ *         'one-off': 'totl', // one-off query header
+ *         'change-on': 'shift1', // over-write universal value
+ *       },
+ *       params: {
+ *         point: 'a7',
+ *         action: 'reverse',
+ *       },
+ *     })
+ * ```
+ */
+export interface QueryOptions {
+  /** Type of query being sent, e.g. 'sql' or 'influxql'.*/
+  type: QueryType
+  /** Custom headers to add to the request.*/
+  headers?: Record<string, string>
+  /** Parameters to accompany a query using them.*/
+  params?: Record<string, QParamType>
+}
+
+/** Default QueryOptions */
+export const DEFAULT_QueryOptions: QueryOptions = {
+  type: 'sql',
+}
+
+/**
  * Options used by {@link InfluxDBClient} .
  */
 export interface ClientOptions extends ConnectionOptions {
-  /** supplies and overrides default writing options */
+  /** supplies query options to be use with each and every query.*/
+  queryOptions?: Partial<QueryOptions>
+  /** supplies and overrides default writing options.*/
   writeOptions?: Partial<WriteOptions>
   /** specifies custom transport */
   transport?: Transport

@@ -70,9 +70,7 @@ describe('e2e test', () => {
 
     const query = `SELECT * FROM "stat" WHERE "testId" = ${testId}`
 
-    const queryType = 'sql'
-
-    const data = client.query(query, database, queryType)
+    const data = client.query(query, database)
 
     let row: IteratorResult<Record<string, any>, void>
     row = await data.next()
@@ -85,7 +83,7 @@ describe('e2e test', () => {
     row = await data.next()
     expect(row.done).to.equal(true)
 
-    let dataPoints = client.queryPoints(query, database, queryType)
+    let dataPoints = client.queryPoints(query, database)
 
     let pointRow: IteratorResult<PointValues, void>
     pointRow = await dataPoints.next()
@@ -106,7 +104,7 @@ describe('e2e test', () => {
         WHERE "testId" = ${testId}
     `
 
-    dataPoints = client.queryPoints(queryAggregation, database, queryType)
+    dataPoints = client.queryPoints(queryAggregation, database)
 
     pointRow = await dataPoints.next()
 
@@ -115,7 +113,7 @@ describe('e2e test', () => {
     expect(pointRow.value?.getField('sum_max')).to.equal(max1)
 
     await client.close()
-    await rejects(client.query(query, database, queryType).next())
+    await rejects(client.query(query, database).next())
   }).timeout(10_000)
 
   it('concurrent query', async () => {
@@ -156,14 +154,11 @@ describe('e2e test', () => {
         AND
         "testId" = ${testId}
     `
-
-    const queryType = 'sql'
-
     const paralelQueries = 8
 
     const datas = await Promise.all(
       range(paralelQueries)
-        .map(() => client.queryPoints(query, database, queryType))
+        .map(() => client.queryPoints(query, database))
         .map(async (data) => {
           const queryValues: typeof values = []
 
@@ -236,13 +231,10 @@ describe('e2e test', () => {
         AND
         "testId" = ${testId}
     `
-
-    const queryType = 'sql'
-
     const queryValues: typeof values = []
 
     for (let tries = 10; tries--; ) {
-      const data = client.queryPoints(query, database, queryType)
+      const data = client.queryPoints(query, database)
 
       for await (const row of data) {
         queryValues.push({
@@ -318,10 +310,7 @@ describe('e2e test', () => {
       quality: 'Excellent',
     },
   ]
-
-  it('queries with parameters', async () => {
-    const {database, token, url} = getEnvVariables()
-
+  async function writeFrameSamples(client: InfluxDBClient, database: string) {
     const time = Date.now()
 
     let lp = ''
@@ -338,6 +327,12 @@ describe('e2e test', () => {
       }
     }
 
+    await client.write(lp, database)
+  }
+
+  it('queries with parameters', async () => {
+    const {database, token, url} = getEnvVariables()
+
     const client = new InfluxDBClient({
       host: url,
       token,
@@ -346,7 +341,7 @@ describe('e2e test', () => {
       },
     })
 
-    await client.write(lp, database)
+    await writeFrameSamples(client, database)
 
     await sleep(3_000)
 
@@ -358,37 +353,22 @@ describe('e2e test', () => {
         AND
         "director" = $director    
     `
-    const data = client.query(
-      query,
-      database,
-      'sql',
-      new Map([['director', 'J_Ford']])
-    )
+    const data = client.query(query, database, {
+      type: 'sql',
+      params: {director: 'J_Ford'},
+    })
 
+    let count = 0
     for await (const row of data) {
+      count++
       expect(row['director']).to.equal('J_Ford')
     }
+    expect(count).to.be.greaterThan(0)
   }).timeout(5_000)
 
   it('queries to points with parameters', async () => {
     const {database, token, url} = getEnvVariables()
 
-    const time = Date.now()
-
-    let lp = ''
-
-    for (let i = 0; i < samples.length; i++) {
-      lp +=
-        `${samples[i].measurement},work=${samples[i].work},` +
-        `director=${samples[i].director} reel=${samples[i].reel}i,` +
-        `lumens=${samples[i].lumens},integ=${samples[i].integrity},` +
-        `sound=${samples[i].sound},quality="${samples[i].quality}"` +
-        ` ${time - i * 60000}`
-      if (i < samples.length - 1) {
-        lp += '\n'
-      }
-    }
-
     const client = new InfluxDBClient({
       host: url,
       token,
@@ -397,7 +377,7 @@ describe('e2e test', () => {
       },
     })
 
-    await client.write(lp, database)
+    await writeFrameSamples(client, database)
 
     await sleep(3_000)
 
@@ -409,15 +389,49 @@ describe('e2e test', () => {
         AND
         "director" = $director    
     `
-    const points = client.queryPoints(
-      query,
-      database,
-      'sql',
-      new Map([['director', 'N_Ray']])
-    )
+    const points = client.queryPoints(query, database, {
+      type: 'sql',
+      params: {director: 'N_Ray'},
+    })
 
+    let count = 0
     for await (const point of points) {
+      count++
       expect(point.getTag('director')).to.equal('N_Ray')
     }
+    expect(count).to.be.greaterThan(0)
+  }).timeout(7_000)
+
+  it('queryies to points using influxql', async () => {
+    const {database, token, url} = getEnvVariables()
+    const client = new InfluxDBClient({
+      host: url,
+      token,
+      writeOptions: {
+        precision: 'ms',
+      },
+      queryOptions: {
+        type: 'influxql',
+      },
+    })
+    await writeFrameSamples(client, database)
+
+    await sleep(3_000)
+
+    const query = `SELECT *
+FROM "frame"
+WHERE
+time > now() - 1h
+AND
+"director" = 'H_Hathaway'`
+
+    const points = client.queryPoints(query, database)
+
+    let count = 0
+    for await (const point of points) {
+      count++
+      expect(point.getTag('director')).to.equal('H_Hathaway')
+    }
+    expect(count).to.be.greaterThan(0)
   }).timeout(7_000)
 })

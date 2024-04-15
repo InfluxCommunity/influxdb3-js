@@ -5,7 +5,9 @@ import QueryApiImpl from './impl/QueryApiImpl'
 import {
   ClientOptions,
   DEFAULT_ConnectionOptions,
-  QueryType,
+  DEFAULT_QueryOptions,
+  QueryOptions,
+  // QueryType,
   WriteOptions,
   fromConnectionString,
   fromEnv,
@@ -99,10 +101,34 @@ export default class InfluxDBClient {
   }
 
   private _mergeWriteOptions = (writeOptions?: Partial<WriteOptions>) => {
-    return {
+    const headerMerge: Record<string, string> = {
+      ...this._options.writeOptions?.headers,
+      ...writeOptions?.headers,
+    }
+    const result = {
       ...this._options.writeOptions,
       ...writeOptions,
     }
+    result.headers = headerMerge
+    return result
+  }
+
+  private _mergeQueryOptions = (queryOptions?: Partial<QueryOptions>) => {
+    const headerMerge: Record<string, string> = {
+      ...this._options.queryOptions?.headers,
+      ...queryOptions?.headers,
+    }
+    const paramsMerge: Record<string, QParamType> = {
+      ...this._options.queryOptions?.params,
+      ...queryOptions?.params,
+    }
+    const result = {
+      ...this._options.queryOptions,
+      ...queryOptions,
+    }
+    result.headers = headerMerge
+    result.params = paramsMerge
+    return result
   }
 
   /**
@@ -135,23 +161,32 @@ export default class InfluxDBClient {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryType - The type of query (default: 'sql').
-   * @param namedParams - for sql queries parameters to be used
+   * @param queryOptions - The options for the query (default: \{ type: 'sql' \}).
+   * @example
+   * ```typescript
+   *    client.query('SELECT * from net', 'traffic_db', {
+   *       type: 'sql',
+   *       headers: {
+   *         'channel-pref': 'eu-west-7',
+   *         'notify': 'central',
+   *       },
+   *     })
+   * ```
    * @returns An async generator that yields maps of string keys to any values.
    */
   query(
     query: string,
     database?: string,
-    queryType: QueryType = 'sql',
-    namedParams?: Map<string, QParamType>
+    queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
+      DEFAULT_QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
+    const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.query(
       query,
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      queryType,
-      namedParams
+      options as QueryOptions
     )
   }
 
@@ -160,23 +195,31 @@ export default class InfluxDBClient {
    *
    * @param query - The query string.
    * @param database - The name of the database to query.
-   * @param queryType - The type of query (default: 'sql').
-   * @param namedParams - for sql queries parameters to be used
+   * @param queryOptions - The type of query (default: \{type: 'sql'\}).
+   * @example
+   *
+   * ```typescript
+   * client.queryPoints('SELECT * FROM cpu', 'performance_db', {
+   *       type: 'sql',
+   *       params: {register: 'rax'},
+   *     })
+   * ```
+   *
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database?: string,
-    queryType: QueryType = 'sql',
-    namedParams?: Map<string, QParamType>
+    queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
+      DEFAULT_QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
+    const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.queryPoints(
       query,
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      queryType,
-      namedParams
+      options as QueryOptions
     )
   }
 

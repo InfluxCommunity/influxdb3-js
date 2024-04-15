@@ -1,7 +1,7 @@
 import {InfluxDBClient, Point} from '@influxdata/influxdb3-client-browser'
 
 import * as view from './view'
-import {EXAMPLE_QUERIES} from './exampleQueries'
+import {EXAMPLE_QUERIES, measurement} from './exampleQueries'
 
 /*********** initial values ***********/
 
@@ -45,7 +45,6 @@ const token = import.meta.env.VITE_INFLUXDB_TOKEN
 const host = '/influx' // vite proxy
 
 // This query type can either be 'sql' or 'influxql'
-const queryType = 'sql'
 
 const client = new InfluxDBClient({host, token})
 
@@ -57,7 +56,7 @@ view.setOnRandomize(() => {
 
 view.setOnWrite(async () => {
   const data = view.getWriteInput()
-  const p = Point.measurement('stat')
+  const p = Point.measurement(measurement)
     .setTag('Device', data['Device'])
     .setFloatField('Temperature', data['Temperature'])
     .setFloatField('Humidity', data['Humidity'])
@@ -82,7 +81,8 @@ view.setOnWrite(async () => {
 
 view.setOnQuery(async () => {
   const query = view.getQuery()
-  const queryResult = client.query(query, database, queryType)
+  // Query type can either be 'sql' or 'influxql'
+  const queryResult = client.query(query, database, {type: 'sql'})
 
   try {
     const firstRow = (await queryResult.next()).value

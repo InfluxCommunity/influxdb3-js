@@ -22,7 +22,8 @@
     "test:unit": "yarn workspaces run test:unit",
     "coverage": "cd packages/client && yarn build && yarn coverage",
     "coverage:ci": "cd packages/client && yarn build && yarn coverage:ci",
-    "flight": "node ./scripts/generate-flight"
+    "flight": "node ./scripts/generate-flight",
+    "flight:test": "node ./scripts/generate-flight test"
   },
   "homepage": "https://github.com/InfluxCommunity/influxdb3-js",
   "repository": {

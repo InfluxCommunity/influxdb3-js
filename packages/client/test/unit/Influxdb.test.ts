@@ -11,6 +11,7 @@ import {
 import type WriteApi from '../../src/WriteApi'
 import type QueryApi from '../../src/QueryApi'
 import {rejects} from 'assert'
+import nock from 'nock'
 
 describe('InfluxDB', () => {
   afterEach(() => {
@@ -43,20 +44,20 @@ describe('InfluxDB', () => {
     const query = 'select *'
     client.query(query)
 
-    expect(queryStub.calledOnceWith(query, database, 'sql')).to.be.true
+    expect(queryStub.calledOnceWith(query, database)).to.be.true
     queryStub.resetHistory()
 
     client.query(query, 'another')
-    expect(queryStub.calledOnceWith(query, 'another', 'sql')).to.be.true
+    expect(queryStub.calledOnceWith(query, 'another')).to.be.true
 
     // queryPoints
     client.queryPoints(query)
 
-    expect(queryPointsStub.calledOnceWith(query, database, 'sql')).to.be.true
+    expect(queryPointsStub.calledOnceWith(query, database)).to.be.true
     queryPointsStub.resetHistory()
 
     client.queryPoints(query, 'another')
-    expect(queryPointsStub.calledOnceWith(query, 'another', 'sql')).to.be.true
+    expect(queryPointsStub.calledOnceWith(query, 'another')).to.be.true
   })
 
   it('throws when no database provided', async () => {
@@ -414,6 +415,237 @@ at 'ClientOptions.database'
           gzipThreshold: 128,
         } as WriteOptions,
       })
+    })
+  })
+  describe('options handling', () => {
+    const DATABASE = 'TEST_DATABASE'
+    it('merges write options', () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        writeOptions: {
+          gzipThreshold: 1000,
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+          },
+        },
+      })
+      const options = client['_mergeWriteOptions']({
+        precision: 's',
+        headers: {
+          hunter: 'H. Hancock',
+        },
+      })
+      expect(options).to.deep.equal({
+        gzipThreshold: 1000,
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+          hunter: 'H. Hancock',
+        },
+        precision: 's',
+      })
+    })
+    it('merges write options with preference for method arg', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        headers: {
+          preserve: '2d',
+        },
+        writeOptions: {
+          gzipThreshold: 1000,
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+            hunter: 'maori',
+          },
+        },
+      })
+      const options = client['_mergeWriteOptions']({
+        precision: 's',
+        headers: {
+          terminate: '12h',
+          hunter: 'H. Hancock',
+        },
+        gzipThreshold: 500,
+      })
+      expect(options).to.deep.equal({
+        gzipThreshold: 500,
+        headers: {
+          terminate: '12h',
+          'channel-preference': 'irish',
+          hunter: 'H. Hancock',
+        },
+        precision: 's',
+      })
+    })
+    it('uses all header options on write', async () => {
+      let extra: any
+      let special: any
+      let oneOff: any
+      nock('http://test:8086')
+        .post(`/api/v2/write?bucket=${DATABASE}&precision=ns`)
+        .reply(
+          204,
+          function (_uri, _body, callback) {
+            extra = this.req.headers['extra']
+            special = this.req.headers['special']
+            oneOff = this.req.headers['one-off']
+            callback(null, '..')
+          },
+          {
+            'content-type': 'application/csv',
+          }
+        )
+        .persist()
+      const client = new InfluxDBClient({
+        host: 'http://test:8086',
+        token: 'TEST_TOKEN',
+        database: DATABASE,
+        headers: {
+          extra: 'yes',
+        },
+        writeOptions: {
+          headers: {
+            special: 'super',
+          },
+        },
+      })
+      await client.write('lpdata', undefined, undefined, {
+        headers: {
+          'one-off': 'top of the league',
+        },
+      })
+      expect(extra).to.equal('yes')
+      expect(special).to.equal('super')
+      expect(oneOff).to.equal('top of the league')
+    })
+    it('merges query options', () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        queryOptions: {
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+          },
+          type: 'influxql',
+        },
+      })
+      const options = client['_mergeQueryOptions']({
+        headers: {
+          hunter: 'H. Hancock',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+      expect(options).to.deep.equal({
+        type: 'influxql',
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+          hunter: 'H. Hancock',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+    })
+    it('merges query options with preference for method arg', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        queryOptions: {
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+          },
+          type: 'influxql',
+          params: {
+            location: 'tower1',
+          },
+        },
+      })
+      const options = client['_mergeQueryOptions']({
+        headers: {
+          hunter: 'H. Hancock',
+          terminate: '12h',
+        },
+        params: {
+          location: 'well99',
+        },
+      })
+      expect(options).to.deep.equal({
+        type: 'influxql',
+        headers: {
+          terminate: '12h',
+          'channel-preference': 'irish',
+          hunter: 'H. Hancock',
+        },
+        params: {
+          location: 'well99',
+        },
+      })
+    })
+    it('merges undefined options in method', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+        queryOptions: {
+          headers: {
+            terminate: 'tomorrow',
+            'channel-preference': 'irish',
+          },
+          params: {
+            location: 'tower1',
+          },
+        },
+      })
+      const options = client['_mergeQueryOptions'](undefined)
+      expect(options).to.deep.equal({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+    })
+    it('merges undefined options in client options', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+      })
+      const options = client['_mergeQueryOptions']({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+      expect(options).to.deep.equal({
+        headers: {
+          terminate: 'tomorrow',
+          'channel-preference': 'irish',
+        },
+        params: {
+          location: 'tower1',
+        },
+      })
+    })
+    it('handles undefined query options', async () => {
+      const client = new InfluxDBClient({
+        host: 'http://localhost:8086',
+        token: 'TEST_TOKEN',
+      })
+      const options = client['_mergeQueryOptions'](undefined)
+      expect(options).to.deep.equal({headers: {}, params: {}})
     })
   })
 })
