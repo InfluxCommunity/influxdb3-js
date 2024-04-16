@@ -1,8 +1,12 @@
-## 0.8.0 [unreleased]
+## 0.8.0 [2024-04-16]
 
 ### Breaking Changes
 
 1. [293](https://github.com/InfluxCommunity/influxdb3-js/pull/293): The Query API now uses a `QueryOptions` structure in `client.query()` methods.  The `queryType` and `queryParams` values are now wrapped inside of it.  QueryOptions also support adding custom headers.  Query parameters are changed from type `Map<string, QParamType>` to type `Record<string, QParamType>`.
+
+### Features
+
+1. [293](https://github.com/InfluxCommunity/influxdb3-js/pull/293): `QueryOptions` also support adding custom headers.
 
 ## 0.7.0 [2024-03-01]
 
