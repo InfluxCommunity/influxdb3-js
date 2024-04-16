@@ -15,7 +15,34 @@ declare class AbortError extends Error
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)()](./influxdb3-client.aborterror._constructor_.md) |  | Constructs a new instance of the <code>AbortError</code> class |
+<table><thead><tr><th>
 
+Constructor
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)()](./influxdb3-client.aborterror._constructor_.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Constructs a new instance of the `AbortError` class
+
+
+</td></tr>
+</tbody></table>

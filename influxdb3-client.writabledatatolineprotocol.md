@@ -9,16 +9,58 @@
 ```typescript
 writableDataToLineProtocol: (data: WritableData, defaultTags?: {
     [key: string]: string;
-} | undefined) => string[]
+}) => string[]
 ```
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  data | [WritableData](./influxdb3-client.writabledata.md) |  |
-|  defaultTags | { \[key: string\]: string; } \| undefined | _(Optional)_ |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+data
+
+
+</td><td>
+
+[WritableData](./influxdb3-client.writabledata.md)
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+defaultTags
+
+
+</td><td>
+
+{ \[key: string\]: string; }
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 string\[\]

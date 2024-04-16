@@ -14,12 +14,71 @@ setField(name: string, value: any, type?: PointFieldType): Point;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | field name |
-|  value | any | field value |
-|  type | [PointFieldType](./influxdb3-client.pointfieldtype.md) | _(Optional)_ field type |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+field name
+
+
+</td></tr>
+<tr><td>
+
+value
+
+
+</td><td>
+
+any
+
+
+</td><td>
+
+field value
+
+
+</td></tr>
+<tr><td>
+
+type
+
+
+</td><td>
+
+[PointFieldType](./influxdb3-client.pointfieldtype.md)
+
+
+</td><td>
+
+_(Optional)_ field type
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Point](./influxdb3-client.point.md)

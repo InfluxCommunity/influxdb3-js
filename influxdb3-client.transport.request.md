@@ -14,13 +14,87 @@ request(path: string, requestBody: any, options: SendOptions, responseStarted?: 
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  path | string | HTTP request path |
-|  requestBody | any | request body |
-|  options | [SendOptions](./influxdb3-client.sendoptions.md) | send options |
-|  responseStarted | [ResponseStartedFn](./influxdb3-client.responsestartedfn.md) | _(Optional)_ |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+path
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+HTTP request path
+
+
+</td></tr>
+<tr><td>
+
+requestBody
+
+
+</td><td>
+
+any
+
+
+</td><td>
+
+request body
+
+
+</td></tr>
+<tr><td>
+
+options
+
+
+</td><td>
+
+[SendOptions](./influxdb3-client.sendoptions.md)
+
+
+</td><td>
+
+send options
+
+
+</td></tr>
+<tr><td>
+
+responseStarted
+
+
+</td><td>
+
+[ResponseStartedFn](./influxdb3-client.responsestartedfn.md)
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 Promise&lt;any&gt;

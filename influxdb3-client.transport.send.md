@@ -14,13 +14,87 @@ send(path: string, requestBody: string, options: SendOptions, callbacks?: Partia
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  path | string | HTTP request path |
-|  requestBody | string | HTTP request body |
-|  options | [SendOptions](./influxdb3-client.sendoptions.md) | send options |
-|  callbacks | Partial&lt;[CommunicationObserver](./influxdb3-client.communicationobserver.md)<!-- -->&lt;Uint8Array&gt;&gt; | _(Optional)_ communication callbacks to received data in Uint8Array |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+path
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+HTTP request path
+
+
+</td></tr>
+<tr><td>
+
+requestBody
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+HTTP request body
+
+
+</td></tr>
+<tr><td>
+
+options
+
+
+</td><td>
+
+[SendOptions](./influxdb3-client.sendoptions.md)
+
+
+</td><td>
+
+send options
+
+
+</td></tr>
+<tr><td>
+
+callbacks
+
+
+</td><td>
+
+Partial&lt;[CommunicationObserver](./influxdb3-client.communicationobserver.md)<!-- -->&lt;Uint8Array&gt;&gt;
+
+
+</td><td>
+
+_(Optional)_ communication callbacks to received data in Uint8Array
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 void

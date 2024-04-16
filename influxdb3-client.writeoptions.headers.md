@@ -9,7 +9,5 @@ HTTP headers that will be sent with every write request
 **Signature:**
 
 ```typescript
-headers?: {
-        [key: string]: string;
-    };
+headers?: Record<string, string>;
 ```

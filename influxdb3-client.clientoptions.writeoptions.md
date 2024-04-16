@@ -4,7 +4,7 @@
 
 ## ClientOptions.writeOptions property
 
-supplies and overrides default writing options
+supplies and overrides default writing options.
 
 **Signature:**
 

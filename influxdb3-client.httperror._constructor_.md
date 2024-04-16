@@ -14,11 +14,96 @@ constructor(statusCode: number, statusMessage: string | undefined, body?: string
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  statusCode | number |  |
-|  statusMessage | string \| undefined |  |
-|  body | string \| undefined | _(Optional)_ |
-|  contentType | string \| null \| undefined | _(Optional)_ |
-|  message | string | _(Optional)_ |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+statusCode
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+statusMessage
+
+
+</td><td>
+
+string \| undefined
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+body
+
+
+</td><td>
+
+string \| undefined
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+contentType
+
+
+</td><td>
+
+string \| null \| undefined
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+message
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+</tbody></table>

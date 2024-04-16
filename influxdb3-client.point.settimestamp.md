@@ -18,10 +18,39 @@ setTimestamp(value: Date | number | string | undefined): Point;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  value | Date \| number \| string \| undefined | point time |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+value
+
+
+</td><td>
+
+Date \| number \| string \| undefined
+
+
+</td><td>
+
+point time
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Point](./influxdb3-client.point.md)

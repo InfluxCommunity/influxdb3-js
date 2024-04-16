@@ -20,10 +20,10 @@ Default tags using client config
 
 ```typescript
 const client = new InfluxDBClient({
-           host: 'my-host',
+           host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
            writeOptions: {
              defaultTags: {
-               device: 'device-a',
+               device: 'nrdc-th-52-fd889e03',
              },
            },
 })
@@ -40,11 +40,11 @@ Default tags using writeOptions argument
 
 ```typescript
 const client = new InfluxDBClient({
-           host: 'my-host',
+           host: 'https://eu-west-1-1.aws.cloud2.influxdata.com',
 })
 
 const defaultTags = {
-           device: 'device-a',
+           device: 'rpi5_0_0599e8d7',
 }
 
 const p = Point.measurement('measurement').setField('num', 3)

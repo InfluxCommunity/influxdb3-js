@@ -14,9 +14,48 @@ interface ChunkCombiner
 
 ## Methods
 
-|  Method | Description |
-|  --- | --- |
-|  [concat(first, second)](./influxdb3-client.chunkcombiner.concat.md) | Concatenates first and second chunk. |
-|  [copy(chunk, start, end)](./influxdb3-client.chunkcombiner.copy.md) | Creates a new chunk from the supplied chunk. |
-|  [toUtf8String(chunk, start, end)](./influxdb3-client.chunkcombiner.toutf8string.md) | Converts chunk into a string. |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[concat(first, second)](./influxdb3-client.chunkcombiner.concat.md)
+
+
+</td><td>
+
+Concatenates first and second chunk.
+
+
+</td></tr>
+<tr><td>
+
+[copy(chunk, start, end)](./influxdb3-client.chunkcombiner.copy.md)
+
+
+</td><td>
+
+Creates a new chunk from the supplied chunk.
+
+
+</td></tr>
+<tr><td>
+
+[toUtf8String(chunk, start, end)](./influxdb3-client.chunkcombiner.toutf8string.md)
+
+
+</td><td>
+
+Converts chunk into a string.
+
+
+</td></tr>
+</tbody></table>

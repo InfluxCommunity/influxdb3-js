@@ -9,21 +9,89 @@ Execute a query and return the results as an async generator.
 **Signature:**
 
 ```typescript
-queryPoints(query: string, database?: string, queryType?: QueryType, namedParams?: Map<string, QParamType>): AsyncGenerator<PointValues, void, void>;
+queryPoints(query: string, database?: string, queryOptions?: Partial<QueryOptions>): AsyncGenerator<PointValues, void, void>;
 ```
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  query | string | The query string. |
-|  database | string | _(Optional)_ The name of the database to query. |
-|  queryType | [QueryType](./influxdb3-client.querytype.md) | _(Optional)_ The type of query (default: 'sql'). |
-|  namedParams | Map&lt;string, [QParamType](./influxdb3-client.qparamtype.md)<!-- -->&gt; | _(Optional)_ for sql queries parameters to be used |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+query
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+The query string.
+
+
+</td></tr>
+<tr><td>
+
+database
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+_(Optional)_ The name of the database to query.
+
+
+</td></tr>
+<tr><td>
+
+queryOptions
+
+
+</td><td>
+
+Partial&lt;[QueryOptions](./influxdb3-client.queryoptions.md)<!-- -->&gt;
+
+
+</td><td>
+
+_(Optional)_ The type of query (default: {<!-- -->type: 'sql'<!-- -->}<!-- -->).
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 AsyncGenerator&lt;[PointValues](./influxdb3-client.pointvalues.md)<!-- -->, void, void&gt;
 
 An async generator that yields PointValues object.
+
+## Example
+
+
+```typescript
+client.queryPoints('SELECT * FROM cpu', 'performance_db', {
+      type: 'sql',
+      params: {register: 'rax'},
+    })
+```
 

@@ -14,8 +14,35 @@ interface Cancellable
 
 ## Methods
 
-|  Method | Description |
-|  --- | --- |
-|  [cancel()](./influxdb3-client.cancellable.cancel.md) | Cancels execution. |
-|  [isCancelled()](./influxdb3-client.cancellable.iscancelled.md) |  |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[cancel()](./influxdb3-client.cancellable.cancel.md)
+
+
+</td><td>
+
+Cancels execution.
+
+
+</td></tr>
+<tr><td>
+
+[isCancelled()](./influxdb3-client.cancellable.iscancelled.md)
+
+
+</td><td>
+
+
+</td></tr>
+</tbody></table>

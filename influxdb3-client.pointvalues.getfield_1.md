@@ -14,11 +14,55 @@ getField(name: string, type: 'string'): string | undefined;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | field name |
-|  type | 'string' | field string type |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+field name
+
+
+</td></tr>
+<tr><td>
+
+type
+
+
+</td><td>
+
+'string'
+
+
+</td><td>
+
+field string type
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 string \| undefined

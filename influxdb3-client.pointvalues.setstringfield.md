@@ -14,11 +14,55 @@ setStringField(name: string, value: string | any): PointValues;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | field name |
-|  value | string \| any | field value |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+field name
+
+
+</td></tr>
+<tr><td>
+
+value
+
+
+</td><td>
+
+string \| any
+
+
+</td><td>
+
+field value
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [PointValues](./influxdb3-client.pointvalues.md)

@@ -14,17 +14,130 @@ interface CommunicationObserver<T>
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [responseStarted?](./influxdb3-client.communicationobserver.responsestarted.md) |  | [ResponseStartedFn](./influxdb3-client.responsestartedfn.md) | _(Optional)_ Informs about a start of response processing. |
-|  [useCancellable?](./influxdb3-client.communicationobserver.usecancellable.md) |  | (cancellable: [Cancellable](./influxdb3-client.cancellable.md)<!-- -->) =&gt; void | _(Optional)_ Setups cancelllable for this communication. |
-|  [useResume?](./influxdb3-client.communicationobserver.useresume.md) |  | (resume: () =&gt; void) =&gt; void | _(Optional)_ Setups a callback that resumes reading of next data, it is called whenever [CommunicationObserver.next()](./influxdb3-client.communicationobserver.next.md) returns <code>false</code>. |
+<table><thead><tr><th>
+
+Property
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[responseStarted?](./influxdb3-client.communicationobserver.responsestarted.md)
+
+
+</td><td>
+
+
+</td><td>
+
+[ResponseStartedFn](./influxdb3-client.responsestartedfn.md)
+
+
+</td><td>
+
+_(Optional)_ Informs about a start of response processing.
+
+
+</td></tr>
+<tr><td>
+
+[useCancellable?](./influxdb3-client.communicationobserver.usecancellable.md)
+
+
+</td><td>
+
+
+</td><td>
+
+(cancellable: [Cancellable](./influxdb3-client.cancellable.md)<!-- -->) =&gt; void
+
+
+</td><td>
+
+_(Optional)_ Setups cancelllable for this communication.
+
+
+</td></tr>
+<tr><td>
+
+[useResume?](./influxdb3-client.communicationobserver.useresume.md)
+
+
+</td><td>
+
+
+</td><td>
+
+(resume: () =&gt; void) =&gt; void
+
+
+</td><td>
+
+_(Optional)_ Setups a callback that resumes reading of next data, it is called whenever [CommunicationObserver.next()](./influxdb3-client.communicationobserver.next.md) returns `false`<!-- -->.
+
+
+</td></tr>
+</tbody></table>
 
 ## Methods
 
-|  Method | Description |
-|  --- | --- |
-|  [complete()](./influxdb3-client.communicationobserver.complete.md) | Communication was successful. |
-|  [error(error)](./influxdb3-client.communicationobserver.error.md) | Communication ended with an error. |
-|  [next(data)](./influxdb3-client.communicationobserver.next.md) | Data chunk received, can be called multiple times. |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[complete()](./influxdb3-client.communicationobserver.complete.md)
+
+
+</td><td>
+
+Communication was successful.
+
+
+</td></tr>
+<tr><td>
+
+[error(error)](./influxdb3-client.communicationobserver.error.md)
+
+
+</td><td>
+
+Communication ended with an error.
+
+
+</td></tr>
+<tr><td>
+
+[next(data)](./influxdb3-client.communicationobserver.next.md)
+
+
+</td><td>
+
+Data chunk received, can be called multiple times.
+
+
+</td></tr>
+</tbody></table>

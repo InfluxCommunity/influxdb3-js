@@ -14,10 +14,39 @@ setMeasurement(name: string): Point;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | measurement name |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+measurement name
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Point](./influxdb3-client.point.md)

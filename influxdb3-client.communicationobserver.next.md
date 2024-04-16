@@ -14,10 +14,39 @@ next(data: T): void | boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  data | T | data |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+data
+
+
+</td><td>
+
+T
+
+
+</td><td>
+
+data
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 void \| boolean

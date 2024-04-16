@@ -14,8 +14,33 @@ interface Logger
 
 ## Methods
 
-|  Method | Description |
-|  --- | --- |
-|  [error(message, err)](./influxdb3-client.logger.error.md) |  |
-|  [warn(message, err)](./influxdb3-client.logger.warn.md) |  |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[error(message, err)](./influxdb3-client.logger.error.md)
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+[warn(message, err)](./influxdb3-client.logger.warn.md)
+
+
+</td><td>
+
+
+</td></tr>
+</tbody></table>

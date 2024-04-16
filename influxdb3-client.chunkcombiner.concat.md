@@ -14,11 +14,55 @@ concat(first: Uint8Array, second: Uint8Array): Uint8Array;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  first | Uint8Array | first chunk |
-|  second | Uint8Array | second chunk |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+first
+
+
+</td><td>
+
+Uint8Array
+
+
+</td><td>
+
+first chunk
+
+
+</td></tr>
+<tr><td>
+
+second
+
+
+</td><td>
+
+Uint8Array
+
+
+</td><td>
+
+second chunk
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 Uint8Array

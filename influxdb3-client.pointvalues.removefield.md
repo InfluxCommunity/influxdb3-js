@@ -14,10 +14,39 @@ removeField(name: string): PointValues;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | The name of the field to be removed. |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+The name of the field to be removed.
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [PointValues](./influxdb3-client.pointvalues.md)

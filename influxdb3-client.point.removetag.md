@@ -14,10 +14,39 @@ removeTag(name: string): Point;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  name | string | The name of the tag to be removed. |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+name
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+The name of the tag to be removed.
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Point](./influxdb3-client.point.md)

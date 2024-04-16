@@ -14,7 +14,36 @@ constructor(options: ClientOptions);
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  options | [ClientOptions](./influxdb3-client.clientoptions.md) | client options |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+options
+
+
+</td><td>
+
+[ClientOptions](./influxdb3-client.clientoptions.md)
+
+
+</td><td>
+
+client options
+
+
+</td></tr>
+</tbody></table>

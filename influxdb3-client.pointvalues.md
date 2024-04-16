@@ -14,42 +14,478 @@ declare class PointValues
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)()](./influxdb3-client.pointvalues._constructor_.md) |  | Create an empty PointValues. |
+<table><thead><tr><th>
+
+Constructor
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)()](./influxdb3-client.pointvalues._constructor_.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Create an empty PointValues.
+
+
+</td></tr>
+</tbody></table>
 
 ## Methods
 
-|  Method | Modifiers | Description |
-|  --- | --- | --- |
-|  [asPoint(measurement)](./influxdb3-client.pointvalues.aspoint.md) |  | Creates new Point with this as values. |
-|  [copy()](./influxdb3-client.pointvalues.copy.md) |  | Creates a copy of this object. |
-|  [getBooleanField(name)](./influxdb3-client.pointvalues.getbooleanfield.md) |  | Gets the boolean field value associated with the specified name. Throws if actual type of field with given name is not boolean. If the field is not present, returns undefined. |
-|  [getField(name, type)](./influxdb3-client.pointvalues.getfield.md) |  | Get field of numeric type. Throws if actual type of field with given name is not given numeric type. If the field is not present, returns undefined. |
-|  [getField(name, type)](./influxdb3-client.pointvalues.getfield_1.md) |  | Get field of string type. Throws if actual type of field with given name is not string. If the field is not present, returns undefined. |
-|  [getField(name, type)](./influxdb3-client.pointvalues.getfield_2.md) |  | Get field of boolean type. Throws if actual type of field with given name is not boolean. If the field is not present, returns undefined. |
-|  [getField(name)](./influxdb3-client.pointvalues.getfield_3.md) |  | Get field without type check. If the field is not present, returns undefined. |
-|  [getFieldNames()](./influxdb3-client.pointvalues.getfieldnames.md) |  | Gets an array of field names associated with this object. |
-|  [getFieldType(name)](./influxdb3-client.pointvalues.getfieldtype.md) |  | Gets the type of field with given name, if it exists. If the field is not present, returns undefined. |
-|  [getFloatField(name)](./influxdb3-client.pointvalues.getfloatfield.md) |  | Gets the float field value associated with the specified name. Throws if actual type of field with given name is not float. If the field is not present, returns undefined. |
-|  [getIntegerField(name)](./influxdb3-client.pointvalues.getintegerfield.md) |  | Gets the integer field value associated with the specified name. Throws if actual type of field with given name is not integer. If the field is not present, returns undefined. |
-|  [getMeasurement()](./influxdb3-client.pointvalues.getmeasurement.md) |  | Get measurement name. Can be undefined if not set. |
-|  [getStringField(name)](./influxdb3-client.pointvalues.getstringfield.md) |  | Gets the string field value associated with the specified name. Throws if actual type of field with given name is not string. If the field is not present, returns undefined. |
-|  [getTag(name)](./influxdb3-client.pointvalues.gettag.md) |  | Gets value of tag with given name. Returns undefined if tag not found. |
-|  [getTagNames()](./influxdb3-client.pointvalues.gettagnames.md) |  | Gets an array of tag names. |
-|  [getTimestamp()](./influxdb3-client.pointvalues.gettimestamp.md) |  | Get timestamp. Can be undefined if not set. |
-|  [getUintegerField(name)](./influxdb3-client.pointvalues.getuintegerfield.md) |  | Gets the uint field value associated with the specified name. Throws if actual type of field with given name is not uint. If the field is not present, returns undefined. |
-|  [hasFields()](./influxdb3-client.pointvalues.hasfields.md) |  | Checks if this object has any fields. |
-|  [removeField(name)](./influxdb3-client.pointvalues.removefield.md) |  | Removes a field with the specified name if it exists; otherwise, it does nothing. |
-|  [removeTag(name)](./influxdb3-client.pointvalues.removetag.md) |  | Removes a tag with the specified name if it exists; otherwise, it does nothing. |
-|  [setBooleanField(name, value)](./influxdb3-client.pointvalues.setbooleanfield.md) |  | Sets a boolean field. |
-|  [setField(name, value, type)](./influxdb3-client.pointvalues.setfield.md) |  | Sets field based on provided type. |
-|  [setFields(fields)](./influxdb3-client.pointvalues.setfields.md) |  | Add fields according to their type. All numeric type is considered float |
-|  [setFloatField(name, value)](./influxdb3-client.pointvalues.setfloatfield.md) |  | Sets a number field. |
-|  [setIntegerField(name, value)](./influxdb3-client.pointvalues.setintegerfield.md) |  | Sets an integer field. |
-|  [setMeasurement(name)](./influxdb3-client.pointvalues.setmeasurement.md) |  | Sets point's measurement. |
-|  [setStringField(name, value)](./influxdb3-client.pointvalues.setstringfield.md) |  | Sets a string field. |
-|  [setTag(name, value)](./influxdb3-client.pointvalues.settag.md) |  | Sets a tag. The caller has to ensure that both name and value are not empty and do not end with backslash. |
-|  [setTimestamp(value)](./influxdb3-client.pointvalues.settimestamp.md) |  | <p>Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string or an undefined value. An undefined value instructs to assign a local timestamp using the client's clock. An empty string can be used to let the server assign the timestamp. A number value represents time as a count of time units since epoch, the exact time unit then depends on the [precision](./influxdb3-client.influxdbclient.write.md) of the API that writes the point.</p><p>Beware that the current time in nanoseconds can't precisely fit into a JS number, which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds, BigInt's <code>toString()</code> returns the required high-precision string.</p><p>Note that InfluxDB requires the timestamp to fit into int64 data type.</p> |
-|  [setUintegerField(name, value)](./influxdb3-client.pointvalues.setuintegerfield.md) |  | Sets an unsigned integer field. |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[asPoint(measurement)](./influxdb3-client.pointvalues.aspoint.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Creates new Point with this as values.
+
+
+</td></tr>
+<tr><td>
+
+[copy()](./influxdb3-client.pointvalues.copy.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Creates a copy of this object.
+
+
+</td></tr>
+<tr><td>
+
+[getBooleanField(name)](./influxdb3-client.pointvalues.getbooleanfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the boolean field value associated with the specified name. Throws if actual type of field with given name is not boolean. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getField(name, type)](./influxdb3-client.pointvalues.getfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get field of numeric type. Throws if actual type of field with given name is not given numeric type. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getField(name, type)](./influxdb3-client.pointvalues.getfield_1.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get field of string type. Throws if actual type of field with given name is not string. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getField(name, type)](./influxdb3-client.pointvalues.getfield_2.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get field of boolean type. Throws if actual type of field with given name is not boolean. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getField(name)](./influxdb3-client.pointvalues.getfield_3.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get field without type check. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getFieldNames()](./influxdb3-client.pointvalues.getfieldnames.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets an array of field names associated with this object.
+
+
+</td></tr>
+<tr><td>
+
+[getFieldType(name)](./influxdb3-client.pointvalues.getfieldtype.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the type of field with given name, if it exists. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getFloatField(name)](./influxdb3-client.pointvalues.getfloatfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the float field value associated with the specified name. Throws if actual type of field with given name is not float. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getIntegerField(name)](./influxdb3-client.pointvalues.getintegerfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the integer field value associated with the specified name. Throws if actual type of field with given name is not integer. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getMeasurement()](./influxdb3-client.pointvalues.getmeasurement.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get measurement name. Can be undefined if not set.
+
+
+</td></tr>
+<tr><td>
+
+[getStringField(name)](./influxdb3-client.pointvalues.getstringfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the string field value associated with the specified name. Throws if actual type of field with given name is not string. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[getTag(name)](./influxdb3-client.pointvalues.gettag.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets value of tag with given name. Returns undefined if tag not found.
+
+
+</td></tr>
+<tr><td>
+
+[getTagNames()](./influxdb3-client.pointvalues.gettagnames.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets an array of tag names.
+
+
+</td></tr>
+<tr><td>
+
+[getTimestamp()](./influxdb3-client.pointvalues.gettimestamp.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Get timestamp. Can be undefined if not set.
+
+
+</td></tr>
+<tr><td>
+
+[getUintegerField(name)](./influxdb3-client.pointvalues.getuintegerfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Gets the uint field value associated with the specified name. Throws if actual type of field with given name is not uint. If the field is not present, returns undefined.
+
+
+</td></tr>
+<tr><td>
+
+[hasFields()](./influxdb3-client.pointvalues.hasfields.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Checks if this object has any fields.
+
+
+</td></tr>
+<tr><td>
+
+[removeField(name)](./influxdb3-client.pointvalues.removefield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Removes a field with the specified name if it exists; otherwise, it does nothing.
+
+
+</td></tr>
+<tr><td>
+
+[removeTag(name)](./influxdb3-client.pointvalues.removetag.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Removes a tag with the specified name if it exists; otherwise, it does nothing.
+
+
+</td></tr>
+<tr><td>
+
+[setBooleanField(name, value)](./influxdb3-client.pointvalues.setbooleanfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets a boolean field.
+
+
+</td></tr>
+<tr><td>
+
+[setField(name, value, type)](./influxdb3-client.pointvalues.setfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets field based on provided type.
+
+
+</td></tr>
+<tr><td>
+
+[setFields(fields)](./influxdb3-client.pointvalues.setfields.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Add fields according to their type. All numeric type is considered float
+
+
+</td></tr>
+<tr><td>
+
+[setFloatField(name, value)](./influxdb3-client.pointvalues.setfloatfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets a number field.
+
+
+</td></tr>
+<tr><td>
+
+[setIntegerField(name, value)](./influxdb3-client.pointvalues.setintegerfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets an integer field.
+
+
+</td></tr>
+<tr><td>
+
+[setMeasurement(name)](./influxdb3-client.pointvalues.setmeasurement.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets point's measurement.
+
+
+</td></tr>
+<tr><td>
+
+[setStringField(name, value)](./influxdb3-client.pointvalues.setstringfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets a string field.
+
+
+</td></tr>
+<tr><td>
+
+[setTag(name, value)](./influxdb3-client.pointvalues.settag.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets a tag. The caller has to ensure that both name and value are not empty and do not end with backslash.
+
+
+</td></tr>
+<tr><td>
+
+[setTimestamp(value)](./influxdb3-client.pointvalues.settimestamp.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets point timestamp. Timestamp can be specified as a Date (preferred), number, string or an undefined value. An undefined value instructs to assign a local timestamp using the client's clock. An empty string can be used to let the server assign the timestamp. A number value represents time as a count of time units since epoch, the exact time unit then depends on the [precision](./influxdb3-client.influxdbclient.write.md) of the API that writes the point.
+
+Beware that the current time in nanoseconds can't precisely fit into a JS number, which can hold at most 2^53 integer number. Nanosecond precision numbers are thus supplied as a (base-10) string. An application can also use ES2020 BigInt to represent nanoseconds, BigInt's `toString()` returns the required high-precision string.
+
+Note that InfluxDB requires the timestamp to fit into int64 data type.
+
+
+</td></tr>
+<tr><td>
+
+[setUintegerField(name, value)](./influxdb3-client.pointvalues.setuintegerfield.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Sets an unsigned integer field.
+
+
+</td></tr>
+</tbody></table>

@@ -14,12 +14,71 @@ copy(chunk: Uint8Array, start: number, end: number): Uint8Array;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  chunk | Uint8Array | chunk to copy |
-|  start | number | start index |
-|  end | number | end index |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+chunk
+
+
+</td><td>
+
+Uint8Array
+
+
+</td><td>
+
+chunk to copy
+
+
+</td></tr>
+<tr><td>
+
+start
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+start index
+
+
+</td></tr>
+<tr><td>
+
+end
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+end index
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 Uint8Array

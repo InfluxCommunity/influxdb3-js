@@ -12,12 +12,119 @@ Options used by [InfluxDBClient.write()](./influxdb3-client.influxdbclient.write
 interface WriteOptions 
 ```
 
+## Example
+
+WriteOptions in write call
+
+```typescript
+      client
+        .write(point, DATABASE, 'cpu', {
+          headers: {
+            'channel-lane': 'reserved',
+            'notify-central': '30m',
+          },
+          precision: 'ns',
+          gzipThreshold: 1000,
+        })
+```
+
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [defaultTags?](./influxdb3-client.writeoptions.defaulttags.md) |  | { \[key: string\]: string; } | _(Optional)_ default tags |
-|  [gzipThreshold?](./influxdb3-client.writeoptions.gzipthreshold.md) |  | number | _(Optional)_ When specified, write bodies larger than the threshold are gzipped |
-|  [headers?](./influxdb3-client.writeoptions.headers.md) |  | { \[key: string\]: string; } | _(Optional)_ HTTP headers that will be sent with every write request |
-|  [precision?](./influxdb3-client.writeoptions.precision.md) |  | [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ Precision to use in writes for timestamp. default ns |
+<table><thead><tr><th>
 
+Property
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[defaultTags?](./influxdb3-client.writeoptions.defaulttags.md)
+
+
+</td><td>
+
+
+</td><td>
+
+{ \[key: string\]: string; }
+
+
+</td><td>
+
+_(Optional)_ default tags
+
+
+</td></tr>
+<tr><td>
+
+[gzipThreshold?](./influxdb3-client.writeoptions.gzipthreshold.md)
+
+
+</td><td>
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+_(Optional)_ When specified, write bodies larger than the threshold are gzipped
+
+
+</td></tr>
+<tr><td>
+
+[headers?](./influxdb3-client.writeoptions.headers.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Record&lt;string, string&gt;
+
+
+</td><td>
+
+_(Optional)_ HTTP headers that will be sent with every write request
+
+
+</td></tr>
+<tr><td>
+
+[precision?](./influxdb3-client.writeoptions.precision.md)
+
+
+</td><td>
+
+
+</td><td>
+
+[WritePrecision](./influxdb3-client.writeprecision.md)
+
+
+</td><td>
+
+_(Optional)_ Precision to use in writes for timestamp. default ns
+
+
+</td></tr>
+</tbody></table>

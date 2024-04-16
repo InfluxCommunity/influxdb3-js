@@ -15,18 +15,177 @@ declare class HttpError extends Error
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(statusCode, statusMessage, body, contentType, message)](./influxdb3-client.httperror._constructor_.md) |  | Constructs a new instance of the <code>HttpError</code> class |
+<table><thead><tr><th>
+
+Constructor
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(statusCode, statusMessage, body, contentType, message)](./influxdb3-client.httperror._constructor_.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Constructs a new instance of the `HttpError` class
+
+
+</td></tr>
+</tbody></table>
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [body?](./influxdb3-client.httperror.body.md) | <code>readonly</code> | string \| undefined | _(Optional)_ |
-|  [code](./influxdb3-client.httperror.code.md) |  | string \| undefined | application error code, when available |
-|  [contentType?](./influxdb3-client.httperror.contenttype.md) | <code>readonly</code> | string \| null \| undefined | _(Optional)_ |
-|  [json](./influxdb3-client.httperror.json.md) |  | any | json error response |
-|  [statusCode](./influxdb3-client.httperror.statuscode.md) | <code>readonly</code> | number |  |
-|  [statusMessage](./influxdb3-client.httperror.statusmessage.md) | <code>readonly</code> | string \| undefined |  |
+<table><thead><tr><th>
 
+Property
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[body?](./influxdb3-client.httperror.body.md)
+
+
+</td><td>
+
+`readonly`
+
+
+</td><td>
+
+string \| undefined
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+[code](./influxdb3-client.httperror.code.md)
+
+
+</td><td>
+
+
+</td><td>
+
+string \| undefined
+
+
+</td><td>
+
+application error code, when available
+
+
+</td></tr>
+<tr><td>
+
+[contentType?](./influxdb3-client.httperror.contenttype.md)
+
+
+</td><td>
+
+`readonly`
+
+
+</td><td>
+
+string \| null \| undefined
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+[json](./influxdb3-client.httperror.json.md)
+
+
+</td><td>
+
+
+</td><td>
+
+any
+
+
+</td><td>
+
+json error response
+
+
+</td></tr>
+<tr><td>
+
+[statusCode](./influxdb3-client.httperror.statuscode.md)
+
+
+</td><td>
+
+`readonly`
+
+
+</td><td>
+
+number
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+[statusMessage](./influxdb3-client.httperror.statusmessage.md)
+
+
+</td><td>
+
+`readonly`
+
+
+</td><td>
+
+string \| undefined
+
+
+</td><td>
+
+
+</td></tr>
+</tbody></table>

@@ -14,9 +14,62 @@ constructor(fieldName: string, expectedType: PointFieldType, actualType: PointFi
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  fieldName | string |  |
-|  expectedType | [PointFieldType](./influxdb3-client.pointfieldtype.md) |  |
-|  actualType | [PointFieldType](./influxdb3-client.pointfieldtype.md) |  |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+fieldName
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+expectedType
+
+
+</td><td>
+
+[PointFieldType](./influxdb3-client.pointfieldtype.md)
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+actualType
+
+
+</td><td>
+
+[PointFieldType](./influxdb3-client.pointfieldtype.md)
+
+
+</td><td>
+
+
+</td></tr>
+</tbody></table>

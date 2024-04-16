@@ -14,13 +14,87 @@ write(data: WritableData, database?: string, org?: string, writeOptions?: Partia
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  data | [WritableData](./influxdb3-client.writabledata.md) | data to write |
-|  database | string | _(Optional)_ database to write into |
-|  org | string | _(Optional)_ organization to write into |
-|  writeOptions | Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt; | _(Optional)_ write options |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+data
+
+
+</td><td>
+
+[WritableData](./influxdb3-client.writabledata.md)
+
+
+</td><td>
+
+data to write
+
+
+</td></tr>
+<tr><td>
+
+database
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+_(Optional)_ database to write into
+
+
+</td></tr>
+<tr><td>
+
+org
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+_(Optional)_ organization to write into
+
+
+</td></tr>
+<tr><td>
+
+writeOptions
+
+
+</td><td>
+
+Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt;
+
+
+</td><td>
+
+_(Optional)_ write options
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 Promise&lt;void&gt;

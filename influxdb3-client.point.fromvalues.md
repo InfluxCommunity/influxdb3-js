@@ -14,10 +14,39 @@ static fromValues(values: PointValues): Point;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  values | [PointValues](./influxdb3-client.pointvalues.md) | point values object with measurement |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+values
+
+
+</td><td>
+
+[PointValues](./influxdb3-client.pointvalues.md)
+
+
+</td><td>
+
+point values object with measurement
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Point](./influxdb3-client.point.md)

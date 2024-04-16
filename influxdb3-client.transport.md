@@ -14,9 +14,48 @@ interface Transport
 
 ## Methods
 
-|  Method | Description |
-|  --- | --- |
-|  [iterate(path, requestBody, options)](./influxdb3-client.transport.iterate.md) | Sends requestBody and returns response chunks in an async iterable that can be easily consumed in an <code>for-await</code> loop. |
-|  [request(path, requestBody, options, responseStarted)](./influxdb3-client.transport.request.md) | Sends data to the server and receives decoded result. The type of the result depends on response's content-type (deserialized json, text). |
-|  [send(path, requestBody, options, callbacks)](./influxdb3-client.transport.send.md) | Send data to the server and receive communication events via callbacks. |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[iterate(path, requestBody, options)](./influxdb3-client.transport.iterate.md)
+
+
+</td><td>
+
+Sends requestBody and returns response chunks in an async iterable that can be easily consumed in an `for-await` loop.
+
+
+</td></tr>
+<tr><td>
+
+[request(path, requestBody, options, responseStarted)](./influxdb3-client.transport.request.md)
+
+
+</td><td>
+
+Sends data to the server and receives decoded result. The type of the result depends on response's content-type (deserialized json, text).
+
+
+</td></tr>
+<tr><td>
+
+[send(path, requestBody, options, callbacks)](./influxdb3-client.transport.send.md)
+
+
+</td><td>
+
+Send data to the server and receive communication events via callbacks.
+
+
+</td></tr>
+</tbody></table>

@@ -12,11 +12,53 @@ convertTime: (value: string | number | Date | undefined, precision?: WritePrecis
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  value | string \| number \| Date \| undefined |  |
-|  precision | [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+value
+
+
+</td><td>
+
+string \| number \| Date \| undefined
+
+
+</td><td>
+
+
+</td></tr>
+<tr><td>
+
+precision
+
+
+</td><td>
+
+[WritePrecision](./influxdb3-client.writeprecision.md)
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 string \| undefined

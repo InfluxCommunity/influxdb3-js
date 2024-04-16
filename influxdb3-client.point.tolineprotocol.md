@@ -16,11 +16,55 @@ toLineProtocol(convertTimePrecision?: TimeConverter | WritePrecision, defaultTag
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  convertTimePrecision | [TimeConverter](./influxdb3-client.timeconverter.md) \| [WritePrecision](./influxdb3-client.writeprecision.md) | _(Optional)_ settings control serialization of a point timestamp and can also add default tags, nanosecond timestamp precision is used when no <code>settings</code> or no <code>settings.convertTime</code> is supplied. |
-|  defaultTags | { \[key: string\]: string; } | _(Optional)_ |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+convertTimePrecision
+
+
+</td><td>
+
+[TimeConverter](./influxdb3-client.timeconverter.md) \| [WritePrecision](./influxdb3-client.writeprecision.md)
+
+
+</td><td>
+
+_(Optional)_ settings control serialization of a point timestamp and can also add default tags, nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
+
+
+</td></tr>
+<tr><td>
+
+defaultTags
+
+
+</td><td>
+
+{ \[key: string\]: string; }
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 string \| undefined

@@ -16,10 +16,39 @@ setFields(fields: {
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  fields | { \[key: string\]: number \| boolean \| string; } | name-value map |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+fields
+
+
+</td><td>
+
+{ \[key: string\]: number \| boolean \| string; }
+
+
+</td><td>
+
+name-value map
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [PointValues](./influxdb3-client.pointvalues.md)

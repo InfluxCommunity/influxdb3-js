@@ -15,7 +15,34 @@ declare class IllegalArgumentError extends Error
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(message)](./influxdb3-client.illegalargumenterror._constructor_.md) |  | Constructs a new instance of the <code>IllegalArgumentError</code> class |
+<table><thead><tr><th>
 
+Constructor
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(message)](./influxdb3-client.illegalargumenterror._constructor_.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Constructs a new instance of the `IllegalArgumentError` class
+
+
+</td></tr>
+</tbody></table>

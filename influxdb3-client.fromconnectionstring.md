@@ -14,10 +14,39 @@ declare function fromConnectionString(connectionString: string): ClientOptions;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  connectionString | string | connection string |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+connectionString
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+connection string
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [ClientOptions](./influxdb3-client.clientoptions.md)

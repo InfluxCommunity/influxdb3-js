@@ -14,18 +14,140 @@ declare class InfluxDBClient
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(options)](./influxdb3-client.influxdbclient._constructor_.md) |  | Creates a new instance of the <code>InfluxDBClient</code> from <code>ClientOptions</code>. |
-|  [(constructor)(connectionString)](./influxdb3-client.influxdbclient._constructor__1.md) |  | Creates a new instance of the <code>InfluxDBClient</code> from connection string. |
-|  [(constructor)()](./influxdb3-client.influxdbclient._constructor__2.md) |  | <p>Creates a new instance of the <code>InfluxDBClient</code> from environment variables.</p><p>Supported variables: - INFLUX\_HOST - cloud/server URL (required) - INFLUX\_TOKEN - authentication token (required) - INFLUX\_TIMEOUT - I/O timeout - INFLUX\_DATABASE - database (bucket) name - INFLUX\_PRECISION - timestamp precision when writing data - INFLUX\_GZIP\_THRESHOLD - payload size threshold for gzipping data</p> |
+<table><thead><tr><th>
+
+Constructor
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[(constructor)(options)](./influxdb3-client.influxdbclient._constructor_.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Creates a new instance of the `InfluxDBClient` from `ClientOptions`<!-- -->.
+
+
+</td></tr>
+<tr><td>
+
+[(constructor)(connectionString)](./influxdb3-client.influxdbclient._constructor__1.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Creates a new instance of the `InfluxDBClient` from connection string.
+
+
+</td></tr>
+<tr><td>
+
+[(constructor)()](./influxdb3-client.influxdbclient._constructor__2.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Creates a new instance of the `InfluxDBClient` from environment variables.
+
+Supported variables: - INFLUX\_HOST - cloud/server URL (required) - INFLUX\_TOKEN - authentication token (required) - INFLUX\_TIMEOUT - I/O timeout - INFLUX\_DATABASE - database (bucket) name - INFLUX\_PRECISION - timestamp precision when writing data - INFLUX\_GZIP\_THRESHOLD - payload size threshold for gzipping data
+
+
+</td></tr>
+</tbody></table>
 
 ## Methods
 
-|  Method | Modifiers | Description |
-|  --- | --- | --- |
-|  [close()](./influxdb3-client.influxdbclient.close.md) |  | Closes the client and all its resources (connections, ...) |
-|  [query(query, database, queryType, namedParams)](./influxdb3-client.influxdbclient.query.md) |  | Execute a query and return the results as an async generator. |
-|  [queryPoints(query, database, queryType, namedParams)](./influxdb3-client.influxdbclient.querypoints.md) |  | Execute a query and return the results as an async generator. |
-|  [write(data, database, org, writeOptions)](./influxdb3-client.influxdbclient.write.md) |  | Write data into specified database. |
+<table><thead><tr><th>
 
+Method
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[close()](./influxdb3-client.influxdbclient.close.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Closes the client and all its resources (connections, ...)
+
+
+</td></tr>
+<tr><td>
+
+[query(query, database, queryOptions)](./influxdb3-client.influxdbclient.query.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Execute a query and return the results as an async generator.
+
+
+</td></tr>
+<tr><td>
+
+[queryPoints(query, database, queryOptions)](./influxdb3-client.influxdbclient.querypoints.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Execute a query and return the results as an async generator.
+
+
+</td></tr>
+<tr><td>
+
+[write(data, database, org, writeOptions)](./influxdb3-client.influxdbclient.write.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Write data into specified database.
+
+
+</td></tr>
+</tbody></table>

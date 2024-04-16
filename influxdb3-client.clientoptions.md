@@ -15,8 +15,82 @@ interface ClientOptions extends ConnectionOptions
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [transport?](./influxdb3-client.clientoptions.transport.md) |  | [Transport](./influxdb3-client.transport.md) | _(Optional)_ specifies custom transport |
-|  [writeOptions?](./influxdb3-client.clientoptions.writeoptions.md) |  | Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt; | _(Optional)_ supplies and overrides default writing options |
+<table><thead><tr><th>
 
+Property
+
+
+</th><th>
+
+Modifiers
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+[queryOptions?](./influxdb3-client.clientoptions.queryoptions.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Partial&lt;[QueryOptions](./influxdb3-client.queryoptions.md)<!-- -->&gt;
+
+
+</td><td>
+
+_(Optional)_ supplies query options to be use with each and every query.
+
+
+</td></tr>
+<tr><td>
+
+[transport?](./influxdb3-client.clientoptions.transport.md)
+
+
+</td><td>
+
+
+</td><td>
+
+[Transport](./influxdb3-client.transport.md)
+
+
+</td><td>
+
+_(Optional)_ specifies custom transport
+
+
+</td></tr>
+<tr><td>
+
+[writeOptions?](./influxdb3-client.clientoptions.writeoptions.md)
+
+
+</td><td>
+
+
+</td><td>
+
+Partial&lt;[WriteOptions](./influxdb3-client.writeoptions.md)<!-- -->&gt;
+
+
+</td><td>
+
+_(Optional)_ supplies and overrides default writing options.
+
+
+</td></tr>
+</tbody></table>

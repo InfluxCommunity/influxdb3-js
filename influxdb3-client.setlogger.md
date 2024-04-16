@@ -14,10 +14,39 @@ declare function setLogger(logger: Logger): Logger;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  logger | [Logger](./influxdb3-client.logger.md) | logger to use |
+<table><thead><tr><th>
 
+Parameter
+
+
+</th><th>
+
+Type
+
+
+</th><th>
+
+Description
+
+
+</th></tr></thead>
+<tbody><tr><td>
+
+logger
+
+
+</td><td>
+
+[Logger](./influxdb3-client.logger.md)
+
+
+</td><td>
+
+logger to use
+
+
+</td></tr>
+</tbody></table>
 **Returns:**
 
 [Logger](./influxdb3-client.logger.md)
