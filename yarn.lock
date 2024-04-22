@@ -673,18 +673,27 @@
     "@microsoft/tsdoc-config" "~0.16.1"
     "@rushstack/node-core-library" "4.0.2"
 
-"@microsoft/api-extractor@^7.36.0":
-  version "7.43.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.43.0.tgz#41c42677bc71cd8e0f23c63c56802d85044e65cd"
-  integrity sha512-GFhTcJpB+MI6FhvXEI9b2K0snulNLWHqC/BbcJtyNYcKUiw7l3Lgis5ApsYncJ0leALX7/of4XfmXk+maT111w==
+"@microsoft/api-extractor-model@7.28.14":
+  version "7.28.14"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor-model/-/api-extractor-model-7.28.14.tgz#f0d2b93ef21f271a05b89c79d0662f6b34adeb0e"
+  integrity sha512-Bery/c8A8SsKPSvA82cTTuy/+OcxZbLRmKhPkk91/AJOQzxZsShcrmHFAGeiEqSIrv1nPZ3tKq9kfMLdCHmsqg==
   dependencies:
-    "@microsoft/api-extractor-model" "7.28.13"
     "@microsoft/tsdoc" "0.14.2"
     "@microsoft/tsdoc-config" "~0.16.1"
-    "@rushstack/node-core-library" "4.0.2"
+    "@rushstack/node-core-library" "4.1.0"
+
+"@microsoft/api-extractor@^7.36.0":
+  version "7.43.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-extractor/-/api-extractor-7.43.1.tgz#5552427cf076819c914289deb9f0dddce743c629"
+  integrity sha512-ohg40SsvFFgzHFAtYq5wKJc8ZDyY46bphjtnSvhSSlXpPTG7GHwyyXkn48UZiUCBwr2WC7TRC1Jfwz7nreuiyQ==
+  dependencies:
+    "@microsoft/api-extractor-model" "7.28.14"
+    "@microsoft/tsdoc" "0.14.2"
+    "@microsoft/tsdoc-config" "~0.16.1"
+    "@rushstack/node-core-library" "4.1.0"
     "@rushstack/rig-package" "0.5.2"
-    "@rushstack/terminal" "0.10.0"
-    "@rushstack/ts-command-line" "4.19.1"
+    "@rushstack/terminal" "0.10.1"
+    "@rushstack/ts-command-line" "4.19.2"
     lodash "~4.17.15"
     minimatch "~3.0.3"
     resolve "~1.22.1"
@@ -1178,6 +1187,18 @@
     semver "~7.5.4"
     z-schema "~5.0.2"
 
+"@rushstack/node-core-library@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@rushstack/node-core-library/-/node-core-library-4.1.0.tgz#526360d4019f8bba7dd6434d6a9b6f8122507c20"
+  integrity sha512-qz4JFBZJCf1YN5cAXa1dP6Mki/HrsQxc/oYGAGx29dF2cwF2YMxHoly0FBhMw3IEnxo5fMj0boVfoHVBkpkx/w==
+  dependencies:
+    fs-extra "~7.0.1"
+    import-lazy "~4.0.0"
+    jju "~1.4.0"
+    resolve "~1.22.1"
+    semver "~7.5.4"
+    z-schema "~5.0.2"
+
 "@rushstack/rig-package@0.5.2":
   version "0.5.2"
   resolved "https://registry.yarnpkg.com/@rushstack/rig-package/-/rig-package-0.5.2.tgz#0e23a115904678717a74049661931c0b37dd5495"
@@ -1194,12 +1215,30 @@
     "@rushstack/node-core-library" "4.0.2"
     supports-color "~8.1.1"
 
+"@rushstack/terminal@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@rushstack/terminal/-/terminal-0.10.1.tgz#e2b54733f72d80fdf1cbbfd867733169c421d278"
+  integrity sha512-C6Vi/m/84IYJTkfzmXr1+W8Wi3MmBjVF/q3za91Gb3VYjKbpALHVxY6FgH625AnDe5Z0Kh4MHKWA3Z7bqgAezA==
+  dependencies:
+    "@rushstack/node-core-library" "4.1.0"
+    supports-color "~8.1.1"
+
 "@rushstack/ts-command-line@4.19.1":
   version "4.19.1"
   resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.19.1.tgz#288ee54dd607e558a8be07705869c16c31b5c3ef"
   integrity sha512-J7H768dgcpG60d7skZ5uSSwyCZs/S2HrWP1Ds8d1qYAyaaeJmpmmLr9BVw97RjFzmQPOYnoXcKA4GkqDCkduQg==
   dependencies:
     "@rushstack/terminal" "0.10.0"
+    "@types/argparse" "1.0.38"
+    argparse "~1.0.9"
+    string-argv "~0.3.1"
+
+"@rushstack/ts-command-line@4.19.2":
+  version "4.19.2"
+  resolved "https://registry.yarnpkg.com/@rushstack/ts-command-line/-/ts-command-line-4.19.2.tgz#4aef9fd7abd598bb0dd236ca471111426a9dbf12"
+  integrity sha512-cqmXXmBEBlzo9WtyUrHtF9e6kl0LvBY7aTSVX4jfnBfXWZQWnPq9JTFPlQZ+L/ZwjZ4HrNwQsOVvhe9oOucZkw==
+  dependencies:
+    "@rushstack/terminal" "0.10.1"
     "@types/argparse" "1.0.38"
     argparse "~1.0.9"
     string-argv "~0.3.1"
@@ -4439,7 +4478,7 @@ minimatch@5.0.1:
   dependencies:
     brace-expansion "^2.0.1"
 
-minimatch@9.0.3, minimatch@^9.0.0, minimatch@^9.0.1, minimatch@^9.0.3:
+minimatch@9.0.3:
   version "9.0.3"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.3.tgz#a6e00c3de44c3a542bfaae70abfc22420a6da825"
   integrity sha512-RHiac9mvaRw0x3AYRgDC1CxAP7HTcNrrECeA8YYJeWnpo+2Q5CegtZjaotWTWxDG3UeGA1coE05iH1mPjT/2mg==
@@ -4467,7 +4506,7 @@ minimatch@^8.0.2:
   dependencies:
     brace-expansion "^2.0.1"
 
-minimatch@^9.0.4:
+minimatch@^9.0.0, minimatch@^9.0.1, minimatch@^9.0.3, minimatch@^9.0.4:
   version "9.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-9.0.4.tgz#8e49c731d1749cbec05050ee5145147b32496a51"
   integrity sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==
