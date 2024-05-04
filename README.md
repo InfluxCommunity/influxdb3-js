@@ -28,6 +28,8 @@ The JavaScript Client that provides a simple and convenient way to interact with
 This package supports both writing data to InfluxDB and querying data using the FlightSQL client,
 which allows you to execute SQL queries against InfluxDB IOx.
 
+We offer this [Getting Started: InfluxDB 3.0 Javascript Client Library](https://www.youtube.com/watch?v=vT5OLqTrJJg) video to learn more about the library and see code examples.
+
 ## Installation
 
 To write or query InfluxDB 3, add `@influxdata/influxdb3-client` as a dependency to your project using your favorite package manager.
