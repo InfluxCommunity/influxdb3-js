@@ -5,6 +5,7 @@ import {Ticket} from '../../src/generated/flight/Flight'
 import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
 import {RpcMetadata} from '@protobuf-ts/runtime-rpc'
+import {CLIENT_LIB_VERSION} from '../../src/impl/version'
 
 const testSQLTicket = {
   db: 'TestDB',
@@ -132,6 +133,15 @@ describe('Query', () => {
         reg: 'CX',
       },
     })
+  })
+  it('has correct default headers', async () => {
+    const qApi = new QueryApiImpl({
+      host: 'http://localost:8086',
+      token: 'TEST_TOKEN',
+    } as ConnectionOptions)
+    const meta: RpcMetadata = qApi.prepareMetadata()
+    expect(meta['User-Agent']).to.equal(`influxdb3-js/${CLIENT_LIB_VERSION}`)
+    expect(meta['authorization']).to.equal('Bearer TEST_TOKEN')
   })
   it('sets header metadata in request', async () => {
     const options: ConnectionOptions = {

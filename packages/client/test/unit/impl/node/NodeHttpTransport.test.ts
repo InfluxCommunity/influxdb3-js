@@ -213,7 +213,7 @@ describe('NodeHttpTransport', () => {
             }
             context.matchHeader(
               'User-Agent',
-              `influxdb-client-js/${CLIENT_LIB_VERSION}`
+              `influxdb3-js/${CLIENT_LIB_VERSION}`
             )
             let cancellable: any
             new NodeHttpTransport({
@@ -748,7 +748,7 @@ describe('NodeHttpTransport', () => {
           }
           context.matchHeader(
             'User-Agent',
-            `influxdb-client-js/${CLIENT_LIB_VERSION}`
+            `influxdb3-js/${CLIENT_LIB_VERSION}`
           )
           const transport = new NodeHttpTransport({
             ...extras,

@@ -12,7 +12,7 @@ import {
 } from '../../results'
 import zlib from 'zlib'
 import completeCommunicationObserver from '../completeCommunicationObserver'
-import {CLIENT_LIB_VERSION} from '../version'
+import {CLIENT_LIB_USER_AGENT} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
@@ -107,7 +107,7 @@ export class NodeHttpTransport implements Transport {
       )
     }
     this._headers = {
-      'User-Agent': `influxdb-client-js/${CLIENT_LIB_VERSION}`,
+      'User-Agent': CLIENT_LIB_USER_AGENT,
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
