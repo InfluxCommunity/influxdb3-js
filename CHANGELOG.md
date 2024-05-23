@@ -1,5 +1,9 @@
 ## 0.9.0 [unreleased]
 
+### Features
+
+1. [319](https://github.com/InfluxCommunity/influxdb3-js/pull/319): Adds standard `user-agent` header to calls.
+
 ## 0.8.0 [2024-04-16]
 
 ### Breaking Changes
