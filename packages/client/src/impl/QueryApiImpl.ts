@@ -8,7 +8,7 @@ import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
-import {CLIENT_LIB_VERSION} from './version'
+import {CLIENT_LIB_USER_AGENT} from './version'
 
 export type TicketDataType = {
   database: string
@@ -59,7 +59,7 @@ export default class QueryApiImpl implements QueryApi {
 
   prepareMetadata(headers?: Record<string, string>): RpcMetadata {
     const meta: RpcMetadata = {
-      'User-Agent': `influxdb-client-js/${CLIENT_LIB_VERSION}`,
+      'User-Agent': CLIENT_LIB_USER_AGENT,
       ...this._defaultHeaders,
       ...headers,
     }
