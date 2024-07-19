@@ -53,9 +53,11 @@ export default class WriteApiImpl implements WriteApi {
     })
 
     let responseStatusCode: number | undefined
+    let headers: Headers
     const callbacks = {
       responseStarted(_headers: Headers, statusCode?: number): void {
         responseStatusCode = statusCode
+        headers = _headers
       },
       error(error: Error): void {
         // ignore informational message about the state of InfluxDB
@@ -84,7 +86,8 @@ export default class WriteApiImpl implements WriteApi {
             responseStatusCode,
             message,
             undefined,
-            '0'
+            '0',
+            headers
           )
           error.message = message
           callbacks.error(error)

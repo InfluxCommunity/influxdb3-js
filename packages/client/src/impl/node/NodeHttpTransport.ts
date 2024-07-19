@@ -71,7 +71,7 @@ export class NodeHttpTransport implements Transport {
       protocol: url.protocol,
       hostname: url.hostname,
     }
-    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    this._contextPath = proxyUrl ? _url : (url.path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -350,8 +350,8 @@ export class NodeHttpTransport implements Transport {
             statusCode,
             res.statusMessage,
             body,
-            res.headers['retry-after'],
-            res.headers['content-type']
+            res.headers['content-type'],
+            res.headers
           )
         )
       })

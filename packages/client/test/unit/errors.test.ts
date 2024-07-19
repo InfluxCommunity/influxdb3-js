@@ -1,4 +1,5 @@
 import {expect} from 'chai'
+import * as http from 'http'
 import {
   HttpError,
   RequestTimedOutError,
@@ -29,9 +30,34 @@ describe('errors', () => {
     })
   })
   describe('message property is defined', () => {
-    expect(new HttpError(200, 'OK').message).is.not.empty
-    expect(new IllegalArgumentError('Not OK').message).is.not.empty
-    expect(new RequestTimedOutError().message).is.not.empty
-    expect(new AbortError().message).is.not.empty
+    it('verifies message properties', () => {
+      expect(new HttpError(200, 'OK').message).is.not.empty
+      expect(new IllegalArgumentError('Not OK').message).is.not.empty
+      expect(new RequestTimedOutError().message).is.not.empty
+      expect(new AbortError().message).is.not.empty
+    })
+  })
+  describe('http error values', () => {
+    it('propagate headers', () => {
+      const httpHeaders: http.IncomingHttpHeaders = {
+        'content-type': 'application/json',
+        'retry-after': '42',
+      }
+      const httpError: HttpError = new HttpError(
+        429,
+        'Too Many Requests',
+        undefined,
+        httpHeaders['content-type'],
+        httpHeaders
+      )
+      expect(httpError.headers).is.not.empty
+      expect(httpError.contentType).equals('application/json')
+      expect(httpError.statusMessage).equals('Too Many Requests')
+      if (httpError.headers) {
+        expect(httpError.headers['retry-after']).equals('42')
+      } else {
+        expect.fail('httpError.headers should be defined')
+      }
+    })
   })
 })
