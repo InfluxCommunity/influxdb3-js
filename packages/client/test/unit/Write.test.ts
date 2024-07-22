@@ -317,7 +317,7 @@ describe('Write', () => {
         }
       }
     })
-    it('propagates retry on 500', async () => {
+    it('propagates retry on 503', async () => {
       const client: InfluxDBClient = new InfluxDBClient({
         ...clientOptions,
       })
@@ -326,7 +326,7 @@ describe('Write', () => {
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           return [
-            500,
+            503,
             '{ message: "see status code"}',
             {
               'retry-after': retryDate.toISOString(),
