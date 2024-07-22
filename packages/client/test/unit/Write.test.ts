@@ -342,7 +342,7 @@ describe('Write', () => {
         )
       } catch (error: any) {
         expect(error.contentType).equals('application/json')
-        expect(error.statusCode).equals(500)
+        expect(error.statusCode).equals(503)
         expect(error.headers).is.not.empty
         expect(retryDate.toISOString()).equals(error.headers['retry-after'])
         if (!(error instanceof HttpError)) {

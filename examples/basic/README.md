@@ -35,6 +35,6 @@ INFLUX_TOKEN="<token>"
 - run `yarn dev`
 
 #### Write Retry
- 
+
 - run `yarn install`
 - run `yarn retry`
