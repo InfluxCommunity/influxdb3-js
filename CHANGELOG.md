@@ -1,5 +1,9 @@
 ## 0.10.0 [unreleased]
 
+### Features
+
+1. [369](https://github.com/InfluxCommunity/influxdb3-js/pull/369): Propagates headers from HTTP response to HttpError when an error is returned from the server.
+
 ## 0.9.0 [2024-06-24]
 
 ### Features
