@@ -90,7 +90,7 @@
     "@protobuf-ts/grpc-transport": "^2.9.1",
     "@protobuf-ts/grpcweb-transport": "^2.9.1",
     "@protobuf-ts/runtime-rpc": "^2.9.1",
-    "apache-arrow": "^16.0.0",
+    "apache-arrow": "^17.0.0",
     "grpc-web": "^1.5.0"
   }
 }
