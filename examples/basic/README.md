@@ -1,6 +1,7 @@
 ## Basic Example
 
 - [IOxExample](./src/index.ts) - How to use write and query data from InfluxDB IOx
+- [IOxRetryExample](./src/writeRetry.ts) - How to use write and then retry if the server returns status `429 - Too many requests` or `503 - Temporarily unavailable`.  
 
 ## prerequisites
 
@@ -26,7 +27,14 @@ INFLUX_DATABASE="<database>"
 INFLUX_TOKEN="<token>"
 ```
 
-### Run example
+### Run examples
+
+#### Basic
 
 - run `yarn install`
 - run `yarn dev`
+
+#### Write Retry
+ 
+- run `yarn install`
+- run `yarn retry`
