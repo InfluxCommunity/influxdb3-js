@@ -18,7 +18,7 @@ async function main() {
   const now = new Date()
   for (let i = 100000; i > -1; i--) {
     const d: Date = new Date(now.getTime() - 100 * i)
-    points[i] = Datum.RandomDatum('demoR').toPoint(d)
+    points[i] = UserMemUsage.RandomUserMemUsage().toPoint(d)
   }
   await writeData(client, points, database, 1)
 }
@@ -104,53 +104,55 @@ const getEnv = (variableName: string): string =>
   process.env[variableName] ??
   throwReturn(new Error(`missing ${variableName} environment variable`))
 
-class Datum {
+class UserMemUsage {
   name: string
   location: string
-  fval: number
-  ival: number
-  sval: string
+  pct: number
+  procCt: number
+  state: string
 
   constructor(
     name: string,
     location: string, // as tag
-    fval: number,
-    ival: number, // as integer
-    sval: string
+    pct: number,
+    procCt: number, // as integer
+    state: string
   ) {
     this.name = name
     this.location = location
-    this.fval = fval
-    this.ival = ival
-    this.sval = sval
+    this.pct = pct
+    this.procCt = procCt
+    this.state = state
   }
 
   static dieRoll(): number {
     return Math.floor(Math.random() * 6) + 1
   }
 
-  static RandomDatum(
-    name = 'random',
+  static RandomUserMemUsage(
+    name = 'userMem',
     location = 'hic',
-    svals = ['feles', 'canus', 'mus', 'equus', 'bos']
-  ): Datum {
-    return new Datum(
+    states = ['OK', 'WARNING', 'EXCEEDED', 'CRITICAL', 'ERROR']
+  ): UserMemUsage {
+    return new UserMemUsage(
       name,
       location,
       Math.random() * 100,
       this.dieRoll() + this.dieRoll() + this.dieRoll(),
-      svals[Math.floor(Math.random() * svals.length)]
+      states[Math.floor(Math.random() * states.length)]
     )
   }
 
   toPoint(date: Date): Point {
     return Point.measurement(this.name)
       .setTag('location', this.location)
-      .setFloatField('fval', this.fval)
-      .setIntegerField('ival', this.ival)
-      .setStringField('sval', this.sval)
+      .setFloatField('percent', this.pct)
+      .setIntegerField('processCount', this.procCt)
+      .setStringField('state', this.state)
       .setTimestamp(date)
   }
 }
 
-main()
+main().then(() => {
+  console.log('DONE')
+})
