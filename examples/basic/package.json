@@ -4,7 +4,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "ts-node -r dotenv/config ./src/index.ts"
+    "dev": "ts-node -r dotenv/config ./src/index.ts",
+    "retry": "ts-node -r dotenv/config src/writeRetry.ts"
   },
   "dependencies": {
     "@influxdata/influxdb3-client": "link:../../packages/client"

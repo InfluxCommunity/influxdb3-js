@@ -1,3 +1,5 @@
+import {Headers} from './results'
+
 /** IllegalArgumentError is thrown when illegal argument is supplied. */
 export class IllegalArgumentError extends Error {
   /* istanbul ignore next */
@@ -23,6 +25,7 @@ export class HttpError extends Error {
     readonly statusMessage: string | undefined,
     readonly body?: string,
     readonly contentType?: string | undefined | null,
+    readonly headers?: Headers | null,
     message?: string
   ) {
     super()

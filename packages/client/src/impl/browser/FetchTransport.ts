@@ -159,14 +159,16 @@ export default class FetchTransport implements Transport {
           response.status,
           response.statusText,
           undefined,
-          response.headers.get('content-type')
+          response.headers.get('content-type'),
+          getResponseHeaders(response)
         )
       }
       throw new HttpError(
         response.status,
         response.statusText,
         text,
-        response.headers.get('content-type')
+        response.headers.get('content-type'),
+        getResponseHeaders(response)
       )
     }
   }

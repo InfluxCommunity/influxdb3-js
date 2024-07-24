@@ -350,8 +350,8 @@ export class NodeHttpTransport implements Transport {
             statusCode,
             res.statusMessage,
             body,
-            res.headers['retry-after'],
-            res.headers['content-type']
+            res.headers['content-type'],
+            res.headers
           )
         )
       })

@@ -113,7 +113,9 @@ export function emulateFetchApi(
   function fetch(url: string, options: any): Promise<any> {
     if (onRequest) onRequest(options)
     return url.endsWith('error')
-      ? Promise.reject(new HttpError(500, undefined, undefined, undefined, url))
+      ? Promise.reject(
+          new HttpError(500, undefined, undefined, undefined, undefined, url)
+        )
       : Promise.resolve(createResponse(spec))
   }
   class TextEncoder {

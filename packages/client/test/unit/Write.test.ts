@@ -287,4 +287,68 @@ describe('Write', () => {
       expect(particular).equals('attribute')
     })
   })
+  describe('propagate error headers', async () => {
+    it('propagates retry header on 429', async () => {
+      const client: InfluxDBClient = new InfluxDBClient({
+        ...clientOptions,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, _requestBody) {
+          return [
+            429,
+            '{ message: "see status code"}',
+            {'retry-after': '42', 'content-type': 'application/json'},
+          ]
+        })
+        .persist()
+      try {
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1),
+          DATABASE
+        )
+      } catch (error: any) {
+        expect(error.contentType).equals('application/json')
+        expect(error.statusCode).equals(429)
+        expect(error.headers).is.not.empty
+        expect(error.headers['retry-after']).equals('42')
+        if (!(error instanceof HttpError)) {
+          expect.fail(`caught error which is not HttpError: ${error}`)
+        }
+      }
+    })
+    it('propagates retry on 503', async () => {
+      const client: InfluxDBClient = new InfluxDBClient({
+        ...clientOptions,
+      })
+      const retryDate = new Date(new Date().valueOf() + 600000)
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, _requestBody) {
+          return [
+            503,
+            '{ message: "see status code"}',
+            {
+              'retry-after': retryDate.toISOString(),
+              'content-type': 'application/json',
+            },
+          ]
+        })
+        .persist()
+      try {
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1),
+          DATABASE
+        )
+      } catch (error: any) {
+        expect(error.contentType).equals('application/json')
+        expect(error.statusCode).equals(503)
+        expect(error.headers).is.not.empty
+        expect(retryDate.toISOString()).equals(error.headers['retry-after'])
+        if (!(error instanceof HttpError)) {
+          expect.fail(`caught error which is not HttpError: ${error}`)
+        }
+      }
+    })
+  })
 })
