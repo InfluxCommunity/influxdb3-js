@@ -37,6 +37,37 @@ describe('errors', () => {
       expect(new AbortError().message).is.not.empty
     })
   })
+  describe('HttpError message property is correct', () => {
+    it('verifies Cloud error message', () => {
+      expect(
+        new HttpError(
+          400,
+          'Bad Request',
+          '{"message": "parsing failed for write_lp endpoint"}'
+        ).message
+      ).equals('parsing failed for write_lp endpoint')
+    })
+    it('verifies Edge error without detail message', () => {
+      expect(
+        new HttpError(
+          400,
+          'Bad Request',
+          '{"error": "parsing failed for write_lp endpoint"}'
+        ).message
+      ).equals('parsing failed for write_lp endpoint')
+    })
+    it('verifies Edge error with detail message', () => {
+      expect(
+        new HttpError(
+          400,
+          'Bad Request',
+          '{"error": "parsing failed for write_lp endpoint", "data": {"error_message": "invalid field value in line protocol for field \'value\' on line 0"}}' // Edge
+        ).message
+      ).equals(
+        "invalid field value in line protocol for field 'value' on line 0"
+      )
+    })
+  })
   describe('http error values', () => {
     it('propagate headers', () => {
       const httpHeaders: http.IncomingHttpHeaders = {

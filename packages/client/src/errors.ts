@@ -33,20 +33,32 @@ export class HttpError extends Error {
     if (message) {
       this.message = message
     } else if (body) {
-      if (contentType?.startsWith('application/json')) {
+      if (contentType?.startsWith('application/json') || !contentType) { // Edge may not set Content-Type header
         try {
           this.json = JSON.parse(body)
           this.message = this.json.message
           this.code = this.json.code
+          if (!this.message) {
+            interface edgeBody {
+              error?: string;
+              data?: {
+                error_message: string;
+              }
+            }
+            const eb: edgeBody = this.json as edgeBody
+            if (eb.data?.error_message) {
+              this.message = eb.data.error_message
+            } else if (eb.error) {
+              this.message = eb.error
+            }
+          }
         } catch (e) {
           // silently ignore, body string is still available
         }
       }
-      if (!this.message) {
-        this.message = `${statusCode} ${statusMessage} : ${body}`
-      }
-    } else {
-      this.message = `${statusCode} ${statusMessage}`
+    }
+    if (!this.message) {
+      this.message = `${statusCode} ${statusMessage} : ${body}`
     }
     this.name = 'HttpError'
   }
