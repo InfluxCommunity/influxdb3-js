@@ -33,16 +33,17 @@ export class HttpError extends Error {
     if (message) {
       this.message = message
     } else if (body) {
-      if (contentType?.startsWith('application/json') || !contentType) { // Edge may not set Content-Type header
+      // Edge may not set Content-Type header
+      if (contentType?.startsWith('application/json') || !contentType) {
         try {
           this.json = JSON.parse(body)
           this.message = this.json.message
           this.code = this.json.code
           if (!this.message) {
             interface EdgeBody {
-              error?: string;
+              error?: string
               data?: {
-                error_message: string;
+                error_message?: string
               }
             }
             const eb: EdgeBody = this.json as EdgeBody
