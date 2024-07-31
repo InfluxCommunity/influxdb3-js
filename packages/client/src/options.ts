@@ -9,6 +9,8 @@ export interface ConnectionOptions {
   host: string
   /** authentication token */
   token?: string
+  /** token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge. */
+  authScheme?: string
   /**
    * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
    * @defaultValue 10000
@@ -190,6 +192,9 @@ export function fromConnectionString(connectionString: string): ClientOptions {
   if (url.searchParams.has('token')) {
     options.token = url.searchParams.get('token') as string
   }
+  if (url.searchParams.has('authScheme')) {
+    options.authScheme = url.searchParams.get('authScheme') as string
+  }
   if (url.searchParams.has('database')) {
     options.database = url.searchParams.get('database') as string
   }
@@ -227,6 +232,9 @@ export function fromEnv(): ClientOptions {
   }
   if (process.env.INFLUX_TOKEN) {
     options.token = process.env.INFLUX_TOKEN.trim()
+  }
+  if (process.env.INFLUX_AUTH_SCHEME) {
+    options.authScheme = process.env.INFLUX_AUTH_SCHEME.trim()
   }
   if (process.env.INFLUX_DATABASE) {
     options.database = process.env.INFLUX_DATABASE.trim()

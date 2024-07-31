@@ -217,6 +217,17 @@ at 'ClientOptions.database'
         token: 'my-token',
       })
     })
+    it('is created with token and auth scheme', () => {
+      expect(
+        (new InfluxDBClient('https://localhost:8086?token=my-token&authScheme=my-scheme') as any)
+          ._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        authScheme: 'my-scheme',
+      })
+    })
     it('is created with token + has whitespaces around (#194)', () => {
       expect(
         (new InfluxDBClient(' https://localhost:8086?token=my-token ') as any)
@@ -310,6 +321,7 @@ at 'ClientOptions.database'
     const clear = () => {
       delete process.env['INFLUX_HOST']
       delete process.env['INFLUX_TOKEN']
+      delete process.env['INFLUX_AUTH_SCHEME']
       delete process.env['INFLUX_DATABASE']
       delete process.env['INFLUX_TIMEOUT']
       delete process.env['INFLUX_PRECISION']
@@ -336,6 +348,18 @@ at 'ClientOptions.database'
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
         token: 'my-token',
+      })
+    })
+    it('is created with host and token and auth scheme', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_AUTH_SCHEME'] = 'my-scheme'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        authScheme: 'my-scheme',
       })
     })
     it('is created with host and token + has whitespaces around (#194)', () => {

@@ -705,6 +705,12 @@ describe('NodeHttpTransport', () => {
         {},
         {
           token: 'a',
+          expectAuthorizationHeaderValue: 'Token a',
+        },
+        {
+          token: 'a',
+          authScheme: 'Bearer',
+          expectAuthorizationHeaderValue: 'Bearer a',
         },
         {
           headers: {
@@ -744,7 +750,7 @@ describe('NodeHttpTransport', () => {
             ])
             .persist()
           if (extras.token) {
-            context.matchHeader('authorization', `Token ${extras.token}`)
+            context.matchHeader('authorization', extras.expectAuthorizationHeaderValue)
           }
           context.matchHeader(
             'User-Agent',
