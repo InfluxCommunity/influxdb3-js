@@ -219,8 +219,11 @@ at 'ClientOptions.database'
     })
     it('is created with token and auth scheme', () => {
       expect(
-        (new InfluxDBClient('https://localhost:8086?token=my-token&authScheme=my-scheme') as any)
-          ._options
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&authScheme=my-scheme'
+          ) as any
+        )._options
       ).to.deep.equal({
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
