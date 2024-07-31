@@ -39,13 +39,13 @@ export class HttpError extends Error {
           this.message = this.json.message
           this.code = this.json.code
           if (!this.message) {
-            interface edgeBody {
+            interface EdgeBody {
               error?: string;
               data?: {
                 error_message: string;
               }
             }
-            const eb: edgeBody = this.json as edgeBody
+            const eb: EdgeBody = this.json as EdgeBody
             if (eb.data?.error_message) {
               this.message = eb.data.error_message
             } else if (eb.error) {
