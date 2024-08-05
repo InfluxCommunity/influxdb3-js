@@ -42,6 +42,7 @@ export default class InfluxDBClient {
    *
    * Supported query parameters:
    *   - token - authentication token (required)
+   *   - authScheme - token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge.
    *   - database - database (bucket) name
    *   - timeout - I/O timeout
    *   - precision - timestamp precision when writing data
@@ -57,6 +58,7 @@ export default class InfluxDBClient {
    * Supported variables:
    *   - INFLUX_HOST - cloud/server URL (required)
    *   - INFLUX_TOKEN - authentication token (required)
+   *   - INFLUX_AUTH_SCHEME - token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge.
    *   - INFLUX_TIMEOUT - I/O timeout
    *   - INFLUX_DATABASE - database (bucket) name
    *   - INFLUX_PRECISION - timestamp precision when writing data

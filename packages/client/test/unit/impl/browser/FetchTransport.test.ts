@@ -52,6 +52,19 @@ describe('FetchTransport', () => {
       })
       expect(transport._connectionOptions).to.deep.equal(options)
     })
+    it('creates the transport with url and token and auth scheme', () => {
+      const options: ConnectionOptions = {
+        host: 'http://test:8086',
+        token: 'a',
+        authScheme: 'Bearer',
+      }
+      const transport: any = new FetchTransport(options)
+      expect(transport._defaultHeaders).to.deep.equal({
+        'content-type': 'application/json; charset=utf-8',
+        Authorization: 'Bearer a',
+      })
+      expect(transport._connectionOptions).to.deep.equal(options)
+    })
     it('ignore last slash / in url', () => {
       const options: ConnectionOptions = {
         host: 'http://test:8086/',
