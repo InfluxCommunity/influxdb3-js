@@ -1,0 +1,8 @@
+{
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "@typescript-eslint/no-unused-expressions": "warn"
+  }
+}
