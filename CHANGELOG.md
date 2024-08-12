@@ -1,10 +1,13 @@
-## 0.10.0 [unreleased]
+## 0.10.0 [2024-08-12]
 
 ### Features
 
 1. [369](https://github.com/InfluxCommunity/influxdb3-js/pull/369): Propagates headers from HTTP response to HttpError when an error is returned from the server.
-1. [376](https://github.com/InfluxCommunity/influxdb3-js/pull/376): Handle InfluxDB Edge (OSS) errors better.
 1. [377](https://github.com/InfluxCommunity/influxdb3-js/pull/377): Add InfluxDB Edge (OSS) authentication support.
+
+### Bugfix
+
+1. [376](https://github.com/InfluxCommunity/influxdb3-js/pull/376): Handle InfluxDB Edge (OSS) errors better.
 
 ## 0.9.0 [2024-06-24]
 
