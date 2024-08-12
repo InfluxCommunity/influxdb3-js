@@ -9,7 +9,7 @@ Constructs a new instance of the `HttpError` class
 **Signature:**
 
 ```typescript
-constructor(statusCode: number, statusMessage: string | undefined, body?: string | undefined, contentType?: string | null | undefined, message?: string);
+constructor(statusCode: number, statusMessage: string | undefined, body?: string | undefined, contentType?: string | undefined | null, headers?: (HttpHeaders | null) | undefined, message?: string);
 ```
 
 ## Parameters
@@ -81,7 +81,23 @@ contentType
 
 </td><td>
 
-string \| null \| undefined
+string \| undefined \| null
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+headers
+
+
+</td><td>
+
+([HttpHeaders](./influxdb3-client.httpheaders.md) \| null) \| undefined
 
 
 </td><td>

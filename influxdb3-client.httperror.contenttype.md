@@ -7,5 +7,5 @@
 **Signature:**
 
 ```typescript
-readonly contentType?: string | null | undefined;
+readonly contentType?: string | undefined | null;
 ```

@@ -52,5 +52,5 @@ connection string
 
 https://us-east-1-1.aws.cloud2.influxdata.com/?token=my-token&amp;database=my-database
 
-Supported query parameters: - token - authentication token (required) - database - database (bucket) name - timeout - I/O timeout - precision - timestamp precision when writing data - gzipThreshold - payload size threshold for gzipping data
+Supported query parameters: - token - authentication token (required) - authScheme - token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge. - database - database (bucket) name - timeout - I/O timeout - precision - timestamp precision when writing data - gzipThreshold - payload size threshold for gzipping data
 

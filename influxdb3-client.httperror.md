@@ -33,7 +33,7 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
-[(constructor)(statusCode, statusMessage, body, contentType, message)](./influxdb3-client.httperror._constructor_.md)
+[(constructor)(statusCode, statusMessage, body, contentType, headers, message)](./influxdb3-client.httperror._constructor_.md)
 
 
 </td><td>
@@ -122,7 +122,28 @@ application error code, when available
 
 </td><td>
 
-string \| null \| undefined
+string \| undefined \| null
+
+
+</td><td>
+
+_(Optional)_
+
+
+</td></tr>
+<tr><td>
+
+[headers?](./influxdb3-client.httperror.headers.md)
+
+
+</td><td>
+
+`readonly`
+
+
+</td><td>
+
+([HttpHeaders](./influxdb3-client.httpheaders.md) \| null) \| undefined
 
 
 </td><td>

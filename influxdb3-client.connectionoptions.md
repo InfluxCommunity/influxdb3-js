@@ -37,6 +37,25 @@ Description
 </th></tr></thead>
 <tbody><tr><td>
 
+[authScheme?](./influxdb3-client.connectionoptions.authscheme.md)
+
+
+</td><td>
+
+
+</td><td>
+
+string
+
+
+</td><td>
+
+_(Optional)_ token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge.
+
+
+</td></tr>
+<tr><td>
+
 [database?](./influxdb3-client.connectionoptions.database.md)
 
 

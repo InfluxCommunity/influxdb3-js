@@ -6,7 +6,7 @@
 
 Creates a new instance of the `InfluxDBClient` from environment variables.
 
-Supported variables: - INFLUX\_HOST - cloud/server URL (required) - INFLUX\_TOKEN - authentication token (required) - INFLUX\_TIMEOUT - I/O timeout - INFLUX\_DATABASE - database (bucket) name - INFLUX\_PRECISION - timestamp precision when writing data - INFLUX\_GZIP\_THRESHOLD - payload size threshold for gzipping data
+Supported variables: - INFLUX\_HOST - cloud/server URL (required) - INFLUX\_TOKEN - authentication token (required) - INFLUX\_AUTH\_SCHEME - token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge. - INFLUX\_TIMEOUT - I/O timeout - INFLUX\_DATABASE - database (bucket) name - INFLUX\_PRECISION - timestamp precision when writing data - INFLUX\_GZIP\_THRESHOLD - payload size threshold for gzipping data
 
 **Signature:**
 
