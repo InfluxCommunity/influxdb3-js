@@ -1,8 +1,10 @@
 ## Example for browser
 
-- [IOx inside browser example](./src/main.ts) - How to use InfluxDB IOx queries in the browser: The browser is a specific environment that requires an additional proxy component, which transfers our communication into a gRPC-compliant form.
+- [IOx inside browser example](./src/main.ts) - How to use InfluxDB IOx queries in the browser.
 
-It's highly recommended to try [basic example](../basic/README.md) first
+It's highly recommended to try [basic example](../basic/README.md) first.
+
+⚠️ The browser is a specific environment that requires an additional proxy component, which transfers our communication into a gRPC-compliant form. For more details about proxy requirements, please refer to the gRPC-Web documentation - [gRPC-Web Protocol](https://github.com/grpc/grpc/blob/master/doc/PROTOCOL-WEB.md).
 
 ## prerequisites
 
