@@ -202,6 +202,32 @@ describe('Write', () => {
         }
       )
     })
+    it('fails on write response status not being 2xx', async () => {
+      useSubject({})
+      let authorization: any
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, _requestBody) {
+          authorization = this.req.headers.authorization
+          return [100, '', {}]
+        })
+        .persist()
+      await subject
+        .write('test value=1', DATABASE)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).to.be.ok
+        })
+      expect(logs.error).has.length(1)
+      expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
+      expect(logs.error[0][1]).instanceOf(HttpError)
+      expect(logs.error[0][1].statusCode).equals(100)
+      expect(logs.error[0][1].message).equals(
+        `2xx HTTP response status code expected, but 100 returned`
+      )
+      expect(logs.warn).deep.equals([])
+      expect(authorization).equals(`Token ${clientOptions.token}`)
+    })
     it('support 201 Created', async () => {
       useSubject({})
       let authorization: any
