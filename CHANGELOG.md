@@ -1,5 +1,9 @@
 ## 0.11.0 [unreleased]
 
+### Features
+
+1. [410](https://github.com/InfluxCommunity/influxdb3-js/pull/410): Accepts HTTP responses with 2xx status codes as a success for writes.
+
 ## 0.10.0 [2024-08-12]
 
 ### Features

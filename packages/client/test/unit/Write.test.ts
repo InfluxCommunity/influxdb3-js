@@ -202,15 +202,14 @@ describe('Write', () => {
         }
       )
     })
-    it('fails on write response status not being exactly 204', async () => {
-      // required because of https://github.com/influxdata/influxdb-client-js/issues/263
+    it('fails on write response status not being 2xx', async () => {
       useSubject({})
       let authorization: any
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
-          return [200, '', {}]
+          return [100, '', {}]
         })
         .persist()
       await subject
@@ -222,12 +221,27 @@ describe('Write', () => {
       expect(logs.error).has.length(1)
       expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
       expect(logs.error[0][1]).instanceOf(HttpError)
-      expect(logs.error[0][1].statusCode).equals(200)
+      expect(logs.error[0][1].statusCode).equals(100)
       expect(logs.error[0][1].message).equals(
-        `204 HTTP response status code expected, but 200 returned`
+        `2xx HTTP response status code expected, but 100 returned`
       )
       expect(logs.warn).deep.equals([])
       expect(authorization).equals(`Token ${clientOptions.token}`)
+    })
+    it('support 201 Created', async () => {
+      useSubject({})
+      let authorization: any
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, _requestBody) {
+          authorization = this.req.headers.authorization
+          return [201, '', {}]
+        })
+        .persist()
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(authorization).equals(`Token a`)
     })
     it('sends custom http header', async () => {
       useSubject({

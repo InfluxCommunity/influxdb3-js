@@ -78,10 +78,13 @@ export default class WriteApiImpl implements WriteApi {
       },
       complete(): void {
         // older implementations of transport do not report status code
-        if (responseStatusCode == 204 || responseStatusCode == undefined) {
+        if (
+          responseStatusCode == undefined ||
+          (responseStatusCode >= 200 && responseStatusCode < 300)
+        ) {
           resolve()
         } else {
-          const message = `204 HTTP response status code expected, but ${responseStatusCode} returned`
+          const message = `2xx HTTP response status code expected, but ${responseStatusCode} returned`
           const error = new HttpError(
             responseStatusCode,
             message,
