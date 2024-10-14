@@ -1,5 +1,9 @@
 ## 0.12.0 [unreleased]
 
+### Bugfix
+
+1. [437](https://github.com/InfluxCommunity/influxdb3-js/pull/437): Simplify iterating over Arrow's batches in `QueryAPI`
+
 ## 0.11.0 [2024-09-13]
 
 ### Features
