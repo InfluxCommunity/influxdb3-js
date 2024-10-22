@@ -1,6 +1,6 @@
 {
   "name": "@influxdata/influxdb3-client-browser",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "InfluxDB 3 client for browser",
   "scripts": {
     "apidoc:extract": "echo \"Nothing to do\"",
@@ -47,7 +47,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@influxdata/influxdb3-client": "^0.11.0",
+    "@influxdata/influxdb3-client": "^0.12.0",
     "cpr": "^3.0.1",
     "rimraf": "^5.0.0"
   }
