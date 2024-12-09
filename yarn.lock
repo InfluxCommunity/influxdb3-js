@@ -664,9 +664,9 @@
     yargs-parser "21.1.1"
 
 "@microsoft/api-documenter@^7.22.21":
-  version "7.26.0"
-  resolved "https://registry.yarnpkg.com/@microsoft/api-documenter/-/api-documenter-7.26.0.tgz#2e5d1609a5c79431553887a271ee48720cba612e"
-  integrity sha512-iI/Oj+vzHwD2YlsHCmw3I5nvunVWxL+F5B1GOBDn5yl2dZ5KOCoh1osOTl9uRDRR65ZGymIUO1EajMgjMZBdEw==
+  version "7.26.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/api-documenter/-/api-documenter-7.26.1.tgz#6470b927ac12b314b6cb4c83eff7cb101064be7d"
+  integrity sha512-flh7iPXsA3hzn03iXQYLiq7dvhTiBagGjmf7lvTNGABjWAKJez7ABI5T7+1jzbXjF3Luy1LFzugecXz9tMBavw==
   dependencies:
     "@microsoft/api-extractor-model" "7.30.0"
     "@microsoft/tsdoc" "~0.15.1"
