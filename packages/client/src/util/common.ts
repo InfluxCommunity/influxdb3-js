@@ -72,5 +72,5 @@ export const isUnsignedNumber = (value?: number | string | null): boolean => {
     return Number(value) >= 0
   }
 
-  return typeof value === 'number' && value >= 0;
+  return typeof value === 'number' && value >= 0
 }
