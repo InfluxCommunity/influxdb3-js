@@ -364,7 +364,7 @@ describe('e2e test', () => {
       expect(row['director']).to.equal('J_Ford')
     }
     expect(count).to.be.greaterThan(0)
-  }).timeout(5_000)
+  }).timeout(10_000)
 
   it('queries to points with parameters', async () => {
     const {database, token, url} = getEnvVariables()

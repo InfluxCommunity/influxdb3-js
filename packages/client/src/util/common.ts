@@ -35,3 +35,42 @@ export const collectAll = async <T>(
   }
   return results
 }
+
+/**
+ * Check if an input value is a valid number.
+ *
+ * @param value - The value to check
+ * @returns Returns true if the value is a valid number else false
+ */
+export const isNumber = (value?: number | string | null): boolean => {
+  if (value === null || undefined) {
+    return false
+  }
+
+  if (
+    typeof value === 'string' &&
+    (value === '' || value.indexOf(' ') !== -1)
+  ) {
+    return false
+  }
+
+  return value !== '' && !isNaN(Number(value?.toString()))
+}
+
+/**
+ * Check if an input value is a valid unsigned number.
+ *
+ * @param value - The value to check
+ * @returns Returns true if the value is a valid unsigned number else false
+ */
+export const isUnsignedNumber = (value?: number | string | null): boolean => {
+  if (!isNumber(value)) {
+    return false
+  }
+
+  if (typeof value === 'string') {
+    return Number(value) >= 0
+  }
+
+  return typeof value === 'number' && value >= 0
+}
