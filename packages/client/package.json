@@ -1,6 +1,6 @@
 {
   "name": "@influxdata/influxdb3-client",
-  "version": "0.12.0",
+  "version": "1.0.0",
   "description": "The Client that provides a simple and convenient way to interact with InfluxDB 3.",
   "scripts": {
     "apidoc:extract": "api-extractor run",
