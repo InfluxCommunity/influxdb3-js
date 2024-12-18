@@ -3,40 +3,49 @@ import {expect} from 'chai'
 import {isUnsignedNumber} from '../../../src/util/common'
 
 describe('Test functions in common', () => {
-  it('should check if value is a valid number', () => {
-    expect(isNumber(1)).equal(true)
-    expect(isNumber(-1)).equal(true)
-    expect(isNumber(-1.2)).equal(true)
-    expect(isNumber('-1.2')).equal(true)
-    expect(isNumber('2')).equal(true)
-
-    expect(isNumber('a')).equal(false)
-    expect(isNumber('true')).equal(false)
-    expect(isNumber('')).equal(false)
-    expect(isNumber(' ')).equal(false)
-    expect(isNumber('32a')).equal(false)
-    expect(isNumber('32 ')).equal(false)
-    expect(isNumber(null)).equal(false)
-    expect(isNumber(undefined)).equal(false)
-    expect(isNumber(NaN)).equal(false)
+  const pairs: Array<{value: any; expect: boolean}> = [
+    {value: 1, expect: true},
+    {value: -1, expect: true},
+    {value: -1.2, expect: true},
+    {value: '-1.2', expect: true},
+    {value: '2', expect: true},
+    {value: 'a', expect: false},
+    {value: 'true', expect: false},
+    {value: '', expect: false},
+    {value: ' ', expect: false},
+    {value: '32a', expect: false},
+    {value: '32 ', expect: false},
+    {value: null, expect: false},
+    {value: undefined, expect: false},
+    {value: NaN, expect: false},
+  ]
+  pairs.forEach((pair) => {
+    it(`check if ${pair.value} is a valid number`, () => {
+      expect(isNumber(pair.value)).to.equal(pair.expect)
+    })
   })
 
-  it('should check if value is a valid unsigned number', () => {
-    expect(isUnsignedNumber(1)).equal(true)
-    expect(isUnsignedNumber(1.2)).equal(true)
-    expect(isUnsignedNumber('1.2')).equal(true)
-    expect(isUnsignedNumber('2')).equal(true)
+  const pairs1: Array<{value: any; expect: boolean}> = [
+    {value: 1, expect: true},
+    {value: 1.2, expect: true},
+    {value: '1.2', expect: true},
+    {value: '2', expect: true},
+    {value: -2.3, expect: false},
+    {value: '-2.3', expect: false},
+    {value: 'a', expect: false},
+    {value: 'true', expect: false},
+    {value: '', expect: false},
+    {value: ' ', expect: false},
+    {value: '32a', expect: false},
+    {value: '32 ', expect: false},
+    {value: null, expect: false},
+    {value: undefined, expect: false},
+    {value: NaN, expect: false},
+  ]
 
-    expect(isUnsignedNumber(-2.3)).equal(false)
-    expect(isUnsignedNumber('-2.3')).equal(false)
-    expect(isUnsignedNumber('a')).equal(false)
-    expect(isUnsignedNumber('true')).equal(false)
-    expect(isUnsignedNumber('')).equal(false)
-    expect(isUnsignedNumber(' ')).equal(false)
-    expect(isUnsignedNumber('32a')).equal(false)
-    expect(isUnsignedNumber('32 ')).equal(false)
-    expect(isUnsignedNumber(null)).equal(false)
-    expect(isUnsignedNumber(undefined)).equal(false)
-    expect(isUnsignedNumber(NaN)).equal(false)
+  pairs1.forEach((pair) => {
+    it(`check if ${pair.value} is a valid unsigned number`, () => {
+      expect(isUnsignedNumber(pair.value)).to.equal(pair.expect)
+    })
   })
 })

@@ -16,7 +16,7 @@ export function getMappedValue(field: Field, value: any): any {
 
   const metaType = field.metadata.get('iox::column::type')
 
-  if (!metaType || (!metaType && field.typeId === ArrowType.Timestamp)) {
+  if (!metaType || field.typeId === ArrowType.Timestamp ) {
     return value
   }
 
