@@ -22,10 +22,6 @@ export function getMappedValue(field: Field, value: any): any {
 
   const [, , valueType, _fieldType] = metaType.split('::')
 
-  if (valueType === 'timestamp') {
-    return value
-  }
-
   if (valueType === 'field') {
     switch (_fieldType) {
       case 'integer':
