@@ -58,4 +58,6 @@ export function getMappedValue(field: Field, value: any): any {
         return value
     }
   }
+
+  return value
 }
