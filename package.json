@@ -13,6 +13,7 @@
     "apidoc:extract": "yarn workspaces run apidoc:extract && node scripts/fix-extracted-api-files.js",
     "apidoc:generate": "api-documenter markdown -i docs -o docs/dist && yarn cp scripts/gh-pages_config.yml docs/dist/_config.yml && node scripts/enhance-doc-index-md.js",
     "apidoc:gh-pages": "gh-pages -d docs/dist -m 'Updates [skip CI]'",
+    "typedoc:gh-pages": "gh-pages -d ./packages/client/docs -m 'Updates [skip CI]'",
     "preinstall": "node ./scripts/require-yarn.js",
     "clean": "rimraf temp docs && yarn workspaces run clean",
     "cp": "node ./scripts/cp.js",
