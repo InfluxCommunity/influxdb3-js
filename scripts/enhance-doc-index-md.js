@@ -26,7 +26,7 @@ function enhanceIndexMD(file) {
       if (line.startsWith('## API Reference')) {
         acc.push('')
         acc.push(
-          `Welcome to the API Reference Documentation of InfluxDB 3 JavaScript Client (version ${version} _${new Date().toISOString()}_).`
+          `!!!!!!!Welcome to the API Reference Documentation of InfluxDB 3 JavaScript Client (version ${version} _${new Date().toISOString()}_).`
         )
         acc.push('Use this client library with InfluxDB 3.')
         acc.push(
