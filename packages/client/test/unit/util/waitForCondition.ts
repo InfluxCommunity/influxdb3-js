@@ -3,7 +3,6 @@
  * for at most `timeout` milliseconds. The `condition`
  * every `step` milliseconds.
  * @param condition - condition to validate
- * @param message
  * @param timeout - maximum wait time
  * @param step - interval to validate the condition
  */
