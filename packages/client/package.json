@@ -4,6 +4,7 @@
   "description": "The Client that provides a simple and convenient way to interact with InfluxDB 3.",
   "scripts": {
     "apidoc:extract": "api-extractor run",
+    "typedoc": "typedoc",
     "build": "yarn cp ../../README.md ./README.md && yarn run clean && yarn run build:browser && yarn run build:node",
     "build:node": "yarn tsup",
     "build:browser": "yarn tsup --config ./tsup.config.browser.ts",
