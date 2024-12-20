@@ -683,7 +683,8 @@ describe('NodeHttpTransport', () => {
       if (resume) resume()
       await waitForCondition(
         () => spy.complete.callCount === 1,
-        'response is fully read'
+        'response is fully read',
+        500
       )
       expect(spy.next.callCount).is.greaterThan(2)
     })
