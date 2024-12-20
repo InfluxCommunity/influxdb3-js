@@ -1,3 +1,5 @@
 {
-  "entryPoints": ["./src/**/*.ts"],
+  "entryPoints": [
+    "./src/**/*.ts"
+  ]
 }
