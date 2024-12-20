@@ -44,7 +44,8 @@
     "gh-pages": "^6.0.0",
     "lerna": "^8.0.0",
     "prettier": "^3.0.0",
-    "rimraf": "^5.0.0"
+    "rimraf": "^5.0.0",
+    "typedoc": "^0.27.5"
   },
   "resolutions": {
     "jackspeak": "2.1.1"
