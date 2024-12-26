@@ -123,8 +123,7 @@ export class NodeHttpTransport implements Transport {
    *
    * @param path - HTTP request  path
    * @param body - message body
-   * @param headers - HTTP headers
-   * @param method - HTTP method
+   * @param options
    * @param callbacks - communication callbacks
    */
   send(
@@ -153,8 +152,9 @@ export class NodeHttpTransport implements Transport {
    * response's content-type (deserialized json, text).
 
    * @param path - HTTP path
-   * @param requestBody - request body
+   * @param body
    * @param options - send options
+   * @param responseStarted
    * @returns Promise of response body
    */
   request(
