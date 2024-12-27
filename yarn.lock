@@ -491,6 +491,18 @@
   resolved "https://registry.yarnpkg.com/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz#98c23c950a3d9b6c8f0daed06da6c3af06981340"
   integrity sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==
 
+"@isaacs/cliui@^8.0.2":
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/@isaacs/cliui/-/cliui-8.0.2.tgz#b37667b7bc181c168782259bab42474fbf52b550"
+  integrity sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==
+  dependencies:
+    string-width "^5.1.2"
+    string-width-cjs "npm:string-width@^4.2.0"
+    strip-ansi "^7.0.1"
+    strip-ansi-cjs "npm:strip-ansi@^6.0.1"
+    wrap-ansi "^8.1.0"
+    wrap-ansi-cjs "npm:wrap-ansi@^7.0.0"
+
 "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@isaacs/string-locale-compare/-/string-locale-compare-1.1.0.tgz#291c227e93fd407a96ecd59879a35809120e432b"
@@ -585,6 +597,86 @@
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
+
+"@lakehouse-rs/flight-sql-client-android-arm-eabi@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-android-arm-eabi/-/flight-sql-client-android-arm-eabi-0.0.10.tgz#78d91d979c1d111cd2b3e4613d71a759d4c276f5"
+  integrity sha512-FSats/tFyqMcfLLUcvSxnrm5KT17yJAfel8dPUO9V3Whv/MYrEOpAsrcweqNTgralzZigSw19XYg0OxHHbeveg==
+
+"@lakehouse-rs/flight-sql-client-android-arm64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-android-arm64/-/flight-sql-client-android-arm64-0.0.10.tgz#c9097886b6076fc53cbd3f500e4e2741e8531047"
+  integrity sha512-SM0b49oUlx6IiYOj87Y7C5V4caLf1SDiKu7XNYsgaFaBT1cyCKjkcAsfB2PWMmmhKsgp/UkofKHd+d0OzUdJkA==
+
+"@lakehouse-rs/flight-sql-client-darwin-arm64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-darwin-arm64/-/flight-sql-client-darwin-arm64-0.0.10.tgz#09b46fc9877ab3c5a293a4337d7d9881e74f7679"
+  integrity sha512-vGvxWUUQiP8xpDYrSVoYnB9w6R2HloR0Fjuyn8orTy/MxI5duK5uyOvkwM2BkBmU52aLAGCvVzfHnF86oIZRRQ==
+
+"@lakehouse-rs/flight-sql-client-darwin-x64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-darwin-x64/-/flight-sql-client-darwin-x64-0.0.10.tgz#e31e52c5ba598b46191dece5b707bf530aeef39b"
+  integrity sha512-GG798Nd2RwSQwJF7lD2p6WjMP2LGtFt0jLzVBHKvr9WeACufOUgqoEeo8UWcAhNRtv0/kQLoieM3D0ytC9dgLg==
+
+"@lakehouse-rs/flight-sql-client-freebsd-x64@0.0.10":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-freebsd-x64/-/flight-sql-client-freebsd-x64-0.0.7.tgz#772289873234994a338d3878ae062aa5de737da6"
+  integrity sha512-XVErUhgidw3GPVrbI14HPOmkIV8r6bF6SUdemN+8n/6ldF0xDsgdjwWGj9PBUkEwn6tZkfjafF4UsQyLJ/UUEQ==
+
+"@lakehouse-rs/flight-sql-client-linux-arm-gnueabihf@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm-gnueabihf/-/flight-sql-client-linux-arm-gnueabihf-0.0.10.tgz#89e50c576d6fef0fd38d6764907832fb7f31cb52"
+  integrity sha512-mwV0cXYzxgbK3cDZim+zyMfB5MhYuSZAapgeVYoNjtmDaWDDZNd4k5aOqdYAq6N0HTAYvxZ3CLaYowJoy+3vmg==
+
+"@lakehouse-rs/flight-sql-client-linux-arm64-gnu@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm64-gnu/-/flight-sql-client-linux-arm64-gnu-0.0.10.tgz#5a81f1c5ae8f9f2a6fd5caa9f233ad057ba10eb3"
+  integrity sha512-YUG06GgSWrXfwcfK38q4Uvxe4zp30cE9Z0ElXrty0x49VchtYAR2GeenPtUAYJ8ebslan7pWzErfxKKz6QDvSA==
+
+"@lakehouse-rs/flight-sql-client-linux-arm64-musl@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm64-musl/-/flight-sql-client-linux-arm64-musl-0.0.10.tgz#ca168799f41262ac273ab939a4b4949a5ca96003"
+  integrity sha512-6iVOb8wHjgsAMJkdHb01LE0wof3hv68kjYOtMFF7DJwLZBWXqLInN0iHOK0/U13EWKEnGD25JjyVbaq3he7OgQ==
+
+"@lakehouse-rs/flight-sql-client-linux-x64-gnu@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-x64-gnu/-/flight-sql-client-linux-x64-gnu-0.0.10.tgz#9df7201836b1babbbe8a65446ca00606abf1833f"
+  integrity sha512-31YEbhfdURz/FTpF427XARMiAnbEonvbEXgRRpVAcMe/ANvKofVKicGvTH/IG2qNUwbqobD4mjQdfQhM3CqVyg==
+
+"@lakehouse-rs/flight-sql-client-linux-x64-musl@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-x64-musl/-/flight-sql-client-linux-x64-musl-0.0.10.tgz#b513dfc32da16abd38e89261f728239837191d5c"
+  integrity sha512-bjJ8miz+OwXow0AU0MRIicCtLJzHD9A/SlERtvo9KvOhjjQPTjUV5vzZTNoyJLvSs0Rw/lfsJb9Xib8EIiuvuQ==
+
+"@lakehouse-rs/flight-sql-client-win32-ia32-msvc@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-win32-ia32-msvc/-/flight-sql-client-win32-ia32-msvc-0.0.10.tgz#f77e3e294855a9d6a58f735f17e24811b2f523d0"
+  integrity sha512-A0qZVDD9mRaevgry8KuuDt7DyNQ8YdwTSFe+KYXHCK9u21nibjTuh9A66cDOVNPwVOt5BFC9wRX0NlVMVIcZ0Q==
+
+"@lakehouse-rs/flight-sql-client-win32-x64-msvc@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-win32-x64-msvc/-/flight-sql-client-win32-x64-msvc-0.0.10.tgz#80f33bba748058d360674a7ca4adc20de9a97774"
+  integrity sha512-RSc8xFGh8SSBSwgb4inAasb5ri2hsIcf4PPbpzBlAx+o/WcWnvxpE1zGReOX/0+aFPKLS6I+w4Hk3Zoh9yv0Fg==
+
+"@lakehouse-rs/flight-sql-client@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client/-/flight-sql-client-0.0.10.tgz#82d80d5565bfc5add6b8a8a590688dadb66ab250"
+  integrity sha512-a+4rshqmgpQcgXaWSRv6KkzJdOHsOBP5wqu/NK9DaMPvswNlWaDS49xEdwqZw9Y1UE2GXJVQ1fCQpyWEN+d+sA==
+  dependencies:
+    apache-arrow "^14.0.1"
+  optionalDependencies:
+    "@lakehouse-rs/flight-sql-client-android-arm-eabi" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-android-arm64" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-darwin-arm64" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-darwin-x64" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-freebsd-x64" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-linux-arm-gnueabihf" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-linux-arm64-gnu" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-linux-arm64-musl" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-linux-x64-gnu" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-linux-x64-musl" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-win32-ia32-msvc" "0.0.10"
+    "@lakehouse-rs/flight-sql-client-win32-x64-msvc" "0.0.10"
 
 "@lerna/create@8.1.9":
   version "8.1.9"
@@ -1455,10 +1547,20 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.3.16.tgz#b1572967f0b8b60bf3f87fe1d854a5604ea70c82"
   integrity sha512-PatH4iOdyh3MyWtmHVFXLWCCIhUbopaltqddG9BzB+gMIzee2MJrvd+jouii9Z3wzQJruGWAm7WOMjgfG8hQlQ==
 
+"@types/command-line-args@5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@types/command-line-args/-/command-line-args-5.2.0.tgz#adbb77980a1cc376bb208e3f4142e907410430f6"
+  integrity sha512-UuKzKpJJ/Ief6ufIaIzr3A/0XnluX7RvFgwkV89Yzvm77wCh1kFaFmqN8XEnGcN62EuHdedQjEMb8mYxFLGPyA==
+
 "@types/command-line-args@^5.2.3":
   version "5.2.3"
   resolved "https://registry.yarnpkg.com/@types/command-line-args/-/command-line-args-5.2.3.tgz#553ce2fd5acf160b448d307649b38ffc60d39639"
   integrity sha512-uv0aG6R0Y8WHZLTamZwtfsDLVRnOa+n+n5rEvFWL5Na5gZ8V2Teab/duDPFzIIIhs9qizDpcavCusCLJZu62Kw==
+
+"@types/command-line-usage@5.0.2":
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/@types/command-line-usage/-/command-line-usage-5.0.2.tgz#ba5e3f6ae5a2009d466679cc431b50635bf1a064"
+  integrity sha512-n7RlEEJ+4x4TS7ZQddTmNSxP+zziEG0TNsMfiRIxcIVXt71ENJ9ojeXmGO3wPoTdn7pJcU2xc3CJYMktNT6DPg==
 
 "@types/command-line-usage@^5.0.4":
   version "5.0.4"
@@ -1490,6 +1592,11 @@
   resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-10.0.10.tgz#91f62905e8d23cbd66225312f239454a23bebfa0"
   integrity sha512-xPyYSz1cMPnJQhl0CLMH68j3gprKZaTjG3s5Vi+fDgx+uhG9NOXwbVt52eFS8ECyXhyKcjDLCBEqBExKuiZb7Q==
 
+"@types/node@20.3.0":
+  version "20.3.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.3.0.tgz#719498898d5defab83c3560f45d8498f58d11938"
+  integrity sha512-cumHmIAf6On83X7yP+LrsEyUOf/YlociZelmpRYaGFydoaPdxdt80MAbu6vWerQT2COCp2nPvHdsbD7tHn/YlQ==
+
 "@types/node@>=13.7.0", "@types/node@^22":
   version "22.10.1"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-22.10.1.tgz#41ffeee127b8975a05f8c4f83fb89bcb2987d766"
@@ -1508,6 +1615,11 @@
   version "2.4.4"
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.4.tgz#56e2cc26c397c038fab0e3a917a12d5c5909e901"
   integrity sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==
+
+"@types/pad-left@2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@types/pad-left/-/pad-left-2.1.1.tgz#17d906fc75804e1cc722da73623f1d978f16a137"
+  integrity sha512-Xd22WCRBydkGSApl5Bw0PhAOHKSVjNL3E3AwzKaps96IMraPqy5BvZIsBVK6JLwdybUzjHnuWVwpDd0JjTfHXA==
 
 "@types/sinon@^17.0.0":
   version "17.0.3"
@@ -1744,6 +1856,11 @@ ansi-regex@^5.0.1:
   resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-5.0.1.tgz#082cb2c89c9fe8659a311a53bd6a4dc5301db304"
   integrity sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ==
 
+ansi-regex@^6.0.1:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/ansi-regex/-/ansi-regex-6.1.0.tgz#95ec409c69619d6cb1b8b34f14b660ef28ebd654"
+  integrity sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==
+
 ansi-styles@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-3.2.1.tgz#41fbb20243e50b12be0f04b8dedbf07520ce841d"
@@ -1763,6 +1880,11 @@ ansi-styles@^5.0.0:
   resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-5.2.0.tgz#07449690ad45777d1924ac2abb2fc8895dba836b"
   integrity sha512-Cxwpt2SfTzTtXcfOlzGEee8O+c+MmUgGrNiBcXnuWxuFJHe6a5Hz7qwhwe5OgaSYI0IJvkLqWX1ASG+cJOkEiA==
 
+ansi-styles@^6.1.0:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-6.2.1.tgz#0e62320cf99c21afff3b3012192546aacbfb05c5"
+  integrity sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==
+
 any-promise@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/any-promise/-/any-promise-1.3.0.tgz#abc6afeedcea52e809cdc0376aed3ce39635d17f"
@@ -1775,6 +1897,22 @@ anymatch@~3.1.2:
   dependencies:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
+
+apache-arrow@^14.0.1:
+  version "14.0.2"
+  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-14.0.2.tgz#737f7b8211ef99a2c137dcc9d2001b469efb0344"
+  integrity sha512-EBO2xJN36/XoY81nhLcwCJgFwkboDZeyNQ+OPsG7bCoQjc2BT0aTyH/MR6SrL+LirSNz+cYqjGRlupMMlP1aEg==
+  dependencies:
+    "@types/command-line-args" "5.2.0"
+    "@types/command-line-usage" "5.0.2"
+    "@types/node" "20.3.0"
+    "@types/pad-left" "2.1.1"
+    command-line-args "5.2.1"
+    command-line-usage "7.0.1"
+    flatbuffers "23.5.26"
+    json-bignum "^0.0.3"
+    pad-left "^2.1.0"
+    tslib "^2.5.3"
 
 apache-arrow@^18.0.0:
   version "18.0.0"
@@ -2281,7 +2419,7 @@ combined-stream@^1.0.8:
   dependencies:
     delayed-stream "~1.0.0"
 
-command-line-args@^5.2.1:
+command-line-args@5.2.1, command-line-args@^5.2.1:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/command-line-args/-/command-line-args-5.2.1.tgz#c44c32e437a57d7c51157696893c5909e9cec42e"
   integrity sha512-H4UfQhZyakIjC74I9d34fGYDwk3XpSr17QhEd0Q3I9Xq1CETHo4Hcuo87WyWHpAF1aSLjLRf5lD9ZGX2qStUvg==
@@ -2291,7 +2429,7 @@ command-line-args@^5.2.1:
     lodash.camelcase "^4.3.0"
     typical "^4.0.0"
 
-command-line-usage@^7.0.0, command-line-usage@^7.0.1:
+command-line-usage@7.0.1, command-line-usage@^7.0.0, command-line-usage@^7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/command-line-usage/-/command-line-usage-7.0.1.tgz#e540afef4a4f3bc501b124ffde33956309100655"
   integrity sha512-NCyznE//MuTjwi3y84QVUGEOT+P5oto1e1Pk/jFPVdPPfsG03qpTIl3yw6etR+v73d0lXsoojRpvbru2sqePxQ==
@@ -2623,6 +2761,11 @@ duplexer@^0.1.1:
   resolved "https://registry.yarnpkg.com/duplexer/-/duplexer-0.1.2.tgz#3abe43aef3835f8ae077d136ddce0f276b0400e6"
   integrity sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==
 
+eastasianwidth@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/eastasianwidth/-/eastasianwidth-0.2.0.tgz#696ce2ec0aa0e6ea93a397ffcf24aa7840c827cb"
+  integrity sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==
+
 ejs@^3.1.7:
   version "3.1.10"
   resolved "https://registry.yarnpkg.com/ejs/-/ejs-3.1.10.tgz#69ab8358b14e896f80cc39e62087b88500c3ac3b"
@@ -2644,6 +2787,11 @@ emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
   integrity sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==
+
+emoji-regex@^9.2.2:
+  version "9.2.2"
+  resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-9.2.2.tgz#840c8803b0d8047f4ff0cf963176b32d4ef3ed72"
+  integrity sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==
 
 encoding@^0.1.13:
   version "0.1.13"
@@ -3030,6 +3178,11 @@ flat@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/flat/-/flat-5.0.2.tgz#8ca6fe332069ffa9d324c327198c598259ceb241"
   integrity sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==
+
+flatbuffers@23.5.26:
+  version "23.5.26"
+  resolved "https://registry.yarnpkg.com/flatbuffers/-/flatbuffers-23.5.26.tgz#01358e272a61239f0faf3bfbe4e014f3ace9d746"
+  integrity sha512-vE+SI9vrJDwi1oETtTIFldC/o9GsVKRM+s6EL0nQgxXlYV1Vc4Tk30hj4xGICftInKQKj1F3up2n8UbIVobISQ==
 
 flatbuffers@^24.3.25:
   version "24.3.25"
@@ -3788,12 +3941,12 @@ istanbul-reports@^3.0.2:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
 
-jackspeak@2.1.1, jackspeak@^2.3.5:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/jackspeak/-/jackspeak-2.1.1.tgz#2a42db4cfbb7e55433c28b6f75d8b796af9669cd"
-  integrity sha512-juf9stUEwUaILepraGOWIJTLwg48bUnBmRqd2ln2Os1sW987zeoj/hzhbvRB95oMuS2ZTpjULmdwHNX4rzZIZw==
+jackspeak@^2.3.5:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/jackspeak/-/jackspeak-2.3.6.tgz#647ecc472238aee4b06ac0e461acc21a8c505ca8"
+  integrity sha512-N3yCS/NegsOBokc8GAdM8UcmfsKiSS8cipheD/nivzr700H+nsMOxJjQnvwOcRYVuFkdH0wGUvW2WbXGmrZGbQ==
   dependencies:
-    cliui "^8.0.1"
+    "@isaacs/cliui" "^8.0.2"
   optionalDependencies:
     "@pkgjs/parseargs" "^0.11.0"
 
@@ -5101,6 +5254,13 @@ pacote@^18.0.0, pacote@^18.0.6:
     ssri "^10.0.0"
     tar "^6.1.11"
 
+pad-left@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/pad-left/-/pad-left-2.1.0.tgz#16e6a3b2d44a8e138cb0838cc7cb403a4fc9e994"
+  integrity sha512-HJxs9K9AztdIQIAIa/OIazRAUW/L6B9hbQDxO4X07roW3eo9XqZc2ur9bn1StH9CnbbI9EgvejHQX7CBpCF1QA==
+  dependencies:
+    repeat-string "^1.5.4"
+
 parent-module@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/parent-module/-/parent-module-1.0.1.tgz#691d2709e78c79fae3a156622452d00762caaaa2"
@@ -5521,6 +5681,11 @@ release-zalgo@^1.0.0:
   dependencies:
     es6-error "^4.0.1"
 
+repeat-string@^1.5.4:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/repeat-string/-/repeat-string-1.6.1.tgz#8dcae470e1c88abc2d600fff4a776286da75e637"
+  integrity sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==
+
 require-directory@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/require-directory/-/require-directory-2.1.1.tgz#8c64ad5fd30dab1c976e2344ffe7f792a6a6df42"
@@ -5889,6 +6054,15 @@ string-argv@~0.3.1:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.2.tgz#2b6d0ef24b656274d957d54e0a4bbf6153dc02b6"
   integrity sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==
 
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
 "string-width@^1.0.2 || 2 || 3 || 4", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
@@ -5897,6 +6071,15 @@ string-argv@~0.3.1:
     emoji-regex "^8.0.0"
     is-fullwidth-code-point "^3.0.0"
     strip-ansi "^6.0.1"
+
+string-width@^5.0.1, string-width@^5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-5.1.2.tgz#14f8daec6d81e7221d2a357e668cab73bdbca794"
+  integrity sha512-HnLOCR3vjcY8beoNLtcjZ5/nxn2afmME6lhrDrebokqMap+XbeW8n9TXpPDOqdGK5qcI3oT0GKTW6wC7EMiVqA==
+  dependencies:
+    eastasianwidth "^0.2.0"
+    emoji-regex "^9.2.2"
+    strip-ansi "^7.0.1"
 
 string_decoder@^1.1.1:
   version "1.3.0"
@@ -5912,12 +6095,26 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
 strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
   dependencies:
     ansi-regex "^5.0.1"
+
+strip-ansi@^7.0.1:
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-7.1.0.tgz#d5b6568ca689d8561370b0707685d22434faff45"
+  integrity sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==
+  dependencies:
+    ansi-regex "^6.0.1"
 
 strip-bom@^3.0.0:
   version "3.0.0"
@@ -6212,6 +6409,11 @@ tslib@^2.1.0, tslib@^2.3.0, tslib@^2.4.0, tslib@^2.6.2:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
   integrity sha512-AEYxH93jGFPn/a2iVAwW87VuUIkR1FVUKB77NwMF7nBTDkDrrT/Hpt/IrCJ0QXhW27jTBDcf5ZY7w6RiqTMw2Q==
 
+tslib@^2.5.3:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.8.1.tgz#612efe4ed235d567e8aba5f2a5fab70280ade83f"
+  integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
+
 tsup@^8.0.1:
   version "8.3.5"
   resolved "https://registry.yarnpkg.com/tsup/-/tsup-8.3.5.tgz#d55344e4756e924bf6f442e54e7d324b4471eee0"
@@ -6494,6 +6696,15 @@ workerpool@^6.5.1:
   resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-6.5.1.tgz#060f73b39d0caf97c6db64da004cd01b4c099544"
   integrity sha512-Fs4dNYcsdpYSAfVxhnl1L5zTksjvOJxtC5hzMNl+1t9B8hTJTdKDyZ5ju7ztgPy+ft9tBFXoOlDNiOT9WUXZlA==
 
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
 wrap-ansi@^6.0.1, wrap-ansi@^6.2.0:
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-6.2.0.tgz#e9393ba07102e6c91a3b221478f0257cd2856e53"
@@ -6511,6 +6722,15 @@ wrap-ansi@^7.0.0:
     ansi-styles "^4.0.0"
     string-width "^4.1.0"
     strip-ansi "^6.0.0"
+
+wrap-ansi@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-8.1.0.tgz#56dc22368ee570face1b49819975d9b9a5ead214"
+  integrity sha512-si7QWI6zUMq56bESFvagtmzMdGOtoxfR+Sez11Mobfc7tm+VkUckk9bW2UeffTGVUbOksxmSw0AA2gs8g71NCQ==
+  dependencies:
+    ansi-styles "^6.1.0"
+    string-width "^5.0.1"
+    strip-ansi "^7.0.1"
 
 wrappy@1:
   version "1.0.2"

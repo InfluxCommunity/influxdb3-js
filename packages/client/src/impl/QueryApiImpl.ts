@@ -88,9 +88,11 @@ export default class QueryApiImpl implements QueryApi {
 
     const meta = this.prepareMetadata(options.headers)
     const rpcOptions: RpcOptions = {meta}
-
+    const getStart = Date.now();
     const flightDataStream = client.doGet(ticket, rpcOptions)
-
+    const getEnd = Date.now();
+    console.log(`get time: ${getEnd - getStart}ms`);
+    const start = Date.now();
     const binaryStream = (async function* () {
       for await (const flightData of flightDataStream.responses) {
         // Include the length of dataHeader for the reader.
@@ -102,7 +104,8 @@ export default class QueryApiImpl implements QueryApi {
     })()
 
     const reader = await RecordBatchReader.from(binaryStream)
-
+    const end = Date.now();
+    console.log(`record batch reader time: ${end - start}ms`);
     yield* reader
   }
 
@@ -112,7 +115,7 @@ export default class QueryApiImpl implements QueryApi {
     options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
     const batches = this._queryRawBatches(query, database, options)
-
+    const start = Date.now();
     for await (const batch of batches) {
       const row: Record<string, any> = {}
       for (const batchRow of batch) {
@@ -122,7 +125,10 @@ export default class QueryApiImpl implements QueryApi {
         yield row
       }
     }
+    const end = Date.now();
+    console.log(`query response time: ${end - start}ms`);
   }
+
 
   async *queryPoints(
     query: string,
