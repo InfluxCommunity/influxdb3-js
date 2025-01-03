@@ -9,6 +9,7 @@ import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
 import {CLIENT_LIB_USER_AGENT} from './version'
+import {getMappedValue} from '../util/TypeCasting'
 
 export type TicketDataType = {
   database: string
@@ -117,7 +118,8 @@ export default class QueryApiImpl implements QueryApi {
       const row: Record<string, any> = {}
       for (const batchRow of batch) {
         for (const column of batch.schema.fields) {
-          row[column.name] = batchRow[column.name]
+          const value = batchRow[column.name]
+          row[column.name] = getMappedValue(column, value)
         }
         yield row
       }
@@ -164,8 +166,10 @@ export default class QueryApiImpl implements QueryApi {
           const [, , valueType, _fieldType] = metaType.split('::')
 
           if (valueType === 'field') {
-            if (_fieldType && value !== undefined && value !== null)
-              values.setField(name, value, _fieldType as PointFieldType)
+            if (_fieldType && value !== undefined && value !== null) {
+              const mappedValue = getMappedValue(columnSchema, value)
+              values.setField(name, mappedValue, _fieldType as PointFieldType)
+            }
           } else if (valueType === 'tag') {
             values.setTag(name, value)
           } else if (valueType === 'timestamp') {
