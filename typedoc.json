@@ -1,5 +1,19 @@
 {
+  "highlightLanguages": [
+    "javascript",
+    "typescript",
+    "sh",
+    "powershell",
+    "console",
+  ],
   "entryPoints": [
     "./packages/client/src/**/*.ts"
-  ]
+  ],
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "rewrittenLink": true,
+    "notDocumented": false,
+    "unusedMergeModuleWith": true
+  }
 }
