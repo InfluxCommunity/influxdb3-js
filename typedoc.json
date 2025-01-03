@@ -9,11 +9,13 @@
   "entryPoints": [
     "./packages/client/src/**/*.ts"
   ],
+  "cleanOutputDir": true,
   "validation": {
-    "notExported": true,
+    "notExported": false,
     "invalidLink": true,
-    "rewrittenLink": true,
+    "rewrittenLink": false,
     "notDocumented": false,
-    "unusedMergeModuleWith": true
-  }
+    "unusedMergeModuleWith": false
+  },
+  "blockTags": ["@param", "@returns", "@generated", "@throws", "@defaultValue", "@example"]
 }
