@@ -55,7 +55,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
 }
 
 /**
- * Options used by {@link InfluxDBClient.write} .
+ * Options used by {@link InfluxDBClient.default.write} .
  *
  * @example WriteOptions in write call
  * ```typescript
@@ -125,7 +125,7 @@ export const DEFAULT_WriteOptions: WriteOptions = {
 export type QueryType = 'sql' | 'influxql'
 
 /**
- * Options used by {@link InfluxDBClient.query} and by {@link InfluxDBClient.queryPoints}.
+ * Options used by {@link InfluxDBClient.default.query} and by {@link InfluxDBClient.default.queryPoints}.
  *
  * @example QueryOptions in queryCall
  * ```typescript

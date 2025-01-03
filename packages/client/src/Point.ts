@@ -116,7 +116,7 @@ export class Point {
    * or an undefined value. An undefined value instructs to assign a local timestamp using
    * the client's clock. An empty string can be used to let the server assign
    * the timestamp. A number value represents time as a count of time units since epoch, the
-   * exact time unit then depends on the {@link InfluxDBClient.write | precision} of the API
+   * exact time unit then depends on the {@link InfluxDBClient.default.write | precision} of the API
    * that writes the point.
    *
    * Beware that the current time in nanoseconds can't precisely fit into a JS number,
@@ -183,7 +183,7 @@ export class Point {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
+   * @throws {@link PointValues.GetFieldTypeMissmatchError} Actual type of field doesn't match float type.
    * @returns The float field value or undefined.
    */
   public getFloatField(name: string): number | undefined {
@@ -209,7 +209,7 @@ export class Point {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
+   * @throws {@link PointValues.GetFieldTypeMissmatchError} Actual type of field doesn't match integer type.
    * @returns The integer field value or undefined.
    */
   public getIntegerField(name: string): number | undefined {
@@ -235,7 +235,7 @@ export class Point {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
+   * @throws {@link PointValues.GetFieldTypeMissmatchError} Actual type of field doesn't match uint type.
    * @returns The uint field value or undefined.
    */
   public getUintegerField(name: string): number | undefined {
@@ -261,7 +261,7 @@ export class Point {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
+   * @throws {@link PointValues.GetFieldTypeMissmatchError} Actual type of field doesn't match string type.
    * @returns The string field value or undefined.
    */
   public getStringField(name: string): string | undefined {
@@ -286,7 +286,7 @@ export class Point {
    * If the field is not present, returns undefined.
    *
    * @param name - field name
-   * @throws {@link GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
+   * @throws {@link PointValues.GetFieldTypeMissmatchError} Actual type of field doesn't match boolean type.
    * @returns The boolean field value or undefined.
    */
   public getBooleanField(name: string): boolean | undefined {
