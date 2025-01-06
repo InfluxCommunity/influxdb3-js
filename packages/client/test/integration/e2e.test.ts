@@ -1,7 +1,6 @@
 import {expect} from 'chai'
 import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
