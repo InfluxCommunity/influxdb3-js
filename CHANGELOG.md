@@ -1,5 +1,9 @@
 ## 0.13.0 [unreleased]
 
+### Features
+
+1. [499](https://github.com/InfluxCommunity/influxdb3-js/pull/499): Migrate to new doc library
+
 ## 0.12.0 [2024-10-22]
 
 ### Bugfix
