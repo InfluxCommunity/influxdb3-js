@@ -68,7 +68,9 @@ describe('e2e test', () => {
       .setIntegerField('testId', testId)
     await client.write(point, database)
 
-    const query = `SELECT * FROM "stat" WHERE "testId" = ${testId}`
+    const query = `SELECT *
+                   FROM "stat"
+                   WHERE "testId" = ${testId}`
 
     const data = client.query(query, database)
 
@@ -99,7 +101,7 @@ describe('e2e test', () => {
     // test aggregation query
     //
     const queryAggregation = `
-    SELECT sum("avg") as "sum_avg", sum("max") as "sum_max"
+        SELECT sum("avg") as "sum_avg", sum("max") as "sum_max"
         FROM "stat"
         WHERE "testId" = ${testId}
     `
@@ -147,12 +149,12 @@ describe('e2e test', () => {
     await sleep(2_000)
 
     const query = `
-      SELECT *
+        SELECT *
         FROM "stat"
         WHERE
-        time >= now() - interval '10 minute'
-        AND
-        "testId" = ${testId}
+            time >= now() - interval '10 minute'
+          AND
+            "testId" = ${testId}
     `
     const paralelQueries = 8
 
@@ -224,12 +226,12 @@ describe('e2e test', () => {
     await sleep(5_000)
 
     const query = `
-      SELECT *
+        SELECT *
         FROM "stat"
         WHERE
-        time >= now() - interval '10 minute'
-        AND
-        "testId" = ${testId}
+            time >= now() - interval '10 minute'
+          AND
+            "testId" = ${testId}
     `
     const queryValues: typeof values = []
 
@@ -276,7 +278,9 @@ describe('e2e test', () => {
       database
     )
 
-    const sql = `Select * from host15 where \"testId\" = ${testId}`
+    const sql = `Select *
+                 from host15
+                 where \"testId\" = ${testId}`
     let dataPoints = client.queryPoints(sql, database)
 
     let pointRow: IteratorResult<PointValues, void>
@@ -352,6 +356,7 @@ describe('e2e test', () => {
       quality: 'Excellent',
     },
   ]
+
   async function writeFrameSamples(client: InfluxDBClient, database: string) {
     const time = Date.now()
 
@@ -388,12 +393,12 @@ describe('e2e test', () => {
     await sleep(3_000)
 
     const query = `
-      SELECT *
+        SELECT *
         FROM "${samples[0].measurement}"
         WHERE
-        time >= now() - interval '10 minute'
-        AND
-        "director" = $director    
+            time >= now() - interval '10 minute'
+          AND
+            "director" = $director
     `
     const data = client.query(query, database, {
       type: 'sql',
@@ -424,12 +429,12 @@ describe('e2e test', () => {
     await sleep(3_000)
 
     const query = `
-      SELECT *
+        SELECT *
         FROM "${samples[0].measurement}"
         WHERE
-        time >= now() - interval '10 minute'
-        AND
-        "director" = $director    
+            time >= now() - interval '10 minute'
+          AND
+            "director" = $director
     `
     const points = client.queryPoints(query, database, {
       type: 'sql',
@@ -461,11 +466,12 @@ describe('e2e test', () => {
     await sleep(3_000)
 
     const query = `SELECT *
-FROM "frame"
-WHERE
-time > now() - 1h
-AND
-"director" = 'H_Hathaway'`
+                   FROM "frame"
+                   WHERE
+                       time
+                       > now() - 1h
+                     AND
+                       "director" = 'H_Hathaway'`
 
     const points = client.queryPoints(query, database)
 
