@@ -274,17 +274,16 @@ describe('e2e test', () => {
     const time = Date.now()
     const testId = getRandomInt(0, 100000000)
     await client.write(
-      `host15,tag=empty name=\"intel\",mem_total=2048,disk_free=100i,temperature=100.86,isActive=true,testId=\"${testId}\" ${time}`,
+      `host15,tag=empty name="intel",mem_total=2048,disk_free=100i,temperature=100.86,isActive=true,testId="${testId}" ${time}`,
       database
     )
 
     const sql = `Select *
                  from host15
-                 where \"testId\" = ${testId}`
-    let dataPoints = client.queryPoints(sql, database)
+                 where "testId" = ${testId}`
+    const dataPoints = client.queryPoints(sql, database)
 
-    let pointRow: IteratorResult<PointValues, void>
-    pointRow = await dataPoints.next()
+    const pointRow: IteratorResult<PointValues, void> = await dataPoints.next()
 
     expect(pointRow.value?.getField('name')).to.equal('intel')
     expect(pointRow.value?.getFieldType('name')).to.equal('string')
