@@ -1,7 +1,7 @@
 import {expect} from 'chai'
-import {InfluxDBClient, Point} from '../../src'
+import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
-import {PointValues} from '../../src'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -257,6 +257,48 @@ describe('e2e test', () => {
 
     await client.close()
   }).timeout(40_000)
+
+  it('queryPoints with getMappedValue', async () => {
+    const {database, token, url} = getEnvVariables()
+
+    const client = new InfluxDBClient({
+      host: url,
+      token,
+      writeOptions: {
+        precision: 'ms',
+      },
+    })
+
+    const time = Date.now()
+    const testId = getRandomInt(0, 100000000)
+    await client.write(
+      `host15,tag=empty name=\"intel\",mem_total=2048,disk_free=100i,temperature=100.86,isActive=true,testId=\"${testId}\" ${time}`,
+      database
+    )
+
+    const sql = `Select * from host15 where \"testId\" = ${testId}`
+    let dataPoints = client.queryPoints(sql, database)
+
+    let pointRow: IteratorResult<PointValues, void>
+    pointRow = await dataPoints.next()
+
+    expect(pointRow.value?.getField('name')).to.equal('intel')
+    expect(pointRow.value?.getFieldType('name')).to.equal('string')
+
+    expect(pointRow.value?.getField('mem_total')).to.equal(2048)
+    expect(pointRow.value?.getFieldType('mem_total')).to.equal('float')
+
+    expect(pointRow.value?.getField('disk_free')).to.equal(100)
+    expect(pointRow.value?.getFieldType('disk_free')).to.equal('integer')
+
+    expect(pointRow.value?.getField('temperature')).to.equal(100.86)
+    expect(pointRow.value?.getFieldType('temperature')).to.equal('float')
+
+    expect(pointRow.value?.getField('isActive')).to.equal(true)
+    expect(pointRow.value?.getFieldType('isActive')).to.equal('boolean')
+
+    await client.close()
+  }).timeout(10_000)
 
   const samples = [
     {
