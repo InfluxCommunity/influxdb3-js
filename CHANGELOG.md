@@ -1,3 +1,15 @@
+## 1.0.0 [unreleased]
+
+### Features
+
+1. [#491](https://github.com/InfluxCommunity/influxdb3-js/pull/491): Respect iox::column_type::field metadata when
+   mapping query results into values.
+    - iox::column_type::field::integer: => number
+    - iox::column_type::field::uinteger: => number
+    - iox::column_type::field::float: => number
+    - iox::column_type::field::string: => string
+    - iox::column_type::field::boolean: => boolean
+
 ## 0.13.0 [unreleased]
 
 ### Features
