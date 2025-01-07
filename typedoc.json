@@ -1,0 +1,21 @@
+{
+  "highlightLanguages": [
+    "javascript",
+    "typescript",
+    "sh",
+    "powershell",
+    "console",
+  ],
+  "entryPoints": [
+    "./packages/client/src/**/*.ts"
+  ],
+  "cleanOutputDir": true,
+  "validation": {
+    "notExported": false,
+    "invalidLink": true,
+    "rewrittenLink": false,
+    "notDocumented": false,
+    "unusedMergeModuleWith": false
+  },
+  "blockTags": ["@param", "@returns", "@generated", "@throws", "@defaultValue", "@example"]
+}
