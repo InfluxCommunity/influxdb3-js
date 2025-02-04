@@ -85,7 +85,7 @@ export default class QueryApiImpl implements QueryApi {
     }
     const client = this._flightClient
 
-    const ticket = this.prepareTicket(database, query, options) // queryType, queryParams)
+    const ticket = this.prepareTicket(database, query, options)
 
     const meta = this.prepareMetadata(options.headers)
     const rpcOptions: RpcOptions = {meta}
