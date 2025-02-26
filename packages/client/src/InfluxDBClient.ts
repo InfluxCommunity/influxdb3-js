@@ -98,7 +98,7 @@ export default class InfluxDBClient {
       this._options.host = host.substring(0, host.length - 1)
     if (typeof this._options.token !== 'string')
       throw new IllegalArgumentError('No token specified!')
-    this._queryApi = new QueryApiImpl(this._options)
+    this._queryApi = new QueryApiImpl(this._options, this._options.queryTransport)
     this._writeApi = new WriteApiImpl(this._options)
   }
 

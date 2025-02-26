@@ -4,7 +4,7 @@ import {Ticket} from '../generated/flight/Flight'
 import {FlightServiceClient} from '../generated/flight/Flight.client'
 import {ConnectionOptions, QueryOptions, QueryType} from '../options'
 import {createInt32Uint8Array} from '../util/common'
-import {RpcMetadata, RpcOptions} from '@protobuf-ts/runtime-rpc'
+import {RpcMetadata, RpcOptions, RpcTransport} from '@protobuf-ts/runtime-rpc'
 import {impl} from './implSelector'
 import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
@@ -25,10 +25,13 @@ export default class QueryApiImpl implements QueryApi {
 
   private _defaultHeaders: Record<string, string> | undefined
 
-  constructor(private _options: ConnectionOptions) {
+  constructor(
+    private _options: ConnectionOptions,
+    transport?: RpcTransport
+  ) {
     const {host, queryTimeout: timeout} = this._options
     this._defaultHeaders = this._options.headers
-    this._transport = impl.queryTransport({host, timeout})
+    this._transport = transport ?? impl.queryTransport({host, timeout})
     this._flightClient = new FlightServiceClient(this._transport)
   }
 
