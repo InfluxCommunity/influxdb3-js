@@ -4,7 +4,7 @@ import {GrpcWebFetchTransport} from '@protobuf-ts/grpcweb-transport'
 import {randomUUID} from 'node:crypto'
 
 export default {
-  async fetch(request: any, env: any, ctx: any) {
+  async fetch(_request: any, env: any, _ctx: any): Promise<Response> {
     let influxDB
     try {
       // These env is from wrangler.json file
@@ -29,7 +29,7 @@ export default {
       })
       const testId = randomUUID()
       const measurement = 'demoBrowser2'
-      let point = Point.measurement(measurement)
+      const point = Point.measurement(measurement)
         .setTag('Device', 'device')
         .setFloatField('Temperature', 14.0)
         .setStringField('testId', testId)
@@ -37,8 +37,8 @@ export default {
       await influxDB.write(point)
 
       const query = `Select *
-                     from \"${measurement}\"
-                     where \"testId\" = '${testId}'`
+                     from "${measurement}"
+                     where "testId" = '${testId}'`
       const points = influxDB.queryPoints(query)
       const p = await points.next()
       return Response.json(p)
