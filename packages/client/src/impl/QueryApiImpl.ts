@@ -25,10 +25,7 @@ export default class QueryApiImpl implements QueryApi {
 
   private _defaultHeaders: Record<string, string> | undefined
 
-  constructor(
-    private _options: ConnectionOptions,
-    transport?: RpcTransport
-  ) {
+  constructor(private _options: ConnectionOptions,transport?: RpcTransport) {
     const {host, queryTimeout: timeout} = this._options
     this._defaultHeaders = this._options.headers
     this._transport = transport ?? impl.queryTransport({host, timeout})
