@@ -508,18 +508,6 @@
   resolved "https://registry.yarnpkg.com/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz#98c23c950a3d9b6c8f0daed06da6c3af06981340"
   integrity sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==
 
-"@influxdata/influxdb3-client@^0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@influxdata/influxdb3-client/-/influxdb3-client-0.12.0.tgz#9ee758d4a6cb125f0a889ba216559765977d712e"
-  integrity sha512-bjScvi+rnUxIvldX3nQ8AYg/ylJJstZIZzenjOa40WnolqQ/fSvTVC0fBuEacO9DvnLPuoQ5YV4L266UdBwo8g==
-  dependencies:
-    "@grpc/grpc-js" "^1.9.9"
-    "@protobuf-ts/grpc-transport" "^2.9.1"
-    "@protobuf-ts/grpcweb-transport" "^2.9.1"
-    "@protobuf-ts/runtime-rpc" "^2.9.1"
-    apache-arrow "^17.0.0"
-    grpc-web "^1.5.0"
-
 "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@isaacs/string-locale-compare/-/string-locale-compare-1.1.0.tgz#291c227e93fd407a96ecd59879a35809120e432b"
@@ -1471,9 +1459,9 @@
   integrity sha512-37i+OaWTh9qeK4LSHPsyRC7NahnGotNuZvjLSgcPzblpHB3rrCJxAOgI5gCdKm7coonsaX1Of0ILiTcnZjbfxA==
 
 "@types/sinon@^17.0.0":
-  version "17.0.3"
-  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-17.0.3.tgz#9aa7e62f0a323b9ead177ed23a36ea757141a5fa"
-  integrity sha512-j3uovdn8ewky9kRBG19bOwaZbexJu/XjtkHyjvUgt4xfPFz18dcORIMqnYh66Fx3Powhcr85NT5+er3+oViapw==
+  version "17.0.4"
+  resolved "https://registry.yarnpkg.com/@types/sinon/-/sinon-17.0.4.tgz#fd9a3e8e07eea1a3f4a6f82a972c899e5778f369"
+  integrity sha512-RHnIrhfPO3+tJT0s7cFaXGZvsL4bbR3/k7z3P312qMS4JaS2Tk+KiwiLx1S0rQ56ERj00u1/BtdyVd0FY+Pdew==
   dependencies:
     "@types/sinonjs__fake-timers" "*"
 
@@ -1699,21 +1687,6 @@ anymatch@~3.1.2:
   dependencies:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
-
-apache-arrow@^17.0.0:
-  version "17.0.0"
-  resolved "https://registry.yarnpkg.com/apache-arrow/-/apache-arrow-17.0.0.tgz#73d98566c86352c9a0314c03890dbd7211073827"
-  integrity sha512-X0p7auzdnGuhYMVKYINdQssS4EcKec9TCXyez/qtJt32DrIMGbzqiaMiQ0X6fQlQpw8Fl0Qygcv4dfRAr5Gu9Q==
-  dependencies:
-    "@swc/helpers" "^0.5.11"
-    "@types/command-line-args" "^5.2.3"
-    "@types/command-line-usage" "^5.0.4"
-    "@types/node" "^20.13.0"
-    command-line-args "^5.2.1"
-    command-line-usage "^7.0.1"
-    flatbuffers "^24.3.25"
-    json-bignum "^0.0.3"
-    tslib "^2.6.2"
 
 apache-arrow@^19.0.0:
   version "19.0.0"
