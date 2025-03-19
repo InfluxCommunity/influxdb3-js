@@ -3,7 +3,7 @@
 ### Features
 
 1. [#545](https://github.com/InfluxCommunity/influxdb3-js/pull/545): Sets the correct versions for the client-browser package.
-2. [554](https://github.com/InfluxCommunity/influxdb3-js/pull/554): Support for Cloudflare workers
+2. [#554](https://github.com/InfluxCommunity/influxdb3-js/pull/554): Support for Cloudflare workers
 
 ## 1.0.0 [2025-01-22]
 
