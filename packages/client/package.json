@@ -89,6 +89,7 @@
     "@protobuf-ts/grpc-transport": "^2.9.1",
     "@protobuf-ts/grpcweb-transport": "^2.9.1",
     "@protobuf-ts/runtime-rpc": "^2.9.1",
+    "@cloudflare/workers-types": "^4.20250214.0",
     "apache-arrow": "^19.0.0",
     "grpc-web": "^1.5.0"
   }

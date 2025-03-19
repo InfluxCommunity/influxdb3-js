@@ -1,5 +1,6 @@
 import {Transport} from './transport'
 import {QParamType} from './QueryApi'
+import {RpcTransport} from '@protobuf-ts/runtime-rpc'
 
 /**
  * Option for the communication with InfluxDB server.
@@ -164,8 +165,10 @@ export interface ClientOptions extends ConnectionOptions {
   queryOptions?: Partial<QueryOptions>
   /** supplies and overrides default writing options.*/
   writeOptions?: Partial<WriteOptions>
-  /** specifies custom transport */
-  transport?: Transport
+  /** specifies custom write transport */
+  writeTransport?: Transport
+  /** specifies custom query rpc transport */
+  queryTransport?: RpcTransport
 }
 
 /**

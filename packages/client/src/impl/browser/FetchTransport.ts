@@ -247,12 +247,15 @@ export default class FetchTransport implements Transport {
         ...this._defaultHeaders,
         ...headers,
       },
-      credentials: 'omit' as const,
       // override with custom transport options
       ...this._connectionOptions.transportOptions,
       // allow to specify custom options, such as signal, in SendOptions
       ...other,
     }
+    if ('credentials' in Request.prototype) {
+      request.credentials = 'omit' as const
+    }
+
     this.requestDecorator(request, options, url)
     return fetch(url, request)
   }
