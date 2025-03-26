@@ -253,6 +253,10 @@ export default class FetchTransport implements Transport {
       // allow to specify custom options, such as signal, in SendOptions
       ...other,
     }
+    if (!('credentials' in Request.prototype)) {
+      delete request.credentials
+    }
+
     this.requestDecorator(request, options, url)
     return fetch(url, request)
   }

@@ -1,0 +1,10 @@
+{
+  "name": "my-worker",
+  "workers_dev": false,
+  "compatibility_date": "2025-02-14",
+  "vars": {
+    "TESTING_INFLUXDB_DATABASE": "admin0",
+    "TESTING_INFLUXDB_TOKEN": "zdFoSUH0X-sXy_s2LglZVUAF6UlrnwUwWdjJbLc_DmaDVMVbZ9bt9NNkCdeyxC__qL7shtV31oE6CDeVbvT8Lw==",
+    "TESTING_INFLUXDB_URL": "http://127.0.0.1:10000"
+  }
+}

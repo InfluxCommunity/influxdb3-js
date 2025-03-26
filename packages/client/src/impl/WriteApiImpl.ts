@@ -12,7 +12,7 @@ export default class WriteApiImpl implements WriteApi {
 
   constructor(private _options: ClientOptions) {
     this._transport =
-      this._options.transport ?? impl.writeTransport(this._options)
+      this._options.writeTransport ?? impl.writeTransport(this._options)
     this.doWrite = this.doWrite.bind(this)
   }
 

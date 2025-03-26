@@ -5,10 +5,18 @@
   "private": true,
   "scripts": {
     "dev": "ts-node -r dotenv/config ./src/index.ts",
+    "cloudflare": "ts-node -r dotenv/config ./src/cloudflare/index.ts",
     "retry": "ts-node -r dotenv/config src/writeRetry.ts"
   },
   "dependencies": {
-    "@influxdata/influxdb3-client": "link:../../packages/client"
+    "@influxdata/influxdb3-client": "link:../../packages/client",
+    "@grpc/grpc-js": "^1.9.9",
+    "@protobuf-ts/grpc-transport": "^2.9.1",
+    "@protobuf-ts/grpcweb-transport": "^2.9.1",
+    "@protobuf-ts/runtime-rpc": "^2.9.1",
+    "@cloudflare/vitest-pool-workers": "^0.6.4",
+    "@cloudflare/workers-types": "^4.20250214.0",
+    "wrangler": "^4.2.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
