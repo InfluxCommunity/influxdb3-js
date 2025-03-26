@@ -1,4 +1,4 @@
-## 1.1.0 [unreleased]
+## 1.1.0 [2025-03-26]
 
 ### Features
 
@@ -15,11 +15,6 @@
     - iox::column_type::field::float: => number
     - iox::column_type::field::string: => string
     - iox::column_type::field::boolean: => boolean
-
-## 0.13.0 [unreleased]
-
-### Features
-
 1. [499](https://github.com/InfluxCommunity/influxdb3-js/pull/499): Migrate to new doc library
 
 ## 0.12.0 [2024-10-22]
