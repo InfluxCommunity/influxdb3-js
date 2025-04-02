@@ -7,12 +7,11 @@ import {ClientOptions, ConnectionOptions, QueryOptions} from '../options'
 // This import path is replaced by tsup for browser. Don't change path for ./node or ./browser!
 export {default as impl} from './node'
 
-
 export interface QueryProvider {
   queryRawBatches(
-      query: string,
-      database: string,
-      options: QueryOptions
+    query: string,
+    database: string,
+    options: QueryOptions
   ): AsyncGenerator<any, void, void>
 }
 
