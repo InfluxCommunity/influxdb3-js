@@ -8,6 +8,7 @@ const outFiles = {
   esm: pkg.exports['.'].import,
   cjs: pkg.exports['.'].require,
 }
+
 export default defineConfig({
   entry: ['src/index.ts'],
   sourcemap: true,
@@ -21,8 +22,17 @@ export default defineConfig({
     options.outdir = undefined
     options.outfile = outFiles[format]
   },
-  define: {
-    'process.env.BUILD_BROWSER': 'false',
-  },
-  esbuildPlugins: [esbuildGzipOutJsPlugin],
+  esbuildPlugins: [
+      esbuildGzipOutJsPlugin,
+    {
+      name: "rewrite-native-import",
+      setup(build) {
+        build.onResolve({ filter: /^.*\/native$/ }, (args) => {
+          // Rewrite the import path to point to "./native"
+          // and mark it as external so it's not bundled.
+          return { path: "./native", external: true };
+        });
+      },
+    },
+  ],
 })

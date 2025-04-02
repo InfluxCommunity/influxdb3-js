@@ -1,0 +1,132 @@
+version: 2.1
+
+executors:
+  macos-executor:
+    macos:
+      version: 12.0
+    environment:
+      DEBUG: "napi:*"
+      APP_NAME: flight-sql-client
+      MACOSX_DEPLOYMENT_TARGET: '10.13'
+
+  ubuntu-executor:
+    docker:
+      - image: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+    environment:
+      DEBUG: "napi:*"
+      APP_NAME: flight-sql-client
+
+  windows-executor:
+    docker:
+      - image: mcr.microsoft.com/windows/servercore:ltsc2022
+    environment:
+      DEBUG: "napi:*"
+      APP_NAME: flight-sql-client
+
+  ubuntu-docker-executor:
+    docker:
+      - image: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
+    working_directory: /workspace
+
+jobs:
+  build:
+    executor: ubuntu-executor
+    strategy:
+      matrix:
+        # List the different platforms to build on
+        parameters:
+          target:
+            - x86_64-apple-darwin
+            - x86_64-pc-windows-msvc
+            - i686-pc-windows-msvc
+            - x86_64-unknown-linux-gnu
+            - x86_64-unknown-linux-musl
+            - aarch64-apple-darwin
+            - aarch64-unknown-linux-gnu
+            - armv7-unknown-linux-gnueabihf
+            - aarch64-linux-android
+            - armv7-linux-androideabi
+            - aarch64-unknown-linux-musl
+    steps:
+      - checkout
+      - run:
+          name: Setup Node.js
+          command: |
+            curl -sL https://deb.nodesource.com/setup_18.x | bash -
+            apt-get install -y nodejs
+            npm install -g yarn
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - run:
+          name: Setup Rust toolchain
+          command: |
+            rustup target add $CIRCLE_JOB
+            rustup update
+      - run:
+          name: Build project
+          command: |
+            yarn build --target $CIRCLE_JOB
+            strip -x *.node
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
+
+  test:
+    executor: ubuntu-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - run:
+          name: Download artifacts
+          command: |
+            cp -r /workspace/artifacts/* .
+      - run:
+          name: Run tests
+          command: yarn test
+
+  publish:
+    executor: ubuntu-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install
+      - run:
+          name: Publish
+          command: |
+            if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+            then
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+              npm publish --access public
+            elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
+            then
+              echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+              npm publish --tag next --access public
+            else
+              echo "Not a release, skipping publish"
+            fi
+          environment:
+            NPM_TOKEN: $NPM_TOKEN
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build:
+          matrix:
+            parameters:
+              target:
+                - x86_64-apple-darwin
+                - x86_64-pc-windows-msvc
+                - x86_64-unknown-linux-gnu
+      - test:
+          requires:
+            - build
+      - publish:
+          requires:
+            - test
+

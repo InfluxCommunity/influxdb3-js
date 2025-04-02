@@ -771,6 +771,56 @@
   resolved "https://registry.yarnpkg.com/@js-sdsl/ordered-map/-/ordered-map-4.4.2.tgz#9299f82874bab9e4c7f9c48d865becbfe8d6907c"
   integrity sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==
 
+"@lakehouse-rs/flight-sql-client-android-arm-eabi@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-android-arm-eabi/-/flight-sql-client-android-arm-eabi-0.0.10.tgz#78d91d979c1d111cd2b3e4613d71a759d4c276f5"
+  integrity sha512-FSats/tFyqMcfLLUcvSxnrm5KT17yJAfel8dPUO9V3Whv/MYrEOpAsrcweqNTgralzZigSw19XYg0OxHHbeveg==
+
+"@lakehouse-rs/flight-sql-client-android-arm64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-android-arm64/-/flight-sql-client-android-arm64-0.0.10.tgz#c9097886b6076fc53cbd3f500e4e2741e8531047"
+  integrity sha512-SM0b49oUlx6IiYOj87Y7C5V4caLf1SDiKu7XNYsgaFaBT1cyCKjkcAsfB2PWMmmhKsgp/UkofKHd+d0OzUdJkA==
+
+"@lakehouse-rs/flight-sql-client-darwin-arm64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-darwin-arm64/-/flight-sql-client-darwin-arm64-0.0.10.tgz#09b46fc9877ab3c5a293a4337d7d9881e74f7679"
+  integrity sha512-vGvxWUUQiP8xpDYrSVoYnB9w6R2HloR0Fjuyn8orTy/MxI5duK5uyOvkwM2BkBmU52aLAGCvVzfHnF86oIZRRQ==
+
+"@lakehouse-rs/flight-sql-client-darwin-x64@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-darwin-x64/-/flight-sql-client-darwin-x64-0.0.10.tgz#e31e52c5ba598b46191dece5b707bf530aeef39b"
+  integrity sha512-GG798Nd2RwSQwJF7lD2p6WjMP2LGtFt0jLzVBHKvr9WeACufOUgqoEeo8UWcAhNRtv0/kQLoieM3D0ytC9dgLg==
+
+"@lakehouse-rs/flight-sql-client-freebsd-x64@0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-freebsd-x64/-/flight-sql-client-freebsd-x64-0.0.7.tgz#772289873234994a338d3878ae062aa5de737da6"
+  integrity sha512-XVErUhgidw3GPVrbI14HPOmkIV8r6bF6SUdemN+8n/6ldF0xDsgdjwWGj9PBUkEwn6tZkfjafF4UsQyLJ/UUEQ==
+
+"@lakehouse-rs/flight-sql-client-linux-arm-gnueabihf@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm-gnueabihf/-/flight-sql-client-linux-arm-gnueabihf-0.0.10.tgz#89e50c576d6fef0fd38d6764907832fb7f31cb52"
+  integrity sha512-mwV0cXYzxgbK3cDZim+zyMfB5MhYuSZAapgeVYoNjtmDaWDDZNd4k5aOqdYAq6N0HTAYvxZ3CLaYowJoy+3vmg==
+
+"@lakehouse-rs/flight-sql-client-linux-arm64-gnu@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm64-gnu/-/flight-sql-client-linux-arm64-gnu-0.0.10.tgz#5a81f1c5ae8f9f2a6fd5caa9f233ad057ba10eb3"
+  integrity sha512-YUG06GgSWrXfwcfK38q4Uvxe4zp30cE9Z0ElXrty0x49VchtYAR2GeenPtUAYJ8ebslan7pWzErfxKKz6QDvSA==
+
+"@lakehouse-rs/flight-sql-client-linux-arm64-musl@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-arm64-musl/-/flight-sql-client-linux-arm64-musl-0.0.10.tgz#ca168799f41262ac273ab939a4b4949a5ca96003"
+  integrity sha512-6iVOb8wHjgsAMJkdHb01LE0wof3hv68kjYOtMFF7DJwLZBWXqLInN0iHOK0/U13EWKEnGD25JjyVbaq3he7OgQ==
+
+"@lakehouse-rs/flight-sql-client-linux-x64-musl@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-linux-x64-musl/-/flight-sql-client-linux-x64-musl-0.0.10.tgz#b513dfc32da16abd38e89261f728239837191d5c"
+  integrity sha512-bjJ8miz+OwXow0AU0MRIicCtLJzHD9A/SlERtvo9KvOhjjQPTjUV5vzZTNoyJLvSs0Rw/lfsJb9Xib8EIiuvuQ==
+
+"@lakehouse-rs/flight-sql-client-win32-ia32-msvc@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@lakehouse-rs/flight-sql-client-win32-ia32-msvc/-/flight-sql-client-win32-ia32-msvc-0.0.10.tgz#f77e3e294855a9d6a58f735f17e24811b2f523d0"
+  integrity sha512-A0qZVDD9mRaevgry8KuuDt7DyNQ8YdwTSFe+KYXHCK9u21nibjTuh9A66cDOVNPwVOt5BFC9wRX0NlVMVIcZ0Q==
+
 "@lerna/create@8.2.0":
   version "8.2.0"
   resolved "https://registry.yarnpkg.com/@lerna/create/-/create-8.2.0.tgz#f705abcedcd073657a1ecabd305d2290e6ecf2f0"
@@ -846,6 +896,11 @@
     write-pkg "4.0.0"
     yargs "17.7.2"
     yargs-parser "21.1.1"
+
+"@napi-rs/cli@^2.18.4":
+  version "2.18.4"
+  resolved "https://registry.yarnpkg.com/@napi-rs/cli/-/cli-2.18.4.tgz#12bebfb7995902fa7ab43cc0b155a7f5a2caa873"
+  integrity sha512-SgJeA4df9DE2iAEpr3M2H0OKl/yjtg1BnRI5/JyowS71tUWhrfSu2LT0V3vlHET+g1hBVlrO60PmEXwUEKp8Mg==
 
 "@napi-rs/wasm-runtime@0.2.4":
   version "0.2.4"
@@ -1722,6 +1777,16 @@
   dependencies:
     "@typescript-eslint/types" "8.24.1"
     eslint-visitor-keys "^4.2.0"
+
+"@vlastahajek/influxdb3-js-flight-sql-client-linux-x64-gnu@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@vlastahajek/influxdb3-js-flight-sql-client-linux-x64-gnu/-/influxdb3-js-flight-sql-client-linux-x64-gnu-0.0.1.tgz#1b669d0eab1440a22142f78496a58eb835b0e9e3"
+  integrity sha512-Qngwla8YMgf4U+NmDiSvxUhc9OnpmMmzrhPuM+sfhJ0z12TEfYT/0Uy765bFisU3YaeMjpef5qOP8du5X/+Ayw==
+
+"@vlastahajek/influxdb3-js-flight-sql-client-win32-x64-msvc@0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@vlastahajek/influxdb3-js-flight-sql-client-win32-x64-msvc/-/influxdb3-js-flight-sql-client-win32-x64-msvc-0.0.1.tgz#0da37352c68090a9bbcd2745bf8513a0abf58916"
+  integrity sha512-jAMVSeT59r8SDj2hBxgmBIVxpMr9I/g+H9XCbzfFSVRxNvPM6N5QSfmRit1FexbUD5HVrohnFVGBINyuVBNRvg==
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"
@@ -3388,7 +3453,7 @@ glob@^10.2.2, glob@^10.3.10, glob@^10.3.7, glob@^10.4.5:
     package-json-from-dist "^1.0.0"
     path-scurry "^1.11.1"
 
-glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
+glob@^7.0.0, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
@@ -3491,6 +3556,13 @@ hasown@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/hasown/-/hasown-2.0.1.tgz#26f48f039de2c0f8d3356c223fb8d50253519faa"
   integrity sha512-1/th4MHjnwncwXsIW6QMzlvYL9kG5e/CpVvLRZe4XPa8TOUNbCELqmvhDmnkNsAjwaG4+I8gJJL0JBvTTLO9qA==
+  dependencies:
+    function-bind "^1.1.2"
+
+hasown@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/hasown/-/hasown-2.0.2.tgz#003eaf91be7adc372e84ec59dc37252cedb80003"
+  integrity sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==
   dependencies:
     function-bind "^1.1.2"
 
@@ -3665,6 +3737,11 @@ inquirer@^8.2.4:
     through "^2.3.6"
     wrap-ansi "^6.0.1"
 
+interpret@^1.0.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.4.0.tgz#665ab8bc4da27a774a40584e812e3e0fa45b1a1e"
+  integrity sha512-agE4QfB2Lkp9uICn7BAqoscw4SZP9kTE2hxiFI3jBPmXJfdqiahTbUuKGsMoN2GtqL9AxhYioAcVvgsb1HvRbA==
+
 ip-address@^9.0.5:
   version "9.0.5"
   resolved "https://registry.yarnpkg.com/ip-address/-/ip-address-9.0.5.tgz#117a960819b08780c3bd1f14ef3c1cc1d3f3ea5a"
@@ -3703,6 +3780,13 @@ is-core-module@^2.13.0, is-core-module@^2.5.0, is-core-module@^2.8.1:
   integrity sha512-hHrIjvZsftOsvKSn2TRYl63zvxsgE0K+0mYMoH6gD4omR5IWB2KynivBQczo3+wF1cCkjzvptnI9Q0sPU66ilw==
   dependencies:
     hasown "^2.0.0"
+
+is-core-module@^2.16.0:
+  version "2.16.1"
+  resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.16.1.tgz#2a98801a849f43e2add644fbb6bc6229b19a4ef4"
+  integrity sha512-UfoeMA6fIJ8wTYFEUjelnaGI67v6+N7qXJEvQuIGa99l4xsCruSYOVSQ0uPANn4dAzm8lkYPaKLrrijLq7x23w==
+  dependencies:
+    hasown "^2.0.2"
 
 is-docker@^2.0.0, is-docker@^2.1.1:
   version "2.2.1"
@@ -4522,7 +4606,7 @@ minimist-options@4.1.0:
     is-plain-obj "^1.1.0"
     kind-of "^6.0.3"
 
-minimist@^1.2.0, minimist@^1.2.5, minimist@^1.2.6:
+minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.5, minimist@^1.2.6:
   version "1.2.8"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.8.tgz#c1a464e7693302e082a075cee0c057741ac4772c"
   integrity sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==
@@ -5632,6 +5716,13 @@ readdirp@~3.6.0:
   dependencies:
     picomatch "^2.2.1"
 
+rechoir@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
+  integrity sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==
+  dependencies:
+    resolve "^1.1.6"
+
 redent@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/redent/-/redent-3.0.0.tgz#e557b7998316bb53c9f1f56fa626352c6963059f"
@@ -5673,6 +5764,15 @@ resolve-from@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
   integrity sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==
+
+resolve@^1.1.6:
+  version "1.22.10"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.10.tgz#b663e83ffb09bbf2386944736baae803029b8b39"
+  integrity sha512-NPRy+/ncIMeDlTAsuqwKIiferiawhefFJtkNSW0qZJEqMEb+qBt/77B/jGeeek+F0uOeN05CDa6HXbbIgtVX4w==
+  dependencies:
+    is-core-module "^2.16.0"
+    path-parse "^1.0.7"
+    supports-preserve-symlinks-flag "^1.0.0"
 
 resolve@^1.10.0:
   version "1.22.8"
@@ -5835,6 +5935,23 @@ shebang-regex@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-3.0.0.tgz#ae16f1644d873ecad843b0307b143362d4c42172"
   integrity sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==
+
+shelljs@^0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.5.tgz#de055408d8361bed66c669d2f000538ced8ee20c"
+  integrity sha512-TiwcRcrkhHvbrZbnRcFYMLl30Dfov3HKqzp5tO5b4pt6G/SezKcYhmDg15zXVBswHmctSAQKznqNW2LO5tTDow==
+  dependencies:
+    glob "^7.0.0"
+    interpret "^1.0.0"
+    rechoir "^0.6.2"
+
+shx@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/shx/-/shx-0.3.4.tgz#74289230b4b663979167f94e1935901406e40f02"
+  integrity sha512-N6A9MLVqjxZYcVn8hLmtneQWIJtp8IKzMP4eMnx+nqkvXoqinUPCbUFLp2UcWTEIUONhlk0ewxr/jaVGlc+J+g==
+  dependencies:
+    minimist "^1.2.3"
+    shelljs "^0.8.5"
 
 signal-exit@3.0.7, signal-exit@^3.0.2, signal-exit@^3.0.3:
   version "3.0.7"

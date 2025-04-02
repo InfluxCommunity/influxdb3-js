@@ -19,6 +19,7 @@ export default defineConfig({
   dts: false,
   minify,
   target: ['es2018'],
+  external: [/.*\.node$/],
   platform: 'browser',
   splitting: false,
   define: {

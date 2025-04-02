@@ -1,0 +1,32 @@
+{
+  "name": "@influxdata/influxdb3-js-flight-sql-client-win32-x64-msvc",
+  "version": "0.0.1",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "influxdb3-js-flight-sql-client.win32-x64-msvc.node",
+  "files": [
+    "influxdb3-js-flight-sql-client.win32-x64-msvc.node"
+  ],
+  "description": "A Rust Flight SQL client for  InfluxDB 3 JS client",
+  "keywords": [
+    "napi-rs",
+    "NAPI",
+    "N-API",
+    "Rust",
+    "node-addon",
+    "node-addon-api"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "repository": "https://github.com/influxdata/influxdb3-client-js.git"
+}

@@ -4,6 +4,6 @@
     "resolveJsonModule": true,
     "lib": ["DOM", "es2018"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts", "native"],
   "exclude": ["*.js"]
 }
