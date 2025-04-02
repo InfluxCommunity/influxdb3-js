@@ -74,7 +74,7 @@ export class NodeHttpTransport implements Transport {
       protocol: url.protocol,
       hostname: url.hostname,
     }
-    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    this._contextPath = proxyUrl ? _url : (url.path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
