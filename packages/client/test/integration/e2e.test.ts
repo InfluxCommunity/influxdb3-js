@@ -117,6 +117,34 @@ describe('e2e test', () => {
     await rejects(client.query(query, database).next())
   }).timeout(10_000)
 
+  it('should not duplicate query results', async () => {
+    const {database, token, url} = getEnvVariables()
+    const client = new InfluxDBClient({
+      host: url,
+      token: token,
+      database: database,
+    })
+
+    const time1 = `t${Date.now()}`
+    const time2 = `t${Date.now() + 1000}`
+    await client.write(`
+          weathers,location=A temperature=0i,test_id="${time1}"
+          weathers,location=B temperature=1i,test_id="${time2}"
+          `)
+    const query = `
+      SELECT location, temperature, test_id
+      FROM "weathers"
+      WHERE test_id = '${time1}' OR test_id = '${time2}';
+    `
+    const queryResult = client.query(query)
+    const rows = []
+    for await (const row of queryResult) {
+      rows.push(row)
+    }
+    expect(rows.length).to.equal(2)
+    expect(rows[0].test_id).to.not.equal(rows[1].test_id)
+  }).timeout(5000)
+
   it('concurrent query', async () => {
     const {database, token, url} = getEnvVariables()
 

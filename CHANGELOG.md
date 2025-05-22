@@ -1,5 +1,9 @@
 ## 1.2.0 [unreleased]
 
+### Features
+
+1. [#570](https://github.com/InfluxCommunity/influxdb3-js/pull/570): Fixing the bug that makes query results duplicate rows [#553](https://github.com/InfluxCommunity/influxdb3-js/issues/553).
+
 ## 1.1.0 [2025-03-26]
 
 ### Features

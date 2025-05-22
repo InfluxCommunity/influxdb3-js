@@ -115,8 +115,8 @@ export default class QueryApiImpl implements QueryApi {
     const batches = this._queryRawBatches(query, database, options)
 
     for await (const batch of batches) {
-      const row: Record<string, any> = {}
       for (const batchRow of batch) {
+        const row: Record<string, any> = {}
         for (const column of batch.schema.fields) {
           const value = batchRow[column.name]
           row[column.name] = getMappedValue(column, value)
