@@ -6,21 +6,27 @@
     "build": "yarn cp ../../README.md ./README.md && yarn run clean && yarn run build:browser && yarn run build:node",
     "build:node": "yarn tsup",
     "build:browser": "yarn tsup --config ./tsup.config.browser.ts",
+    "build:napi": "napi build --platform --release --dts native.d.ts --js native.js --js-package-name @influxdata/influxdb3-js-flight-sql-client --cargo-cwd rust --pipe \"prettier -w\"",
+    "build:napi:debug": "napi build --platform  --dts native.d.ts --js native.js --js-package-name @influxdata/influxdb3-js-flight-sql-client --cargo-cwd rust --pipe \"prettier -w\"",
+    "postbuild": "shx cp native.* dist",
+    "prepublish:napi": "napi prepublish --skip-gh-release",
     "clean": "rimraf --glob dist build coverage .nyc_output doc *.lcov reports",
     "coverage": "nyc mocha --require ts-node/register 'test/**/*.test.ts' --exit",
     "coverage:ci": "yarn run coverage && yarn run coverage:lcov",
     "coverage:lcov": "yarn run --silent nyc report --reporter=text-lcov > coverage/coverage.lcov",
     "cp": "node ../../scripts/cp.js",
+    "ci:artifacts": "napi artifacts",
     "test": "yarn run lint && yarn run typecheck && yarn run test:all",
-    "test:all": "mocha 'test/**/*.test.ts' --exit",
-    "test:unit": "mocha 'test/unit/**/*.test.ts' --exit",
-    "test:integration": "mocha 'test/integration/**/*.test.ts' --exit",
+    "test:all": "mocha \"test/**/*.test.ts\" --exit",
+    "test:unit": "mocha \"test/unit/**/*.test.ts\" --exit",
+    "test:integration": "mocha \"test/integration/**/*.test.ts\" --exit",
     "test:ci": "yarn run lint:ci && yarn run test:all --exit --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/core_mocha/test-results.xml",
     "test:watch": "mocha 'test/unit/**/*.test.ts' --watch-extensions ts --watch",
     "typecheck": "tsc --noEmit --pretty",
     "lint": "eslint src/**/*.ts test/**/*.ts",
     "lint:ci": "yarn run lint --format junit --output-file ../../reports/core_eslint/eslint.xml",
-    "lint:fix": "eslint --fix src/**/*.ts"
+    "lint:fix": "eslint --fix src/**/*.ts",
+    "lint:rust": "cd rust && cargo fmt && cargo clippy --fix --allow-dirty"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -58,7 +64,28 @@
   "publishConfig": {
     "access": "public"
   },
+  "napi": {
+    "name": "influxdb3-js-flight-sql-client",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-linux-android",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "armv7-linux-androideabi",
+        "armv7-unknown-linux-gnueabihf",
+        "i686-pc-windows-msvc",
+        "x86_64-apple-darwin",
+        "x86_64-pc-windows-msvc",
+        "x86_64-unknown-freebsd",
+        "x86_64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl"
+      ]
+    }
+  },
   "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
     "@types/chai": "^4.2.5",
     "@types/mocha": "^10.0.0",
     "@types/sinon": "^17.0.0",
@@ -79,6 +106,7 @@
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
     "rxjs": "^7.2.0",
+    "shx": "^0.3.4",
     "sinon": "^19.0.2",
     "ts-node": "^10.9.1",
     "tsup": "^8.0.1",
@@ -91,5 +119,9 @@
     "@protobuf-ts/runtime-rpc": "^2.9.1",
     "apache-arrow": "^19.0.0",
     "grpc-web": "^1.5.0"
+  },
+  "optionalDependencies": {
+    "@vlastahajek/influxdb3-js-flight-sql-client-linux-x64-gnu": "0.0.1",
+    "@vlastahajek/influxdb3-js-flight-sql-client-win32-x64-msvc": "0.0.1"
   }
 }

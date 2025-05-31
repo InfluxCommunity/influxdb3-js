@@ -1,0 +1,38 @@
+[package]
+authors = ["InfluxData"]
+edition = "2021"
+name    = "influxdb3-js-flight-sql-client"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+arrow-array = "53.3.0"
+arrow-cast = "53.3.0"
+arrow-flight = { version = "53.3.0", features = [
+  "flight-sql-experimental",
+  "tls",
+] }
+arrow-ipc = "53.3.0"
+arrow-schema = "53.3.0"
+futures = "0.3"
+napi = { version = "2.12.2", default-features = false, features = [
+  "napi8",
+  "tokio_rt",
+  "async",
+] }
+napi-derive = "2"
+snafu = "0.7"
+tokio = "1"
+tonic = { version = "0.12.3", features = ["tls", "tls-native-roots"] }
+tracing-log = "0.2"
+tracing-subscriber = "0.3"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
