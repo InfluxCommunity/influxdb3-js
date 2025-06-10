@@ -27,6 +27,7 @@ export default class WriteApiImpl implements WriteApi {
     writeOptions: WriteOptions,
     org?: string
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const precision = writeOptions.precision ?? DEFAULT_WriteOptions.precision!
 
     let path: string

@@ -275,9 +275,7 @@ export function fromEnv(): ClientOptions {
   }
   if (process.env.INFLUX_WRITE_NO_SYNC) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.noSync = parseBoolean(
-      process.env.INFLUX_WRITE_NO_SYNC
-    )
+    options.writeOptions.noSync = parseBoolean(process.env.INFLUX_WRITE_NO_SYNC)
   }
 
   return options
