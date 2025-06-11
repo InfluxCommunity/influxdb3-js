@@ -1,6 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    // Temporarily disable due to the following error in generated Flight.ts:
+    // TS6133: 'wireType' is declared but its value is never read.
+    "noUnusedLocals": true,
     "resolveJsonModule": true,
     "lib": ["DOM", "es2018"]
   },
