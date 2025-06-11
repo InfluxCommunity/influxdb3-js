@@ -21,6 +21,7 @@ const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
 const WRITE_PATH_NS = `/api/v2/write?bucket=${DATABASE}&precision=ns`
+const WRITE_PATH_NS_V3_NO_SYNC = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&no_sync=true`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
@@ -299,6 +300,80 @@ describe('Write', () => {
       expect(logs.warn).has.length(0)
       expect(universal).equals('substance')
       expect(particular).equals('attribute')
+    })
+    it('calls v2 api if noSync is not provided', async () => {
+      useSubject({})
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri) {
+          return [204, '', {'retry-after': '1'}]
+        })
+        .persist()
+
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+    it('calls v2 api if noSync=false', async () => {
+      useSubject({
+        noSync: false,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri) {
+          return [204, '', {'retry-after': '1'}]
+        })
+        .persist()
+
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+    it('calls v3 api if noSync=true', async () => {
+      useSubject({
+        noSync: true,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V3_NO_SYNC)
+        .reply(function (_uri) {
+          return [204, {}]
+        })
+        .persist()
+
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+    it('fails if noSync=true but server supports only v2 api', async () => {
+      useSubject({
+        noSync: true,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V3_NO_SYNC)
+        .reply(function (_uri) {
+          return [405, '']
+        })
+        .persist()
+
+      await subject
+        .write('test value=1', DATABASE)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).to.be.ok
+        })
+      expect(logs.error).has.length(1)
+      expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
+      expect(logs.error[0][1]).instanceOf(HttpError)
+      expect(logs.error[0][1].statusCode).equals(405)
+      expect(logs.error[0][1].message).contain(
+        `Server doesn't support write with noSync=true (supported by InfluxDB 3 Core/Enterprise servers only).`
+      )
+      expect(logs.warn).to.length(0)
+
+      expect(nock.isDone()).to.be.true
     })
   })
   describe('propagate error headers', async () => {

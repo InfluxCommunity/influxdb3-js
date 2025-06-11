@@ -1,5 +1,11 @@
 import WriteApi from '../WriteApi'
-import {ClientOptions, DEFAULT_WriteOptions, WriteOptions} from '../options'
+import {
+  ClientOptions,
+  DEFAULT_WriteOptions,
+  precisionToV2ApiString,
+  precisionToV3ApiString,
+  WriteOptions,
+} from '../options'
 import {Transport} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
@@ -21,14 +27,26 @@ export default class WriteApiImpl implements WriteApi {
     writeOptions: WriteOptions,
     org?: string
   ) {
-    const query: string[] = [
-      `bucket=${encodeURIComponent(bucket)}`,
-      `precision=${writeOptions.precision}`,
-    ]
-    if (org) query.push(`org=${encodeURIComponent(org)}`)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const precision = writeOptions.precision!
 
-    const path = `/api/v2/write?${query.join('&')}`
-    return path
+    let path: string
+    const query: string[] = []
+    if (org) query.push(`org=${encodeURIComponent(org)}`)
+    if (writeOptions.noSync) {
+      // Setting no_sync=true is supported only in the v3 API.
+      path = `/api/v3/write_lp`
+      query.push(`db=${encodeURIComponent(bucket)}`)
+      query.push(`precision=${precisionToV3ApiString(precision)}`)
+      query.push(`no_sync=true`)
+    } else {
+      // By default, use the v2 API.
+      path = `/api/v2/write`
+      query.push(`bucket=${encodeURIComponent(bucket)}`)
+      query.push(`precision=${precisionToV2ApiString(precision)}`)
+    }
+
+    return `${path}?${query.join('&')}`
   }
 
   doWrite(
@@ -52,6 +70,11 @@ export default class WriteApiImpl implements WriteApi {
       reject = rej
     })
 
+    const writeOptionsOrDefault: WriteOptions = {
+      ...DEFAULT_WriteOptions,
+      ...writeOptions,
+    }
+
     let responseStatusCode: number | undefined
     let headers: Headers
     const callbacks = {
@@ -72,6 +95,20 @@ export default class WriteApiImpl implements WriteApi {
           responseStatusCode = 204
           callbacks.complete()
           return
+        }
+        if (
+          error instanceof HttpError &&
+          error.statusCode == 405 &&
+          writeOptionsOrDefault.noSync
+        ) {
+          error = new HttpError(
+            error.statusCode,
+            "Server doesn't support write with noSync=true " +
+              '(supported by InfluxDB 3 Core/Enterprise servers only).',
+            error.body,
+            error.contentType,
+            error.headers
+          )
         }
         Log.error(`Write to InfluxDB failed.`, error)
         reject(error)
@@ -98,10 +135,6 @@ export default class WriteApiImpl implements WriteApi {
       },
     }
 
-    const writeOptionsOrDefault: WriteOptions = {
-      ...DEFAULT_WriteOptions,
-      ...writeOptions,
-    }
     const sendOptions = {
       method: 'POST',
       headers: {

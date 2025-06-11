@@ -47,6 +47,7 @@ export default class InfluxDBClient {
    *   - timeout - I/O timeout
    *   - precision - timestamp precision when writing data
    *   - gzipThreshold - payload size threshold for gzipping data
+   *   - writeNoSync - skip waiting for WAL persistence on write
    *
    * @param connectionString - connection string
    */
@@ -63,6 +64,7 @@ export default class InfluxDBClient {
    *   - INFLUX_DATABASE - database (bucket) name
    *   - INFLUX_PRECISION - timestamp precision when writing data
    *   - INFLUX_GZIP_THRESHOLD - payload size threshold for gzipping data
+   *   - INFLUX_WRITE_NO_SYNC - skip waiting for WAL persistence on write
    */
   constructor()
 
