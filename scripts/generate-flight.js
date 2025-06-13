@@ -19,10 +19,10 @@ const OUTPUT_DIR = 'out/flight'
 const packageJsonContent = {
   scripts: {
     protoc: 'protoc',
-    'generate-protoc': `npx protoc --experimental_allow_proto3_optional --ts_out ./${OUTPUT_DIR}/ --ts_opt optimize_code_size --ts_opt server_grpc1 --proto_path . *.proto`,
+    'generate-protoc': `npx protoc --experimental_allow_proto3_optional --ts_out ./${OUTPUT_DIR}/ --ts_opt optimize_code_size --ts_opt server_grpc1 --ts_opt ts_nocheck --proto_path . *.proto`,
   },
   dependencies: {
-    '@protobuf-ts/plugin': '^2.9.0',
+    '@protobuf-ts/plugin': '^2.11.0',
   },
   license: 'MIT',
 }
