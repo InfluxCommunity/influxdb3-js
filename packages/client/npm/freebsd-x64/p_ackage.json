@@ -1,0 +1,19 @@
+{
+  "name": "@influxdata/influxdb3-js-flight-sql-client-freebsd-x64",
+  "version": "0.0.8",
+  "os": ["freebsd"],
+  "cpu": ["x64"],
+  "main": "influxdb3-js-flight-sql-client.freebsd-x64.node",
+  "files": ["influxdb3-js-flight-sql-client.freebsd-x64.node"],
+  "description": "A FlightSQL client for  Node.js",
+  "keywords": ["napi-rs", "NAPI", "N-API", "Rust", "node-addon", "node-addon-api"],
+  "license": "MIT",
+  "engines": {
+    "node": ">= 10"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "repository": "https://github.com/InfluxCommunity/influxdb3-js.git"
+}

@@ -41,9 +41,8 @@ export default class FetchTransport implements Transport {
     }
     if (this._connectionOptions.token) {
       const authScheme = this._connectionOptions.authScheme ?? 'Token'
-      this._defaultHeaders[
-        'Authorization'
-      ] = `${authScheme} ${this._connectionOptions.token}`
+      this._defaultHeaders['Authorization'] =
+        `${authScheme} ${this._connectionOptions.token}`
     }
     this._url = String(this._connectionOptions.host)
     if (this._url.endsWith('/')) {
@@ -241,8 +240,8 @@ export default class FetchTransport implements Transport {
         method === 'GET' || method === 'HEAD'
           ? undefined
           : typeof body === 'string'
-          ? body
-          : JSON.stringify(body),
+            ? body
+            : JSON.stringify(body),
       headers: {
         ...this._defaultHeaders,
         ...headers,
