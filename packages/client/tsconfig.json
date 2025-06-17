@@ -5,7 +5,7 @@
     // TS6133: 'wireType' is declared but its value is never read.
     "noUnusedLocals": true,
     "resolveJsonModule": true,
-    "lib": ["DOM", "es2018"]
+    "lib": ["DOM", "es2023"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["*.js"]
