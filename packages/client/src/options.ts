@@ -67,6 +67,7 @@ export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
  *           },
  *           precision: 'ns',
  *           gzipThreshold: 1000,
+ *           noSync: false,
  *         })
  * ```
  */
@@ -78,6 +79,17 @@ export interface WriteOptions {
   headers?: Record<string, string>
   /** When specified, write bodies larger than the threshold are gzipped  */
   gzipThreshold?: number
+  /**
+   * Instructs the server whether to wait with the response until WAL persistence completes.
+   * noSync=true means faster write but without the confirmation that the data was persisted.
+   *
+   * Note: This option is supported by InfluxDB 3 Core and Enterprise servers only.
+   * For other InfluxDB 3 server types (InfluxDB Clustered, InfluxDB Clould Serverless/Dedicated)
+   * the write operation will fail with an error.
+   *
+   * Default value: false.
+   */
+  noSync?: boolean
   /** default tags
    *
    * @example Default tags using client config
@@ -120,6 +132,7 @@ export interface WriteOptions {
 export const DEFAULT_WriteOptions: WriteOptions = {
   precision: 'ns',
   gzipThreshold: 1000,
+  noSync: false,
 }
 
 export type QueryType = 'sql' | 'influxql'
@@ -203,14 +216,20 @@ export function fromConnectionString(connectionString: string): ClientOptions {
   }
   if (url.searchParams.has('precision')) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = url.searchParams.get(
-      'precision'
-    ) as WritePrecision
+    options.writeOptions.precision = parsePrecision(
+      url.searchParams.get('precision') as string
+    )
   }
   if (url.searchParams.has('gzipThreshold')) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
     options.writeOptions.gzipThreshold = parseInt(
       url.searchParams.get('gzipThreshold') as string
+    )
+  }
+  if (url.searchParams.has('writeNoSync')) {
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.noSync = parseBoolean(
+      url.searchParams.get('writeNoSync') as string
     )
   }
 
@@ -244,8 +263,9 @@ export function fromEnv(): ClientOptions {
   }
   if (process.env.INFLUX_PRECISION) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = process.env
-      .INFLUX_PRECISION as WritePrecision
+    options.writeOptions.precision = parsePrecision(
+      process.env.INFLUX_PRECISION as string
+    )
   }
   if (process.env.INFLUX_GZIP_THRESHOLD) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
@@ -253,6 +273,60 @@ export function fromEnv(): ClientOptions {
       process.env.INFLUX_GZIP_THRESHOLD
     )
   }
+  if (process.env.INFLUX_WRITE_NO_SYNC) {
+    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
+    options.writeOptions.noSync = parseBoolean(process.env.INFLUX_WRITE_NO_SYNC)
+  }
 
   return options
+}
+
+function parseBoolean(value: string): boolean {
+  return ['true', '1', 't', 'y', 'yes'].includes(value.trim().toLowerCase())
+}
+
+export function precisionToV2ApiString(precision: WritePrecision): string {
+  switch (precision) {
+    case 'ns':
+    case 'us':
+    case 'ms':
+    case 's':
+      return precision as string
+    default:
+      throw Error(`Unsupported precision '${precision}'`)
+  }
+}
+
+export function precisionToV3ApiString(precision: WritePrecision): string {
+  switch (precision) {
+    case 'ns':
+      return 'nanosecond'
+    case 'us':
+      return 'microsecond'
+    case 'ms':
+      return 'millisecond'
+    case 's':
+      return 'second'
+    default:
+      throw Error(`Unsupported precision '${precision}'`)
+  }
+}
+
+export function parsePrecision(value: string): WritePrecision {
+  switch (value.trim().toLowerCase()) {
+    case 'ns':
+    case 'nanosecond':
+      return 'ns'
+    case 'us':
+    case 'microsecond':
+      return 'us'
+    case 'ms':
+    case 'millisecond':
+      return 'ms'
+    case 's':
+    case 'second':
+      return 's'
+    default:
+      throw Error(`Unsupported precision '${value}'`)
+  }
 }

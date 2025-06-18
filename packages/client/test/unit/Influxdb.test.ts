@@ -194,6 +194,46 @@ at 'ClientOptions.database'
         .has.property('_requestApi')
         .is.equal(request)
     })
+    it('creates instance with noSync=true', () => {
+      expect(
+        (
+          new InfluxDBClient({
+            host: 'https://localhost:8086/',
+            token: 'my-token',
+            writeOptions: {
+              noSync: true,
+            } as WriteOptions,
+          }) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: true,
+        },
+      })
+    })
+    it('creates instance with noSync=false', () => {
+      expect(
+        (
+          new InfluxDBClient({
+            host: 'https://localhost:8086/',
+            token: 'my-token',
+            writeOptions: {
+              noSync: false,
+            } as WriteOptions,
+          }) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: false,
+        },
+      })
+    })
   })
 
   describe('constructor with connection string', () => {
@@ -285,6 +325,22 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
+    it('is created with long precision', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&precision=millisecond'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          precision: 'ms' as WritePrecision,
+        } as WriteOptions,
+      })
+    })
     it('is created with gzip threshold', () => {
       expect(
         (
@@ -301,11 +357,59 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
-    it('is created with precision and gzip threshold', () => {
+    it('creates instance with noSync=true', () => {
       expect(
         (
           new InfluxDBClient(
-            'https://localhost:8086?token=my-token&precision=us&gzipThreshold=128'
+            'https://localhost:8086?token=my-token&writeNoSync=true'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: true,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with noSync=false', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&writeNoSync=false'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: false,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with noSync=false for invalid input', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&writeNoSync=invalid'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: false,
+        } as WriteOptions,
+      })
+    })
+    it('is created with precision, gzip threshold and writeNoSync', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&precision=us&gzipThreshold=128&writeNoSync=true'
           ) as any
         )._options
       ).to.deep.equal({
@@ -315,6 +419,7 @@ at 'ClientOptions.database'
         writeOptions: {
           precision: 'us' as WritePrecision,
           gzipThreshold: 128,
+          noSync: true,
         } as WriteOptions,
       })
     })
@@ -329,6 +434,7 @@ at 'ClientOptions.database'
       delete process.env['INFLUX_TIMEOUT']
       delete process.env['INFLUX_PRECISION']
       delete process.env['INFLUX_GZIP_THRESHOLD']
+      delete process.env['INFLUX_WRITE_NO_SYNC']
     }
     it('fails on missing host', () => {
       clear()
@@ -413,6 +519,20 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
+    it('is created with host, token and long precision', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_PRECISION'] = 'nanosecond'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          precision: 'ns' as WritePrecision,
+        } as WriteOptions,
+      })
+    })
     it('is created with host, token and gzip threshold', () => {
       clear()
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
@@ -427,12 +547,55 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
-    it('is created with host, token, precision and gzip threshold', () => {
+    it('creates instance with noSync=true', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_WRITE_NO_SYNC'] = 'true'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: true,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with noSync=false', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_WRITE_NO_SYNC'] = 'false'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: false,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with noSync=false for invalid input', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_WRITE_NO_SYNC'] = 'invalid'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          noSync: false,
+        } as WriteOptions,
+      })
+    })
+    it('is created with host, token, precision, gzip threshold and write-no-sync', () => {
       clear()
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_PRECISION'] = 'us'
       process.env['INFLUX_GZIP_THRESHOLD'] = '128'
+      process.env['INFLUX_WRITE_NO_SYNC'] = 'true'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
@@ -440,6 +603,7 @@ at 'ClientOptions.database'
         writeOptions: {
           precision: 'us' as WritePrecision,
           gzipThreshold: 128,
+          noSync: true,
         } as WriteOptions,
       })
     })
@@ -452,6 +616,7 @@ at 'ClientOptions.database'
         token: 'TEST_TOKEN',
         writeOptions: {
           gzipThreshold: 1000,
+          noSync: true,
           headers: {
             terminate: 'tomorrow',
             'channel-preference': 'irish',
@@ -460,6 +625,7 @@ at 'ClientOptions.database'
       })
       const options = client['_mergeWriteOptions']({
         precision: 's',
+        noSync: false,
         headers: {
           hunter: 'H. Hancock',
         },
@@ -472,6 +638,7 @@ at 'ClientOptions.database'
           hunter: 'H. Hancock',
         },
         precision: 's',
+        noSync: false,
       })
     })
     it('merges write options with preference for method arg', async () => {
