@@ -245,7 +245,8 @@ export default class InfluxDBClient {
           method: 'GET',
         },
         (headers, _) => {
-          version = headers['X-Influxdb-Version'] ?? headers['x-influxdb-version']
+          version =
+            headers['X-Influxdb-Version'] ?? headers['x-influxdb-version']
         }
       )
       if (responseBody && !version) {
