@@ -854,6 +854,17 @@ at 'ClientOptions.database'
       const version = await getInfuxDbClient().getServerVersion()
       expect(version).to.equal('2.0')
     })
+    it('should return server version success', async () => {
+      nock('http://test:8086').get('/ping').reply(
+        200,
+        {version: '3.0'},
+        {
+          'x-influxdb-version': '2.0',
+        }
+      )
+      const version = await getInfuxDbClient().getServerVersion()
+      expect(version).to.equal('2.0')
+    })
     it('should return server version success from body', async () => {
       nock('http://test:8086')
         .get('/ping')
