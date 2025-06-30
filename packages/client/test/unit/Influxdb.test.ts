@@ -1,12 +1,12 @@
 import {expect} from 'chai'
 import sinon from 'sinon'
 import {
-  InfluxDBClient,
   ClientOptions,
+  DEFAULT_ConnectionOptions,
+  InfluxDBClient,
   Transport,
   WriteOptions,
   WritePrecision,
-  DEFAULT_ConnectionOptions,
 } from '../../src'
 import type WriteApi from '../../src/WriteApi'
 import type QueryApi from '../../src/QueryApi'
@@ -855,11 +855,9 @@ at 'ClientOptions.database'
       expect(version).to.equal('2.0')
     })
     it('should return server version success from body', async () => {
-      nock('http://test:8086').get('/ping').reply(
-        200,
-        {version: '3.0'},
-        {"something": '2.0'}
-      )
+      nock('http://test:8086')
+        .get('/ping')
+        .reply(200, {version: '3.0'}, {something: '2.0'})
       const version = await getInfuxDbClient().getServerVersion()
       expect(version).to.equal('3.0')
     })
@@ -868,7 +866,7 @@ at 'ClientOptions.database'
         200,
         {notVersion: '3.0'},
         {
-          'something': '2.0',
+          something: '2.0',
         }
       )
       const version = await getInfuxDbClient().getServerVersion()
@@ -882,17 +880,19 @@ at 'ClientOptions.database'
           'Some-header': '2.0',
         }
       )
-      getInfuxDbClient().getServerVersion().catch(reason => {
-        expect(reason).to.equal('400')
-      })
+      getInfuxDbClient()
+        .getServerVersion()
+        .catch((reason) => {
+          expect(reason).to.equal('400')
+        })
     })
   })
 })
 
-function getInfuxDbClient()  {
+function getInfuxDbClient() {
   return new InfluxDBClient({
     host: 'http://test:8086',
     token: 'TEST_TOKEN',
-    database: 'TEST_DATABASE'
+    database: 'TEST_DATABASE',
   })
 }
