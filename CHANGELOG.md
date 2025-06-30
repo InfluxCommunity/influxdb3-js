@@ -1,5 +1,9 @@
 ## 1.3.0 [unreleased]
 
+### Features
+
+1. [#585](https://github.com/InfluxCommunity/influxdb3-js/pull/585): Add function to get InfluxDB version.
+
 ## 1.2.0 [2025-06-26]
 
 ### Features
