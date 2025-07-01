@@ -107,8 +107,8 @@ export default class InfluxDBClient {
 
     this._transport = impl.writeTransport(this._options)
     this._writeApi = new WriteApiImpl({
-      ...this._options,
       transport: this._transport,
+      ...this._options,
     })
   }
 
