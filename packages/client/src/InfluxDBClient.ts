@@ -235,6 +235,13 @@ export default class InfluxDBClient {
     )
   }
 
+  /**
+   * Retrieves the server version by making a request to the `/ping` endpoint.
+   * It attempts to return the version information from the response headers or the response body.
+   *
+   * @return {Promise<string | undefined>} A promise that resolves to the server version as a string, or undefined if it cannot be determined.
+   * Rejects the promise if an error occurs during the request.
+   */
   async getServerVersion(): Promise<string | undefined> {
     let version = undefined
     try {
