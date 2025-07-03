@@ -20,6 +20,7 @@ const DEFAULT_PORT = 44404
 export class MockService {
   static callMeta: Map<string, Map<string, string[]>> = new Map()
   static callTickets: Map<string, flt.Ticket> = new Map()
+  static defaultBlobSize = 65536
 
   static callCount: {[key: string]: any} = {
     doAction: 0,
@@ -125,13 +126,15 @@ export class MockService {
  */
 
   public static sendEmptyResponseBody(
-    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    path: string
   ): void {
+    console.log(`DEBUG [TestServer] sending empty repsonse body path: ${path}`)
     call.write(
       {
         flight_descriptor: {
           type: 2,
-          path: call.getPath(),
+          path: path,
         },
         dataHeader: Message.encode(
           new Message(0, MetadataVersion.V5, MessageHeader.RecordBatch, {
@@ -163,9 +166,10 @@ export class MockService {
   }
 
   public static echoMetadata(
-    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    metadata: grpc.Metadata
   ): void {
-    call.sendMetadata(call.metadata)
+    call.sendMetadata(metadata)
   }
 
   public static pushCallMetadata(
@@ -187,6 +191,19 @@ export class MockService {
     this.callTickets.set(callId, ticket)
   }
 
+  public static handleBlob(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>, size: number) {
+    console.log(`DEBUG [TestServer] handling blob of size ${size}`)
+    let data = new Uint8Array(size);
+    for(let i = 0; i < data.length; i++){
+      data[i] = Math.floor(Math.random() * 96) + 32
+    }
+    const decoder = new TextDecoder('utf-8')
+    const dataB64 = btoa(decoder.decode(data))
+    const fd = flt.FlightData.fromJsonString(`{ "dataBody": "${dataB64}" }`)
+   // console.log(`DEBUG [TestServer] sending data ${fd.dataBody}`)
+    call.write(fd)
+  }
+
   public static service: fsv.IFlightService = {
     doAction(call: grpc.ServerWritableStream<flt.Action, flt.Result>): void {
       MockService.callCount.doAction++
@@ -205,6 +222,7 @@ export class MockService {
       )
     },
     doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
+      console.log("DEBUG [TestServer] starting doGet")
       MockService.callCount.doGet++
       MockService.pushCallMetadata(
         MockService.genCallId('doGet', MockService.callCount.doGet),
@@ -217,15 +235,48 @@ export class MockService {
       call.on('error', (args) => {
         Log.error.call(Log, `MockService ERROR on doGet() ${args}`)
       })
-      const responseTrailers = new grpc.Metadata()
-      // echo metadata back
-      MockService.echoMetadata(call)
-      // Send empty responses
-      // Send Schema
-      MockService.sendEmptySchema(call)
-      // Send ResponseBody
-      MockService.sendEmptyResponseBody(call)
-      call.end(responseTrailers)
+
+      console.log("DEBUG [TestServer] copying metadata")
+      let metadata = call.metadata;
+      // const responseTrailers = new grpc.Metadata()
+      console.log(`DEBUG [TestServer] metadata ${JSON.stringify(metadata)}`)
+      console.log("DEBUG [TestServer] copying path")
+      let path = call.getPath()
+      // let ticket = flt.Ticket.create({ ticket: new TextEncoder().encode(JSON.stringify({}))})
+      // console.log("DEBUG [TestServer] copying request to ticket")
+      // let ticket = JSON.parse(call.request.toString())
+
+      // if (call.request.ticket) {
+        // const tkt = JSON.parse(call.request.toString())
+        // console.log(`DEBUG [TestServer] tkt ${JSON.stringify(tkt)}`)
+        // const db = tkt.database
+        // console.log(`DEBUG [TestServer] db is ${db}`)
+      // }
+
+      if (metadata.get("sendblob").length > 0) {
+        console.log(`DEBUG [TestServer] have sendblob ${metadata.get("sendblob")}`)
+        let blobSize = Number.parseInt(metadata.get("sendblob").toString())
+        blobSize = Number.isNaN(blobSize) || blobSize < 1 ? MockService.defaultBlobSize : blobSize
+        MockService.handleBlob(call, blobSize)
+      } else {
+        console.log(`DEBUG [TestServer] not a sendblob request`)
+
+
+
+
+        console.log("DEBUG [TestServer] echoing metadata")
+        // echo metadata back
+        MockService.echoMetadata(call, metadata)
+        // Send empty responses
+        // Send Schema
+        console.log("DEBUG [TestServer] sending empty schema")
+        MockService.sendEmptySchema(call)
+        // Send ResponseBody
+        console.log("DEBUG [TestServer] sending empty response body")
+        MockService.sendEmptyResponseBody(call, path)
+      }
+      call.end(metadata)
+
     },
     doPut(call: grpc.ServerDuplexStream<flt.FlightData, flt.PutResult>): void {
       MockService.callCount.doPut++

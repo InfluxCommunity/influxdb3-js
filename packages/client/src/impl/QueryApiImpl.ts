@@ -10,6 +10,7 @@ import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
 import {CLIENT_LIB_USER_AGENT} from './version'
 import {getMappedValue} from '../util/TypeCasting'
+import {ClientOptions} from '@grpc/grpc-js'
 
 export type TicketDataType = {
   database: string
@@ -25,10 +26,20 @@ export default class QueryApiImpl implements QueryApi {
 
   private _defaultHeaders: Record<string, string> | undefined
 
+  // TODO handle grpcClientOptions
   constructor(private _options: ConnectionOptions) {
-    const {host, queryTimeout: timeout} = this._options
+    console.log(`DEBUG ConnectionOptions ${JSON.stringify(_options)}`)
+    const {host, queryTimeout: timeout, grpcOptions, database} = this._options
+    console.log(`DEBUG database ${JSON.stringify(database)}`)
+    console.log(`DEBUG grpcOptions ${JSON.stringify(grpcOptions)}`)
     this._defaultHeaders = this._options.headers
-    this._transport = impl.queryTransport({host, timeout})
+    let clientOptions: ClientOptions = {}
+    if ( grpcOptions !== undefined ) {
+      clientOptions = grpcOptions
+    }
+    console.log(`DEBUG QueryApiImpl clientOptions ${JSON.stringify(clientOptions)}`)
+    // @ts-ignore TODO find a way to remove this ignore
+    this._transport = impl.queryTransport({host: host, timeout: timeout, clientOptions: { ...clientOptions } })
     this._flightClient = new FlightServiceClient(this._transport)
   }
 

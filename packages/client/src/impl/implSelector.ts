@@ -4,6 +4,7 @@
 import {RpcTransport} from '@protobuf-ts/runtime-rpc'
 import {Transport} from '../transport'
 import {ClientOptions} from '../options'
+// import * as grpc from '@grpc/grpc-js/'
 
 // This import path is replaced by tsup for browser. Don't change path for ./node or ./browser!
 export {default as impl} from './node'
@@ -16,6 +17,7 @@ export type CreateWriteTransport = (options: ClientOptions) => Transport
 export type CreateQueryTransport = (options: {
   host: string
   timeout?: number
+  clientOptions?: Record<string, any>
 }) => RpcTransport & MaybeCloseable
 
 export type TargetBasedImplementation = {

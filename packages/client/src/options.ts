@@ -46,6 +46,11 @@ export interface ConnectionOptions {
    * Full HTTP web proxy URL including schema, for example http://your-proxy:8080.
    */
   proxyUrl?: string
+
+  /**
+   * Grpc options to be passed when instantiation query transport
+   */
+  grpcOptions?: Record<string, any>
 }
 
 /** default connection options */
@@ -162,6 +167,9 @@ export interface QueryOptions {
   headers?: Record<string, string>
   /** Parameters to accompany a query using them.*/
   params?: Record<string, QParamType>
+  /** GRPC specific Parameters to be set when instantiating client **/
+  /** Note these are ignored when used directly in a call **/
+  grpcOptions?: Record<string, any>
 }
 
 /** Default QueryOptions */

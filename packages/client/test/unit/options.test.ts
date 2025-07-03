@@ -9,6 +9,8 @@ import {
   WritePrecision,
 } from '../../src'
 
+// TODO update Options tests with new GrpcOptions
+
 describe('ClientOptions', () => {
   afterEach(() => {
     sinon.restore()

@@ -1,7 +1,10 @@
 import {expect, assert} from 'chai'
 import {InfluxDBClient, QueryOptions, DEFAULT_QueryOptions} from '../../src'
 import {MockService, TestServer} from '../TestServer'
-;(BigInt.prototype as any).toJSON = function () {
+;
+//import { RpcError } from "@protobuf-ts/runtime-rpc";
+
+(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
 
@@ -240,5 +243,75 @@ describe('query api tests', () => {
       query_type: 'influxql',
       params: {},
     })
+  })
+  it('fails on large received message', async () => {
+    // three tests - fails on blob, handles blob, fails on restricted send,
+    const blobSize = (1024 * 1024 * 4) + 1000
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      headers: {
+        extra: 'yes',
+        sendBlob: `${blobSize}`,
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+      },
+    })
+
+    const data = client.query("SELECT * FROM wumpus", "CI_TEST")
+
+    // TODO has to be a better way to do this
+    try {
+      await data.next()
+      assert.fail("should throw an RpcError")
+    } catch (e: any) {
+      if (e.name !== "RpcError") {
+        assert.fail(e)
+      }
+      assert.isTrue(true)
+    }
+  })
+  it('sets grpc large receive message size', async () => {
+    const blobSize = (1024 * 1024 * 4) + 1000
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      headers: {
+        extra: 'yes',
+        sendBlob: `${blobSize}`,
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+        grpcOptions: {
+          "grpc.max_receive_message_length": blobSize + 100
+        }
+      },
+    })
+
+    const data = client.query("SELECT * FROM wumpus", "CI_TEST")
+
+    try {
+
+      await data.next()
+
+    } catch (e: any) {
+       assert.fail(e)
+    }
+
   })
 })
