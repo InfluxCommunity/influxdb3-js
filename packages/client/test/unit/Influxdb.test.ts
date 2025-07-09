@@ -15,7 +15,7 @@ import nock from 'nock'
 
 const CONNECTION_TEST_OPTIONS = {
   ...DEFAULT_ConnectionOptions,
-  grpcOptions: undefined
+  grpcOptions: undefined,
 }
 
 describe('InfluxDB', () => {
