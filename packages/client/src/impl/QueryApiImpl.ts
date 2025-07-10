@@ -28,16 +28,17 @@ export default class QueryApiImpl implements QueryApi {
 
   // TODO handle grpcClientOptions
   constructor(private _options: ConnectionOptions) {
-    console.log(`DEBUG ConnectionOptions ${JSON.stringify(_options)}`)
-    const {host, queryTimeout: timeout, grpcOptions, database} = this._options
-    console.log(`DEBUG database ${JSON.stringify(database)}`)
-    console.log(`DEBUG grpcOptions ${JSON.stringify(grpcOptions)}`)
+    // console.log(`DEBUG ConnectionOptions ${JSON.stringify(_options)}`)
+    // const {host, queryTimeout: timeout, grpcOptions, database} = this._options
+    const {host, queryTimeout: timeout, grpcOptions} = this._options
+    // console.log(`DEBUG database ${JSON.stringify(database)}`)
+    // console.log(`DEBUG grpcOptions ${JSON.stringify(grpcOptions)}`)
     this._defaultHeaders = this._options.headers
     let clientOptions: ClientOptions = {}
     if ( grpcOptions !== undefined ) {
       clientOptions = grpcOptions
     }
-    console.log(`DEBUG QueryApiImpl clientOptions ${JSON.stringify(clientOptions)}`)
+    // console.log(`DEBUG QueryApiImpl clientOptions ${JSON.stringify(clientOptions)}`)
     // @ts-ignore TODO find a way to remove this ignore
     this._transport = impl.queryTransport({host: host, timeout: timeout, clientOptions: { ...clientOptions } })
     this._flightClient = new FlightServiceClient(this._transport)

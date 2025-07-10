@@ -8,7 +8,7 @@ export const createTransport: CreateQueryTransport = ({host, timeout, clientOpti
   const channelCredentials =
     grpc.credentials[safe ?? true ? 'createSsl' : 'createInsecure']()
 
-  console.log(`DEBUG createTransport grpcClientOptions ${JSON.stringify(clientOptions)}`)
+  // console.log(`DEBUG createTransport grpcClientOptions ${JSON.stringify(clientOptions)}`)
 
   // TODO is timeout used?
   return new GrpcTransport(

@@ -1,4 +1,4 @@
-import {expect} from 'chai'
+import { assert, expect } from "chai";
 import {setLogger} from '../src/util/logger'
 
 let previous: any
@@ -59,4 +59,38 @@ export const unhandledRejections = {
     process.off('unhandledRejection', addRejection)
     expect(rejections, 'Unhandled Promise rejections detected').deep.equals([])
   },
+}
+
+
+export const expectThrowsAsync = async(
+  method: Function,
+  message?: string,
+  errName?: string,
+) => {
+  let err: any = null;
+  try {
+    await method()
+  } catch (rejected) {
+    err = rejected;
+  }
+  if (!err) {
+
+    assert.fail(`Method ${method} should throw error ${errName ?? 'Error'}: ${message ?? ''}`)
+  }
+  if(errName) {
+    expect(err.name).to.equal(errName);
+  }
+  if(message){
+    expect(err["message"]).to.be.equal(message)
+  }
+}
+
+export const expectResolve = async(
+  method: Function
+)=> {
+  try {
+    await method()
+  } catch(error) {
+    assert.fail(`Method should resolve without error: ${method}.  But caught ${error}`)
+  }
 }
