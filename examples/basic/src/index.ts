@@ -2,6 +2,8 @@ import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
 
 type Defined<T> = Exclude<T, undefined>
 
+// TODO need example of setting grpc options
+
 /* allows to throw error as expression */
 const throwReturn = <T>(err: Error): Defined<T> => {
   throw err

@@ -167,8 +167,7 @@ export interface QueryOptions {
   headers?: Record<string, string>
   /** Parameters to accompany a query using them.*/
   params?: Record<string, QParamType>
-  /** GRPC specific Parameters to be set when instantiating client **/
-  /** Note these are ignored when used directly in a call **/
+  /** GRPC specific Parameters to be set when instantiating a client **/
   grpcOptions?: Record<string, any>
 }
 

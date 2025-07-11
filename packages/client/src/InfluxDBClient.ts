@@ -65,6 +65,7 @@ export default class InfluxDBClient {
    *   - INFLUX_PRECISION - timestamp precision when writing data
    *   - INFLUX_GZIP_THRESHOLD - payload size threshold for gzipping data
    *   - INFLUX_WRITE_NO_SYNC - skip waiting for WAL persistence on write
+   *   - INFLUX_GRPC_OPTIONS - comma separated set of key=value pairs matching @grpc/grpc-js channel options.
    */
   constructor()
 
