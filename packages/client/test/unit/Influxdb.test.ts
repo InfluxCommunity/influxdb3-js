@@ -667,7 +667,7 @@ at 'ClientOptions.database'
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_GRPC_OPTIONS'] =
-        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536';
+        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536'
       const expectedOptions = {
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
