@@ -294,9 +294,9 @@ export function fromEnv(): ClientOptions {
       if(kvPair.length != 2){
         continue
       }
-      let value: any = parseFloat(kvPair[1])
+      let value: any = parseInt(kvPair[1])
       if(Number.isNaN(value)) {
-        value = parseInt(kvPair[1])
+        value = parseFloat(kvPair[1])
         if(Number.isNaN(value)) {
           value = kvPair[1]
         }

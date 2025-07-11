@@ -709,6 +709,32 @@ at 'ClientOptions.database'
       const client: any = new InfluxDBClient()
       expect(client._options).to.deep.equal(expectedOptions)
     })
+    it('grpc - handles non-standard grpc value', async() => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_GRPC_OPTIONS'] =
+        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536,grpc.foo=bar';
+      const expectedOptions = {
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        grpcOptions: {
+          "grpc.max_receive_message_length": 65536,
+          "grpc.max_send_message_length": 65536,
+          "grpc.foo": "bar",
+        },
+        queryOptions: {
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+            'grpc.foo': 'bar',
+          }
+        }
+      }
+      const client: any = new InfluxDBClient()
+      expect(client._options).to.deep.equal(expectedOptions)
+    })
   })
   describe('options handling', () => {
     const DATABASE = 'TEST_DATABASE'
