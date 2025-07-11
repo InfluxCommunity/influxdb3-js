@@ -285,6 +285,25 @@ export function fromEnv(): ClientOptions {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
     options.writeOptions.noSync = parseBoolean(process.env.INFLUX_WRITE_NO_SYNC)
   }
+  if (process.env.INFLUX_GRPC_OPTIONS) {
+    const optionSets = process.env.INFLUX_GRPC_OPTIONS.split(',')
+    if(!options.grpcOptions) options.grpcOptions = {} as Record<string,any>
+    for(const optSet of optionSets){
+      const kvPair = optSet.split("=")
+      // ignore malformed values
+      if(kvPair.length != 2){
+        continue
+      }
+      let value: any = parseFloat(kvPair[1])
+      if(Number.isNaN(value)) {
+        value = parseInt(kvPair[1])
+        if(Number.isNaN(value)) {
+          value = kvPair[1]
+        }
+      }
+      options.grpcOptions[kvPair[0]] = value;
+    }
+  }
 
   return options
 }

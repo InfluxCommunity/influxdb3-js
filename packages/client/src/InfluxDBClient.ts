@@ -95,8 +95,21 @@ export default class InfluxDBClient {
     }
 
     // see list of grpcOptions in @grpc/grpc-js/README.md
-    this._options.grpcOptions = options.queryOptions?.grpcOptions
-    // console.log(`DEBUG this._options ${JSON.stringify(this._options)}`)
+    // sync grpcOptions between ConnectionOptions (needed by transport)
+    // and QueryOptions (User friendly location also more accessible via env)
+    if (this._options.grpcOptions) {
+      this._options.queryOptions = {
+         ...options.queryOptions,
+        grpcOptions: {
+          ...this._options.grpcOptions
+        }
+      }
+    } else {
+      if (options.queryOptions &&
+        options.queryOptions?.grpcOptions) {
+        this._options.grpcOptions = options.queryOptions?.grpcOptions
+      }
+    }
     const host = this._options.host
     if (typeof host !== 'string')
       throw new IllegalArgumentError('No host specified!')

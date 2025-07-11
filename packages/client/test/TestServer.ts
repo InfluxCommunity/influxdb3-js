@@ -129,7 +129,6 @@ export class MockService {
     call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
     path: string
   ): void {
-    console.log(`DEBUG [TestServer] sending empty repsonse body path: ${path}`)
     call.write(
       {
         flight_descriptor: {
@@ -192,7 +191,6 @@ export class MockService {
   }
 
   public static handleBlob(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>, size: number) {
-    console.log(`DEBUG [TestServer] handling blob of size ${size}`)
     let data = new Uint8Array(size);
     for(let i = 0; i < data.length; i++){
       data[i] = Math.floor(Math.random() * 96) + 32
@@ -200,7 +198,6 @@ export class MockService {
     const decoder = new TextDecoder('utf-8')
     const dataB64 = btoa(decoder.decode(data))
     const fd = flt.FlightData.fromJsonString(`{ "dataBody": "${dataB64}" }`)
-   // console.log(`DEBUG [TestServer] sending data ${fd.dataBody}`)
     call.write(fd)
   }
 
@@ -222,7 +219,6 @@ export class MockService {
       )
     },
     doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
-      console.log("DEBUG [TestServer] starting doGet")
       MockService.callCount.doGet++
       MockService.pushCallMetadata(
         MockService.genCallId('doGet', MockService.callCount.doGet),
@@ -236,43 +232,20 @@ export class MockService {
         Log.error.call(Log, `MockService ERROR on doGet() ${args}`)
       })
 
-      console.log("DEBUG [TestServer] copying metadata")
       let metadata = call.metadata;
-      // const responseTrailers = new grpc.Metadata()
-      console.log(`DEBUG [TestServer] metadata ${JSON.stringify(metadata)}`)
-      console.log("DEBUG [TestServer] copying path")
       let path = call.getPath()
-      // let ticket = flt.Ticket.create({ ticket: new TextEncoder().encode(JSON.stringify({}))})
-      // console.log("DEBUG [TestServer] copying request to ticket")
-      // let ticket = JSON.parse(call.request.toString())
-
-      // if (call.request.ticket) {
-        // const tkt = JSON.parse(call.request.toString())
-        // console.log(`DEBUG [TestServer] tkt ${JSON.stringify(tkt)}`)
-        // const db = tkt.database
-        // console.log(`DEBUG [TestServer] db is ${db}`)
-      // }
 
       if (metadata.get("sendblob").length > 0) {
-        console.log(`DEBUG [TestServer] have sendblob ${metadata.get("sendblob")}`)
         let blobSize = Number.parseInt(metadata.get("sendblob").toString())
         blobSize = Number.isNaN(blobSize) || blobSize < 1 ? MockService.defaultBlobSize : blobSize
         MockService.handleBlob(call, blobSize)
       } else {
-        console.log(`DEBUG [TestServer] not a sendblob request`)
-
-
-
-
-        console.log("DEBUG [TestServer] echoing metadata")
         // echo metadata back
         MockService.echoMetadata(call, metadata)
         // Send empty responses
         // Send Schema
-        console.log("DEBUG [TestServer] sending empty schema")
         MockService.sendEmptySchema(call)
         // Send ResponseBody
-        console.log("DEBUG [TestServer] sending empty response body")
         MockService.sendEmptyResponseBody(call, path)
       }
       call.end(metadata)

@@ -1,12 +1,12 @@
 import {GrpcWebFetchTransport} from '@protobuf-ts/grpcweb-transport'
 import {CreateQueryTransport} from '../implSelector'
 
-export const createTransport: CreateQueryTransport = ({host, timeout, grpcClientOptions}) => {
+export const createTransport: CreateQueryTransport = ({host, timeout, clientOptions}) => {
 
-  if (grpcClientOptions) {
+  if (clientOptions) {
     // TODO use logger
     console.warn(`Detected grpcClientOptions: such options are ignored in the GrpcWebFetchTransport:\n
-    ${JSON.stringify(grpcClientOptions)}`)
+    ${JSON.stringify(clientOptions)}`)
   }
   return new GrpcWebFetchTransport({baseUrl: host, timeout})
 }
