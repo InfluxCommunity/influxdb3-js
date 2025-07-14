@@ -35,9 +35,11 @@ export default class QueryApiImpl implements QueryApi {
       clientOptions = grpcOptions
     }
 
-    this._transport = impl.queryTransport(
-      {host: host, timeout: queryTimeout, clientOptions: { ...clientOptions } }
-    )
+    this._transport = impl.queryTransport({
+      host: host,
+      timeout: queryTimeout,
+      clientOptions: {...clientOptions},
+    })
     this._flightClient = new FlightServiceClient(this._transport)
   }
 

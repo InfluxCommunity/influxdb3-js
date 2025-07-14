@@ -74,7 +74,9 @@ export const expectThrowsAsync = async (
   }
   if (!err) {
     assert.fail(
-      `Method ${method} should throw error ${errName ?? 'Error'}: ${expectedMessage ?? ''}`
+      `Method ${method} should throw error ${errName ?? 'Error'}: ${
+        expectedMessage ?? ''
+      }`
     )
   }
   if (errName) {

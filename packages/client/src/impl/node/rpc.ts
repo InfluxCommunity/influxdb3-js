@@ -10,7 +10,7 @@ export const createTransport: CreateQueryTransport = ({
 }) => {
   const {url, safe} = replaceURLProtocolWithPort(host)
   const channelCredentials =
-    grpc.credentials[(safe ?? true) ? 'createSsl' : 'createInsecure']()
+    grpc.credentials[ safe ?? true ? 'createSsl' : 'createInsecure']()
 
   return new GrpcTransport({
     host: url,
