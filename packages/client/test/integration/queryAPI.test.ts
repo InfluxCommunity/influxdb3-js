@@ -326,9 +326,40 @@ describe('query api tests', () => {
     })
 
      await expectThrowsAsync(async () => {
-        const data = client.query("SELECT * FROM wumpus", "CI_TST")
+        const data = client.query("SELECT * FROM wumpus", "CI_TEST")
         await data.next()
      }, 'Attempted to send message with a size larger than 16', 'RpcError'
     )
+  })
+  it('times out', async function(){
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 100,
+      headers: {
+        extra: 'yes',
+        delay: '2000',
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+        grpcOptions: {
+          "grpc.max_send_message_length": 256
+        }
+      },
+    })
+
+    await expectThrowsAsync(async () => {
+      const data = client.query("SELECT * FROM wumpus", "CI_TEST")
+      await data.next()
+    }, /^Deadline exceeded.*/, "RpcError")
+
   })
 })

@@ -27,7 +27,7 @@ export default class QueryApiImpl implements QueryApi {
   private _defaultHeaders: Record<string, string> | undefined
 
   constructor(private _options: ConnectionOptions) {
-    const {host, queryTimeout: timeout, grpcOptions} = this._options
+    const {host, queryTimeout, grpcOptions} = this._options
 
     this._defaultHeaders = this._options.headers
     let clientOptions: ClientOptions = {}
@@ -35,7 +35,7 @@ export default class QueryApiImpl implements QueryApi {
       clientOptions = grpcOptions
     }
 
-    this._transport = impl.queryTransport({host: host, timeout: timeout, clientOptions: { ...clientOptions } })
+    this._transport = impl.queryTransport({host: host, timeout: queryTimeout, clientOptions: { ...clientOptions } })
     this._flightClient = new FlightServiceClient(this._transport)
   }
 

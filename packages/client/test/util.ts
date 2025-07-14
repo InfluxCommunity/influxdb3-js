@@ -64,7 +64,7 @@ export const unhandledRejections = {
 
 export const expectThrowsAsync = async(
   method: Function,
-  message?: string,
+  expectedMessage?: string | RegExp,
   errName?: string,
 ) => {
   let err: any = null;
@@ -75,13 +75,18 @@ export const expectThrowsAsync = async(
   }
   if (!err) {
 
-    assert.fail(`Method ${method} should throw error ${errName ?? 'Error'}: ${message ?? ''}`)
+    assert.fail(`Method ${method} should throw error ${errName ?? 'Error'}: ${expectedMessage ?? ''}`)
   }
   if(errName) {
     expect(err.name).to.equal(errName);
   }
-  if(message){
-    expect(err["message"]).to.be.equal(message)
+  if(expectedMessage) {
+    if (typeof expectedMessage === 'string') {
+      expect(err["message"]).to.be.equal(expectedMessage)
+    }
+    if (expectedMessage instanceof RegExp) {
+      expect(err["message"]).to.match(expectedMessage)
+    }
   }
 }
 

@@ -219,6 +219,7 @@ export class MockService {
       )
     },
     doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
+      let timeout = 0
       MockService.callCount.doGet++
       MockService.pushCallMetadata(
         MockService.genCallId('doGet', MockService.callCount.doGet),
@@ -248,8 +249,13 @@ export class MockService {
         // Send ResponseBody
         MockService.sendEmptyResponseBody(call, path)
       }
-      call.end(metadata)
 
+      if (metadata.get("delay").length > 0){
+        timeout = Number.parseInt(metadata.get("delay").toString())
+      }
+      setTimeout(() => {
+        call.end(metadata)
+      }, timeout)
     },
     doPut(call: grpc.ServerDuplexStream<flt.FlightData, flt.PutResult>): void {
       MockService.callCount.doPut++
