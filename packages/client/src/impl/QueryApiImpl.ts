@@ -31,11 +31,13 @@ export default class QueryApiImpl implements QueryApi {
 
     this._defaultHeaders = this._options.headers
     let clientOptions: ClientOptions = {}
-    if ( grpcOptions !== undefined ) {
+    if (grpcOptions !== undefined) {
       clientOptions = grpcOptions
     }
 
-    this._transport = impl.queryTransport({host: host, timeout: queryTimeout, clientOptions: { ...clientOptions } })
+    this._transport = impl.queryTransport(
+      {host: host, timeout: queryTimeout, clientOptions: { ...clientOptions } }
+    )
     this._flightClient = new FlightServiceClient(this._transport)
   }
 

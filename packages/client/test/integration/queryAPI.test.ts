@@ -1,16 +1,14 @@
 import {expect, assert} from 'chai'
 import {InfluxDBClient, QueryOptions, DEFAULT_QueryOptions} from '../../src'
 import {MockService, TestServer} from '../TestServer'
-;
-import {expectResolve, expectThrowsAsync} from "../util";
+import {expectResolve, expectThrowsAsync} from '../util'
 //import { RpcError } from "@protobuf-ts/runtime-rpc";
-
-(BigInt.prototype as any).toJSON = function () {
+;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
 
 const grpcVersion: string =
-  // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-require-imports
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('../../../../node_modules/@grpc/grpc-js/package.json').version
 
 const USER_AGENT = `grpc-node-js/${grpcVersion}`
@@ -247,7 +245,7 @@ describe('query api tests', () => {
   })
   it('grpc - fails on large received message', async () => {
     // const blobSize = (1024 * 1024 * 4) + 1000
-    const blobSize = (1024 * 1024 * 4) + 1000
+    const blobSize = 1024 * 1024 * 4 + 1000
     const client: InfluxDBClient = new InfluxDBClient({
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
@@ -267,13 +265,17 @@ describe('query api tests', () => {
       },
     })
 
-    await expectThrowsAsync(async () => {
-      const data = client.query("SELECT * FROM wumpus", "CI_TEST")
-      await data.next()
-    }, 'Received message larger than max (4195310 vs 4194304)', 'RpcError')
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      'Received message larger than max (4195310 vs 4194304)',
+      'RpcError'
+    )
   })
   it('grpc - sets large receive message size', async () => {
-    const blobSize = (1024 * 1024 * 4) + 1000
+    const blobSize = 1024 * 1024 * 4 + 1000
     const client: InfluxDBClient = new InfluxDBClient({
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
@@ -291,17 +293,17 @@ describe('query api tests', () => {
           acteur: 'R_NAVARRE',
         },
         grpcOptions: {
-          "grpc.max_receive_message_length": blobSize + 100
-        }
+          'grpc.max_receive_message_length': blobSize + 100,
+        },
       },
     })
 
     await expectResolve(async () => {
-      const data = client.query("SELECT * FROM wumpus", "CI_TEST")
+      const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
       await data.next()
     })
   })
-  it('grpc - fails on a restricted send message size', async() => {
+  it('grpc - fails on a restricted send message size', async () => {
     const blobSize = 65536
     const client: InfluxDBClient = new InfluxDBClient({
       host: `http://localhost:${server.port}`,
@@ -320,18 +322,21 @@ describe('query api tests', () => {
           acteur: 'R_NAVARRE',
         },
         grpcOptions: {
-          "grpc.max_send_message_length": 16
-        }
+          'grpc.max_send_message_length': 16,
+        },
       },
     })
 
-     await expectThrowsAsync(async () => {
-        const data = client.query("SELECT * FROM wumpus", "CI_TEST")
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
         await data.next()
-     }, 'Attempted to send message with a size larger than 16', 'RpcError'
+      },
+      'Attempted to send message with a size larger than 16',
+      'RpcError'
     )
   })
-  it('times out', async function(){
+  it('times out', async function () {
     this.timeout(3000)
     const client: InfluxDBClient = new InfluxDBClient({
       host: `http://localhost:${server.port}`,
@@ -351,15 +356,18 @@ describe('query api tests', () => {
           acteur: 'R_NAVARRE',
         },
         grpcOptions: {
-          "grpc.max_send_message_length": 256
-        }
+          'grpc.max_send_message_length': 256,
+        },
       },
     })
 
-    await expectThrowsAsync(async () => {
-      const data = client.query("SELECT * FROM wumpus", "CI_TEST")
-      await data.next()
-    }, /^Deadline exceeded.*/, "RpcError")
-
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
   })
 })

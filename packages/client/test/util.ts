@@ -1,4 +1,4 @@
-import { assert, expect } from "chai";
+import {assert, expect} from 'chai'
 import {setLogger} from '../src/util/logger'
 
 let previous: any
@@ -61,41 +61,41 @@ export const unhandledRejections = {
   },
 }
 
-
-export const expectThrowsAsync = async(
-  method: Function,
+export const expectThrowsAsync = async (
+  method: () => void,
   expectedMessage?: string | RegExp,
-  errName?: string,
-) => {
-  let err: any = null;
+  errName?: string
+): Promise<void> => {
+  let err: any = null
   try {
     await method()
   } catch (rejected) {
-    err = rejected;
+    err = rejected
   }
   if (!err) {
-
-    assert.fail(`Method ${method} should throw error ${errName ?? 'Error'}: ${expectedMessage ?? ''}`)
+    assert.fail(
+      `Method ${method} should throw error ${errName ?? 'Error'}: ${expectedMessage ?? ''}`
+    )
   }
-  if(errName) {
-    expect(err.name).to.equal(errName);
+  if (errName) {
+    expect(err.name).to.equal(errName)
   }
-  if(expectedMessage) {
+  if (expectedMessage) {
     if (typeof expectedMessage === 'string') {
-      expect(err["message"]).to.be.equal(expectedMessage)
+      expect(err['message']).to.be.equal(expectedMessage)
     }
     if (expectedMessage instanceof RegExp) {
-      expect(err["message"]).to.match(expectedMessage)
+      expect(err['message']).to.match(expectedMessage)
     }
   }
 }
 
-export const expectResolve = async(
-  method: Function
-)=> {
+export const expectResolve = async (method: () => void): Promise<void> => {
   try {
     await method()
-  } catch(error) {
-    assert.fail(`Method should resolve without error: ${method}.  But caught ${error}`)
+  } catch (error) {
+    assert.fail(
+      `Method should resolve without error: ${method}.  But caught ${error}`
+    )
   }
 }

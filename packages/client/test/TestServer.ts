@@ -190,9 +190,12 @@ export class MockService {
     this.callTickets.set(callId, ticket)
   }
 
-  public static handleBlob(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>, size: number) {
-    let data = new Uint8Array(size);
-    for(let i = 0; i < data.length; i++){
+  public static handleBlob(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    size: number
+  ): void {
+    const data = new Uint8Array(size)
+    for (let i = 0; i < data.length; i++) {
       data[i] = Math.floor(Math.random() * 96) + 32
     }
     const decoder = new TextDecoder('utf-8')
@@ -233,12 +236,15 @@ export class MockService {
         Log.error.call(Log, `MockService ERROR on doGet() ${args}`)
       })
 
-      let metadata = call.metadata;
-      let path = call.getPath()
+      const metadata = call.metadata
+      const path = call.getPath()
 
-      if (metadata.get("sendblob").length > 0) {
-        let blobSize = Number.parseInt(metadata.get("sendblob").toString())
-        blobSize = Number.isNaN(blobSize) || blobSize < 1 ? MockService.defaultBlobSize : blobSize
+      if (metadata.get('sendblob').length > 0) {
+        let blobSize = Number.parseInt(metadata.get('sendblob').toString())
+        blobSize =
+          Number.isNaN(blobSize) || blobSize < 1
+            ? MockService.defaultBlobSize
+            : blobSize
         MockService.handleBlob(call, blobSize)
       } else {
         // echo metadata back
@@ -250,8 +256,8 @@ export class MockService {
         MockService.sendEmptyResponseBody(call, path)
       }
 
-      if (metadata.get("delay").length > 0){
-        timeout = Number.parseInt(metadata.get("delay").toString())
+      if (metadata.get('delay').length > 0) {
+        timeout = Number.parseInt(metadata.get('delay').toString())
       }
       setTimeout(() => {
         call.end(metadata)
