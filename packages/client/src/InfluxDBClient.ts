@@ -100,14 +100,13 @@ export default class InfluxDBClient {
     // and QueryOptions (User friendly location also more accessible via env)
     if (this._options.grpcOptions) {
       this._options.queryOptions = {
-         ...options.queryOptions,
+        ...options.queryOptions,
         grpcOptions: {
-          ...this._options.grpcOptions
-        }
+          ...this._options.grpcOptions,
+        },
       }
     } else {
-      if (options.queryOptions &&
-        options.queryOptions?.grpcOptions) {
+      if (options.queryOptions && options.queryOptions?.grpcOptions) {
         this._options.grpcOptions = options.queryOptions?.grpcOptions
       }
     }

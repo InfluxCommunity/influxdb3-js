@@ -286,21 +286,21 @@ export function fromEnv(): ClientOptions {
   }
   if (process.env.INFLUX_GRPC_OPTIONS) {
     const optionSets = process.env.INFLUX_GRPC_OPTIONS.split(',')
-    if(!options.grpcOptions) options.grpcOptions = {} as Record<string,any>
-    for(const optSet of optionSets){
-      const kvPair = optSet.split("=")
+    if (!options.grpcOptions) options.grpcOptions = {} as Record<string, any>
+    for (const optSet of optionSets) {
+      const kvPair = optSet.split('=')
       // ignore malformed values
-      if(kvPair.length != 2){
+      if (kvPair.length != 2) {
         continue
       }
       let value: any = parseInt(kvPair[1])
-      if(Number.isNaN(value)) {
+      if (Number.isNaN(value)) {
         value = parseFloat(kvPair[1])
-        if(Number.isNaN(value)) {
+        if (Number.isNaN(value)) {
           value = kvPair[1]
         }
       }
-      options.grpcOptions[kvPair[0]] = value;
+      options.grpcOptions[kvPair[0]] = value
     }
   }
 
