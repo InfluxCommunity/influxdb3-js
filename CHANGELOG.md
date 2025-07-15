@@ -1,5 +1,14 @@
 ## 1.3.0 [unreleased]
 
+### Features
+
+1. [#588](https://github.com/InfluxCommunity/influxdb3-js/pull/588): Support grpc options available via [@grpc/grpc-js](https://github.com/grpc/grpc-node/blob/master/packages/grpc-js/README.md#supported-channel-options).
+   - New client option (`grpcOptions`) added. Accepts key-value pairs available via @grpc/grpc-js.
+   - New queryOptions option (`grpcOptions`) added. Accepts key-value pairs available via @grpc/grpc-js.
+   - Configurable also with the environment variable (`INFLUXDB_GRPC_OPTIONS`) which takes a comma separated list of key-value pairs.
+   - See new example `clientWithGrpcOptions.ts`.
+   - Not supported in browser API.
+
 ## 1.2.0 [2025-06-26]
 
 ### Features
