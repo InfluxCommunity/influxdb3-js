@@ -4,7 +4,6 @@ import {CreateQueryTransport} from '../implSelector'
 export const createTransport: CreateQueryTransport = ({host, timeout, clientOptions}) => {
 
   if (clientOptions) {
-    // TODO use logger
     console.warn(`Detected grpcClientOptions: such options are ignored in the GrpcWebFetchTransport:\n
     ${JSON.stringify(clientOptions)}`)
   }
