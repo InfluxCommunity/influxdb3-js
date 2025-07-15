@@ -8,7 +8,7 @@ import {expectResolve, expectThrowsAsync} from '../util'
 }
 
 const grpcVersion: string =
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  //eslint-disable-next-line @typescript-eslint/no-require-imports
   require('../../../../node_modules/@grpc/grpc-js/package.json').version
 
 const USER_AGENT = `grpc-node-js/${grpcVersion}`
