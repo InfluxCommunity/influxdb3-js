@@ -16,6 +16,8 @@ import {IllegalArgumentError} from './errors'
 import {WritableData, writableDataToLineProtocol} from './util/generics'
 import {throwReturn} from './util/common'
 import {PointValues} from './PointValues'
+import {Transport} from './transport'
+import {impl} from './impl/implSelector'
 
 const argumentErrorMessage = `\
 Please specify the 'database' as a method parameter or use default configuration \
@@ -29,6 +31,7 @@ export default class InfluxDBClient {
   private readonly _options: ClientOptions
   private readonly _writeApi: WriteApi
   private readonly _queryApi: QueryApi
+  private readonly _transport: Transport
 
   /**
    * Creates a new instance of the `InfluxDBClient` from `ClientOptions`.
@@ -118,7 +121,12 @@ export default class InfluxDBClient {
     if (typeof this._options.token !== 'string')
       throw new IllegalArgumentError('No token specified!')
     this._queryApi = new QueryApiImpl(this._options)
-    this._writeApi = new WriteApiImpl(this._options)
+
+    this._transport = impl.writeTransport(this._options)
+    this._writeApi = new WriteApiImpl({
+      transport: this._transport,
+      ...this._options,
+    })
   }
 
   private _mergeWriteOptions = (writeOptions?: Partial<WriteOptions>) => {
@@ -242,6 +250,37 @@ export default class InfluxDBClient {
         throwReturn(new Error(argumentErrorMessage)),
       options as QueryOptions
     )
+  }
+
+  /**
+   * Retrieves the server version by making a request to the `/ping` endpoint.
+   * It attempts to return the version information from the response headers or the response body.
+   *
+   * @return {Promise<string | undefined>} A promise that resolves to the server version as a string, or undefined if it cannot be determined.
+   * Rejects the promise if an error occurs during the request.
+   */
+  async getServerVersion(): Promise<string | undefined> {
+    let version = undefined
+    try {
+      const responseBody = await this._transport.request(
+        '/ping',
+        null,
+        {
+          method: 'GET',
+        },
+        (headers, _) => {
+          version =
+            headers['X-Influxdb-Version'] ?? headers['x-influxdb-version']
+        }
+      )
+      if (responseBody && !version) {
+        version = responseBody['version']
+      }
+    } catch (error) {
+      return Promise.reject(error)
+    }
+
+    return Promise.resolve(version)
   }
 
   /**
