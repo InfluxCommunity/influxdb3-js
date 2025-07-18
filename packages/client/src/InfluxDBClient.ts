@@ -109,7 +109,7 @@ export default class InfluxDBClient {
         },
       }
     } else {
-      if (options.queryOptions && options.queryOptions?.grpcOptions) {
+      if (options.queryOptions?.grpcOptions) {
         this._options.grpcOptions = options.queryOptions?.grpcOptions
       }
     }

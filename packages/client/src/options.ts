@@ -48,7 +48,7 @@ export interface ConnectionOptions {
   proxyUrl?: string
 
   /**
-   * Grpc options to be passed when instantiation query transport
+   * Grpc options to be passed when instantiating query transport. See supported channel options in @grpc/grpc-js/README.md.
    */
   grpcOptions?: Record<string, any>
 }
@@ -167,7 +167,8 @@ export interface QueryOptions {
   headers?: Record<string, string>
   /** Parameters to accompany a query using them.*/
   params?: Record<string, QParamType>
-  /** GRPC specific Parameters to be set when instantiating a client **/
+  /** GRPC specific Parameters to be set when instantiating a client
+   * See supported channel options in @grpc/grpc-js/README.md. **/
   grpcOptions?: Record<string, any>
 }
 
