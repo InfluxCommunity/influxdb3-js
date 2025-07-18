@@ -234,6 +234,60 @@ at 'ClientOptions.database'
         },
       })
     })
+    it('creates instance with grpc options', () => {
+      const expectedOptions = {
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        grpcOptions: {
+          'grpc.max_receive_message_length': 65536,
+          'grpc.max_send_message_length': 65536,
+        },
+        queryOptions: {
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+          },
+        },
+      }
+      const clients = {
+        client1: new InfluxDBClient({
+          host: 'https://localhost:8086',
+          token: 'my-token',
+          queryOptions: {
+            grpcOptions: {
+              'grpc.max_receive_message_length': 65536,
+              'grpc.max_send_message_length': 65536,
+            },
+          },
+        }),
+        client2: new InfluxDBClient({
+          host: 'https://localhost:8086',
+          token: 'my-token',
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+          },
+        }),
+        client3: new InfluxDBClient({
+          host: 'https://localhost:8086',
+          token: 'my-token',
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+          },
+          queryOptions: {
+            grpcOptions: {
+              'grpc.max_receive_message_length': 32768,
+              'grpc.max_send_message_length': 32768,
+            },
+          },
+        }),
+      }
+      for (const client of Object.values(clients)) {
+        expect((client as any)._options).to.deep.equal(expectedOptions)
+      }
+    })
   })
 
   describe('constructor with connection string', () => {
@@ -435,6 +489,7 @@ at 'ClientOptions.database'
       delete process.env['INFLUX_PRECISION']
       delete process.env['INFLUX_GZIP_THRESHOLD']
       delete process.env['INFLUX_WRITE_NO_SYNC']
+      delete process.env['INFLUX_GRPC_OPTIONS']
     }
     it('fails on missing host', () => {
       clear()
@@ -606,6 +661,80 @@ at 'ClientOptions.database'
           noSync: true,
         } as WriteOptions,
       })
+    })
+    it('grpc - creates a host with grpc options', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_GRPC_OPTIONS'] =
+        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536'
+      const expectedOptions = {
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        grpcOptions: {
+          'grpc.max_receive_message_length': 65536,
+          'grpc.max_send_message_length': 65536,
+        },
+        queryOptions: {
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+          },
+        },
+      }
+      const client: any = new InfluxDBClient()
+      expect(client._options).to.deep.equal(expectedOptions)
+    })
+    it('grpc - handles illegal values in grpc environment variables', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_GRPC_OPTIONS'] =
+        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536,grpc.garbled'
+      const expectedOptions = {
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        grpcOptions: {
+          'grpc.max_receive_message_length': 65536,
+          'grpc.max_send_message_length': 65536,
+        },
+        queryOptions: {
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+          },
+        },
+      }
+      const client: any = new InfluxDBClient()
+      expect(client._options).to.deep.equal(expectedOptions)
+    })
+    it('grpc - handles non-standard grpc value', async () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_GRPC_OPTIONS'] =
+        'grpc.max_receive_message_length=65536,grpc.max_send_message_length=65536,grpc.foo=bar'
+      const expectedOptions = {
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        grpcOptions: {
+          'grpc.max_receive_message_length': 65536,
+          'grpc.max_send_message_length': 65536,
+          'grpc.foo': 'bar',
+        },
+        queryOptions: {
+          grpcOptions: {
+            'grpc.max_receive_message_length': 65536,
+            'grpc.max_send_message_length': 65536,
+            'grpc.foo': 'bar',
+          },
+        },
+      }
+      const client: any = new InfluxDBClient()
+      expect(client._options).to.deep.equal(expectedOptions)
     })
   })
   describe('options handling', () => {

@@ -16,6 +16,7 @@ export type CreateWriteTransport = (options: ClientOptions) => Transport
 export type CreateQueryTransport = (options: {
   host: string
   timeout?: number
+  clientOptions?: Record<string, any>
 }) => RpcTransport & MaybeCloseable
 
 export type TargetBasedImplementation = {

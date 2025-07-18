@@ -1,6 +1,8 @@
 import {expect, assert} from 'chai'
 import {InfluxDBClient, QueryOptions, DEFAULT_QueryOptions} from '../../src'
 import {MockService, TestServer} from '../TestServer'
+import {expectResolve, expectThrowsAsync} from '../util'
+//import { RpcError } from "@protobuf-ts/runtime-rpc";
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -240,5 +242,132 @@ describe('query api tests', () => {
       query_type: 'influxql',
       params: {},
     })
+  })
+  it('grpc - fails on large received message', async () => {
+    // const blobSize = (1024 * 1024 * 4) + 1000
+    const blobSize = 1024 * 1024 * 4 + 1000
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      headers: {
+        extra: 'yes',
+        sendBlob: `${blobSize}`,
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+      },
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      'Received message larger than max (4195310 vs 4194304)',
+      'RpcError'
+    )
+  })
+  it('grpc - sets large receive message size', async () => {
+    const blobSize = 1024 * 1024 * 4 + 1000
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      headers: {
+        extra: 'yes',
+        sendBlob: `${blobSize}`,
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+        grpcOptions: {
+          'grpc.max_receive_message_length': blobSize + 100,
+        },
+      },
+    })
+
+    await expectResolve(async () => {
+      const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+      await data.next()
+    })
+  })
+  it('grpc - fails on a restricted send message size', async () => {
+    const blobSize = 65536
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      headers: {
+        extra: 'yes',
+        sendBlob: `${blobSize}`,
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+        grpcOptions: {
+          'grpc.max_send_message_length': 16,
+        },
+      },
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      'Attempted to send message with a size larger than 16',
+      'RpcError'
+    )
+  })
+  it('times out', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 100,
+      headers: {
+        extra: 'yes',
+        delay: '2000',
+      },
+      queryOptions: {
+        headers: {
+          special: 'super',
+        },
+        params: {
+          ecrivain: 'E_ZOLA',
+          acteur: 'R_NAVARRE',
+        },
+        grpcOptions: {
+          'grpc.max_send_message_length': 256,
+        },
+      },
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
   })
 })

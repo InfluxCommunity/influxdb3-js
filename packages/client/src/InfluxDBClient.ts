@@ -68,6 +68,7 @@ export default class InfluxDBClient {
    *   - INFLUX_PRECISION - timestamp precision when writing data
    *   - INFLUX_GZIP_THRESHOLD - payload size threshold for gzipping data
    *   - INFLUX_WRITE_NO_SYNC - skip waiting for WAL persistence on write
+   *   - INFLUX_GRPC_OPTIONS - comma separated set of key=value pairs matching @grpc/grpc-js channel options.
    */
   constructor()
 
@@ -95,6 +96,22 @@ export default class InfluxDBClient {
     this._options = {
       ...DEFAULT_ConnectionOptions,
       ...options,
+    }
+
+    // see list of grpcOptions in @grpc/grpc-js/README.md
+    // sync grpcOptions between ConnectionOptions (needed by transport)
+    // and QueryOptions (User friendly location also more accessible via env)
+    if (this._options.grpcOptions) {
+      this._options.queryOptions = {
+        ...options.queryOptions,
+        grpcOptions: {
+          ...this._options.grpcOptions,
+        },
+      }
+    } else {
+      if (options.queryOptions?.grpcOptions) {
+        this._options.grpcOptions = options.queryOptions?.grpcOptions
+      }
     }
     const host = this._options.host
     if (typeof host !== 'string')

@@ -46,6 +46,11 @@ export interface ConnectionOptions {
    * Full HTTP web proxy URL including schema, for example http://your-proxy:8080.
    */
   proxyUrl?: string
+
+  /**
+   * Grpc options to be passed when instantiating query transport. See supported channel options in @grpc/grpc-js/README.md.
+   */
+  grpcOptions?: Record<string, any>
 }
 
 /** default connection options */
@@ -162,6 +167,9 @@ export interface QueryOptions {
   headers?: Record<string, string>
   /** Parameters to accompany a query using them.*/
   params?: Record<string, QParamType>
+  /** GRPC specific Parameters to be set when instantiating a client
+   * See supported channel options in @grpc/grpc-js/README.md. **/
+  grpcOptions?: Record<string, any>
 }
 
 /** Default QueryOptions */
@@ -276,6 +284,25 @@ export function fromEnv(): ClientOptions {
   if (process.env.INFLUX_WRITE_NO_SYNC) {
     if (!options.writeOptions) options.writeOptions = {} as WriteOptions
     options.writeOptions.noSync = parseBoolean(process.env.INFLUX_WRITE_NO_SYNC)
+  }
+  if (process.env.INFLUX_GRPC_OPTIONS) {
+    const optionSets = process.env.INFLUX_GRPC_OPTIONS.split(',')
+    if (!options.grpcOptions) options.grpcOptions = {} as Record<string, any>
+    for (const optSet of optionSets) {
+      const kvPair = optSet.split('=')
+      // ignore malformed values
+      if (kvPair.length != 2) {
+        continue
+      }
+      let value: any = parseInt(kvPair[1])
+      if (Number.isNaN(value)) {
+        value = parseFloat(kvPair[1])
+        if (Number.isNaN(value)) {
+          value = kvPair[1]
+        }
+      }
+      options.grpcOptions[kvPair[0]] = value
+    }
   }
 
   return options
