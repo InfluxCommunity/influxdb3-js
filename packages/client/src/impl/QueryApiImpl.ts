@@ -10,6 +10,7 @@ import {PointFieldType, PointValues} from '../PointValues'
 import {allParamsMatched, queryHasParams} from '../util/sql'
 import {CLIENT_LIB_USER_AGENT} from './version'
 import {getMappedValue} from '../util/TypeCasting'
+import {ClientOptions} from '@grpc/grpc-js'
 
 export type TicketDataType = {
   database: string
@@ -26,9 +27,19 @@ export default class QueryApiImpl implements QueryApi {
   private _defaultHeaders: Record<string, string> | undefined
 
   constructor(private _options: ConnectionOptions) {
-    const {host, queryTimeout: timeout} = this._options
+    const {host, queryTimeout, grpcOptions} = this._options
+
     this._defaultHeaders = this._options.headers
-    this._transport = impl.queryTransport({host, timeout})
+    let clientOptions: ClientOptions = {}
+    if (grpcOptions !== undefined) {
+      clientOptions = grpcOptions
+    }
+
+    this._transport = impl.queryTransport({
+      host: host,
+      timeout: queryTimeout,
+      clientOptions: {...clientOptions},
+    })
     this._flightClient = new FlightServiceClient(this._transport)
   }
 

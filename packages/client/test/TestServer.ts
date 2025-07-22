@@ -20,6 +20,7 @@ const DEFAULT_PORT = 44404
 export class MockService {
   static callMeta: Map<string, Map<string, string[]>> = new Map()
   static callTickets: Map<string, flt.Ticket> = new Map()
+  static defaultBlobSize = 65536
 
   static callCount: {[key: string]: any} = {
     doAction: 0,
@@ -125,13 +126,14 @@ export class MockService {
  */
 
   public static sendEmptyResponseBody(
-    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    path: string
   ): void {
     call.write(
       {
         flight_descriptor: {
           type: 2,
-          path: call.getPath(),
+          path: path,
         },
         dataHeader: Message.encode(
           new Message(0, MetadataVersion.V5, MessageHeader.RecordBatch, {
@@ -163,9 +165,10 @@ export class MockService {
   }
 
   public static echoMetadata(
-    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    metadata: grpc.Metadata
   ): void {
-    call.sendMetadata(call.metadata)
+    call.sendMetadata(metadata)
   }
 
   public static pushCallMetadata(
@@ -187,6 +190,20 @@ export class MockService {
     this.callTickets.set(callId, ticket)
   }
 
+  public static handleBlob(
+    call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>,
+    size: number
+  ): void {
+    const data = new Uint8Array(size)
+    for (let i = 0; i < data.length; i++) {
+      data[i] = Math.floor(Math.random() * 96) + 32
+    }
+    const decoder = new TextDecoder('utf-8')
+    const dataB64 = btoa(decoder.decode(data))
+    const fd = flt.FlightData.fromJsonString(`{ "dataBody": "${dataB64}" }`)
+    call.write(fd)
+  }
+
   public static service: fsv.IFlightService = {
     doAction(call: grpc.ServerWritableStream<flt.Action, flt.Result>): void {
       MockService.callCount.doAction++
@@ -205,6 +222,7 @@ export class MockService {
       )
     },
     doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
+      let timeout = 0
       MockService.callCount.doGet++
       MockService.pushCallMetadata(
         MockService.genCallId('doGet', MockService.callCount.doGet),
@@ -217,15 +235,33 @@ export class MockService {
       call.on('error', (args) => {
         Log.error.call(Log, `MockService ERROR on doGet() ${args}`)
       })
-      const responseTrailers = new grpc.Metadata()
-      // echo metadata back
-      MockService.echoMetadata(call)
-      // Send empty responses
-      // Send Schema
-      MockService.sendEmptySchema(call)
-      // Send ResponseBody
-      MockService.sendEmptyResponseBody(call)
-      call.end(responseTrailers)
+
+      const metadata = call.metadata
+      const path = call.getPath()
+
+      if (metadata.get('sendblob').length > 0) {
+        let blobSize = Number.parseInt(metadata.get('sendblob').toString())
+        blobSize =
+          Number.isNaN(blobSize) || blobSize < 1
+            ? MockService.defaultBlobSize
+            : blobSize
+        MockService.handleBlob(call, blobSize)
+      } else {
+        // echo metadata back
+        MockService.echoMetadata(call, metadata)
+        // Send empty responses
+        // Send Schema
+        MockService.sendEmptySchema(call)
+        // Send ResponseBody
+        MockService.sendEmptyResponseBody(call, path)
+      }
+
+      if (metadata.get('delay').length > 0) {
+        timeout = Number.parseInt(metadata.get('delay').toString())
+      }
+      setTimeout(() => {
+        call.end(metadata)
+      }, timeout)
     },
     doPut(call: grpc.ServerDuplexStream<flt.FlightData, flt.PutResult>): void {
       MockService.callCount.doPut++
