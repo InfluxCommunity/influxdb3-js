@@ -60,6 +60,7 @@ export class PointValues {
 
   /**
    * Get measurement name. Can be undefined if not set.
+   * It will return undefined when querying with SQL Query.
    *
    * @returns measurement name or undefined
    */
