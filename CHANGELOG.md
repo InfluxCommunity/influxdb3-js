@@ -9,6 +9,7 @@
    - Configurable also with the environment variable (`INFLUXDB_GRPC_OPTIONS`) which takes a comma separated list of key-value pairs.
    - See new example `clientWithGrpcOptions.ts`.
    - Not supported in browser API.
+3. [#591](https://github.com/InfluxCommunity/influxdb3-js/pull/591): Add comment warning null when calling getMeasurement function.
 
 ## 1.2.0 [2025-06-26]
 
