@@ -82,6 +82,7 @@ export class Point {
 
   /**
    * Get measurement name.
+   * It will return undefined when querying with SQL Query.
    *
    * @returns measurement name
    */
