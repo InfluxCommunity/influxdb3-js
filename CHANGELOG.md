@@ -10,6 +10,7 @@
    - See new example `clientWithGrpcOptions.ts`.
    - Not supported in browser API.
 3. [#591](https://github.com/InfluxCommunity/influxdb3-js/pull/591): Add comment warning null when calling getMeasurement function.
+4. [#592](https://github.com/InfluxCommunity/influxdb3-js/pull/592): Run integration tests against a locally started InfluxDB 3 Core server.
 
 ## 1.2.0 [2025-06-26]
 
