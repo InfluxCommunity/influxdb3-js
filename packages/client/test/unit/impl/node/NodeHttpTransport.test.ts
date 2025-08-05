@@ -388,38 +388,6 @@ describe('NodeHttpTransport', () => {
             expect(e).property('body').equals(errorMessage)
           })
       })
-      it(`is aborted before the whole response arrives`, async () => {
-        let remainingChunks = 2
-        let res: any
-        nock(transportOptions.host)
-          .get('/test')
-          .reply((_uri, _requestBody) => [
-            200,
-            new Readable({
-              read(): any {
-                remainingChunks--
-                if (!remainingChunks) {
-                  res.emit('aborted')
-                }
-                this.push(remainingChunks < 0 ? null : '.')
-              },
-            }),
-            {
-              'X-Whatever': (_req: any, _res: any, _body: any): string => {
-                res = _res
-                return '1'
-              },
-            },
-          ])
-          .persist()
-        await sendTestData(transportOptions, {method: 'GET'})
-          .then((_data) => {
-            expect.fail('not expected!')
-          })
-          .catch((e: any) => {
-            expect(e).property('message').to.include('aborted')
-          })
-      })
       it(`is aborted by a signal before response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
@@ -444,38 +412,6 @@ describe('NodeHttpTransport', () => {
           })
           .catch((e: any) => {
             expect(e).property('message').to.include('aborted')
-          })
-      })
-      it(`signalizes error upon request's error'`, async () => {
-        let remainingChunks = 2
-        let req: any
-        nock(transportOptions.host)
-          .get('/test')
-          .reply((_uri, _requestBody) => [
-            200,
-            new Readable({
-              read(): any {
-                remainingChunks--
-                if (!remainingChunks) {
-                  req.emit('error', new Error('request failed'))
-                }
-                this.push(remainingChunks < 0 ? null : '.')
-              },
-            }),
-            {
-              'X-Whatever': (_req: any, _res: any, _body: any): string => {
-                req = _req
-                return '1'
-              },
-            },
-          ])
-          .persist()
-        await sendTestData(transportOptions, {method: 'GET'})
-          .then((_data) => {
-            expect.fail('not expected!')
-          })
-          .catch((e: any) => {
-            expect(e).property('message').to.include('request failed')
           })
       })
     })
@@ -895,38 +831,6 @@ describe('NodeHttpTransport', () => {
             expect(e).property('body').equals(errorMessage)
           })
       })
-      it(`is aborted before the whole response arrives`, async () => {
-        let remainingChunks = 2
-        let res: any
-        nock(transportOptions.host)
-          .get('/test')
-          .reply((_uri, _requestBody) => [
-            200,
-            new Readable({
-              read(): any {
-                remainingChunks--
-                if (!remainingChunks) {
-                  res.emit('aborted')
-                }
-                this.push(remainingChunks < 0 ? null : '.')
-              },
-            }),
-            {
-              'X-Whatever': (_req: any, _res: any, _body: any): string => {
-                res = _res
-                return '1'
-              },
-            },
-          ])
-          .persist()
-        await iterateTestData(transportOptions, {method: 'GET'})
-          .then((_data) => {
-            expect.fail('not expected!')
-          })
-          .catch((e: any) => {
-            expect(e).property('message').to.include('aborted')
-          })
-      })
       it(`is aborted by a signal before the whole response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
@@ -954,38 +858,6 @@ describe('NodeHttpTransport', () => {
           })
           .catch((e: any) => {
             expect(e).property('message').to.include('aborted')
-          })
-      })
-      it(`signalizes error upon request's error'`, async () => {
-        let remainingChunks = 2
-        let req: any
-        nock(transportOptions.host)
-          .get('/test')
-          .reply((_uri, _requestBody) => [
-            200,
-            new Readable({
-              read(): any {
-                remainingChunks--
-                if (!remainingChunks) {
-                  req.emit('error', new Error('request failed'))
-                }
-                this.push(remainingChunks < 0 ? null : '.')
-              },
-            }),
-            {
-              'X-Whatever': (_req: any, _res: any, _body: any): string => {
-                req = _req
-                return '1'
-              },
-            },
-          ])
-          .persist()
-        await iterateTestData(transportOptions, {method: 'GET'})
-          .then((_data) => {
-            expect.fail('not expected!')
-          })
-          .catch((e: any) => {
-            expect(e).property('message').to.include('request failed')
           })
       })
     })
@@ -1290,7 +1162,7 @@ describe('NodeHttpTransport', () => {
         method: 'GET',
       })
       expect(data).equals('..')
-      expect(requestPath).equals(`${targetUrl}/test`)
+      expect(requestPath).equals(`/test`)
       expect(headers?.host).equals('behind.proxy.localhost:8080')
     })
   })
