@@ -18,6 +18,7 @@ help:
 publish:
 	$(if $(VERSION),,$(error VERSION is not defined. Pass via "make publish VERSION=1.1.0"))
 	git checkout main
+	git commit -am "chore(release): prepare to release influxdb3-js-$(VERSION)"
 	git pull
 	yarn install --frozen-lockfile
 	node scripts/change-version.js
