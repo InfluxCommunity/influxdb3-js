@@ -21,7 +21,7 @@ jobs:
     parameters:
       image:
         type: string
-        default: &default-image 'cimg/node:21.4'
+        default: &default-image 'cimg/node:18.19'
     docker:
       - image: << parameters.image >>
       - image: influxdb:3-core
@@ -111,8 +111,19 @@ workflows:
   build:
     jobs:
       - tests:
+          name: 'tests-node-18'
+          filters:
+            branches:
+              ignore: gh-pages
+      - tests:
           name: 'tests-node-21'
           image: 'cimg/node:21.4'
+          filters:
+            branches:
+              ignore: gh-pages
+      - tests:
+          name: 'tests-node-20'
+          image: 'cimg/node:20.9.0'
           filters:
             branches:
               ignore: gh-pages
@@ -132,7 +143,7 @@ workflows:
               ignore: gh-pages
       - deploy-preview:
           requires:
-            - tests-node-21
+            - tests-node-18
             - coverage
           filters:
             branches:
