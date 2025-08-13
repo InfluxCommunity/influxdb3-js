@@ -132,7 +132,7 @@ workflows:
               ignore: gh-pages
       - deploy-preview:
           requires:
-            - tests-node-18
+            - tests-node-21
             - coverage
           filters:
             branches:
