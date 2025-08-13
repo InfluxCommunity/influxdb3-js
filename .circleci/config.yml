@@ -21,7 +21,7 @@ jobs:
     parameters:
       image:
         type: string
-        default: &default-image 'cimg/node:18.19'
+        default: &default-image 'cimg/node:21.4'
     docker:
       - image: << parameters.image >>
       - image: influxdb:3-core
