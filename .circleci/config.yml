@@ -111,19 +111,8 @@ workflows:
   build:
     jobs:
       - tests:
-          name: 'tests-node-18'
-          filters:
-            branches:
-              ignore: gh-pages
-      - tests:
           name: 'tests-node-21'
           image: 'cimg/node:21.4'
-          filters:
-            branches:
-              ignore: gh-pages
-      - tests:
-          name: 'tests-node-20'
-          image: 'cimg/node:20.9.0'
           filters:
             branches:
               ignore: gh-pages
