@@ -1,5 +1,9 @@
 ## 1.4.0 [unreleased]
 
+### Features
+
+1. [#606](https://github.com/InfluxCommunity/influxdb3-js/pull/606): Update Nock version 13 to 14.
+
 ## 1.3.0 [2025-08-12]
 
 ### Features
