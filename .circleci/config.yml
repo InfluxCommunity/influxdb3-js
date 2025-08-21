@@ -168,6 +168,7 @@ jobs:
           command: bash .circleci/deploy-nightly-version.sh
 
 workflows:
+  version: 2
   build:
     jobs:
       - tests:
