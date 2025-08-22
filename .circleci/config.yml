@@ -169,7 +169,7 @@ jobs:
 
 workflows:
   version: 2
-  build:
+  build-something:
     jobs:
       - tests:
           matrix:
