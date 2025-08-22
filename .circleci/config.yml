@@ -1,5 +1,38 @@
 version: 2.1
 
+parameters:
+  default-node-image:
+    type: string
+    default: "cimg/node:18.19"
+
+executors:
+  docker-amd64-image:
+    parameters:
+      node-image:
+        type: string
+        default: << pipeline.parameters.default-node-image >>
+    docker:
+      - image: <<parameters.node-image>>
+      - image: influxdb:3-core
+        environment:
+          - INFLUXDB3_NODE_IDENTIFIER_PREFIX=node01
+          - INFLUXDB3_OBJECT_STORE=file
+          - INFLUXDB3_DB_DIR=/var/lib/influxdb3/data
+  docker-arm64-image:
+    parameters:
+      node-image:
+        type: string
+        default: << pipeline.parameters.default-node-image >>
+    docker:
+      - image: <<parameters.node-image>>
+      - image: influxdb:3-core
+        environment:
+          - INFLUXDB3_NODE_IDENTIFIER_PREFIX=node01
+          - INFLUXDB3_OBJECT_STORE=file
+          - INFLUXDB3_DB_DIR=/var/lib/influxdb3/data
+    resource_class: arm.medium
+
+
 commands:
   init-dependencies:
     steps:
@@ -15,20 +48,43 @@ commands:
           key: yarn-packages-v2-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+  upload-codecov-amd64:
+    steps:
+      - run:
+          name: Collecting coverage reports
+          command: |
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
+            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig
+            curl -s https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+            gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+            shasum -a 256 -c codecov.SHA256SUM
+            chmod +x ./codecov
+            ./codecov
+  upload-codecov-arm64:
+    steps:
+      - run:
+          name: Collecting coverage reports
+          command: |
+            curl -k https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
+            curl -Os https://uploader.codecov.io/v0.8.0/aarch64/codecov
+            curl -Os https://uploader.codecov.io/v0.8.0/aarch64/codecov.SHA256SUM
+            curl -Os https://uploader.codecov.io/v0.8.0/aarch64/codecov.SHA256SUM.sig
+            gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+            shasum -a 256 -c codecov.SHA256SUM
+            sudo chmod +x codecov
+
 
 jobs:
   tests:
     parameters:
-      image:
+      node-image:
         type: string
-        default: &default-image 'cimg/node:18.19'
-    docker:
-      - image: << parameters.image >>
-      - image: influxdb:3-core
-        environment:
-          - INFLUXDB3_NODE_IDENTIFIER_PREFIX=node01
-          - INFLUXDB3_OBJECT_STORE=file
-          - INFLUXDB3_DB_DIR=/var/lib/influxdb3/data
+        default: << pipeline.parameters.default-node-image >>
+      exe:
+        type: executor
+        default: docker-amd64-image
+    executor: << parameters.exe >>
     steps:
       - checkout
       - init-dependencies
@@ -51,7 +107,7 @@ jobs:
 
   generate-flight:
     docker:
-      - image: *default-image
+      - image: << pipeline.parameters.default-node-image >>
     steps:
       - checkout
       - init-dependencies
@@ -61,8 +117,13 @@ jobs:
             yarn flight
   coverage:
     parameters:
-    docker:
-      - image: *default-image
+      node-image:
+        type: string
+        default: << pipeline.parameters.default-node-image >>
+      exe:
+        type: executor
+        default: docker-amd64-image
+    executor: << parameters.exe >>
     steps:
       - checkout
       - init-dependencies
@@ -72,24 +133,23 @@ jobs:
             yarn --version
             yarn flight:test
             yarn run coverage:ci
-      - run:
-          name: Report test results to codecov
-          command: |
-            curl -Os https://uploader.codecov.io/latest/linux/codecov
-            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
-            curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig
-            curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import
-            gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
-            shasum -a 256 -c codecov.SHA256SUM
-            chmod +x ./codecov
-            ./codecov
+      - when:
+          condition:
+            equal: [ docker-amd64-image, << parameters.exe >> ]
+          steps:
+            - upload-codecov-amd64
+      - when:
+          condition:
+            equal: [ docker-arm64-image, << parameters.exe >> ]
+          steps:
+            - upload-codecov-arm64
       - store_artifacts:
           path: ./packages/client/coverage
 
   deploy-preview:
     parameters:
     docker:
-      - image: *default-image
+      - image: << pipeline.parameters.default-node-image >>
     steps:
       - run:
           name: Early return if this build is from a forked repository
@@ -111,29 +171,18 @@ workflows:
   build:
     jobs:
       - tests:
-          name: 'tests-node-18'
-          filters:
-            branches:
-              ignore: gh-pages
-      - tests:
-          name: 'tests-node-21'
-          image: 'cimg/node:21.4'
-          filters:
-            branches:
-              ignore: gh-pages
-      - tests:
-          name: 'tests-node-20'
-          image: 'cimg/node:20.9.0'
-          filters:
-            branches:
-              ignore: gh-pages
-      - tests:
-          name: 'tests-node-22'
-          image: 'cimg/node:22.12.0'
+          matrix:
+            parameters:
+              exe: [ docker-amd64-image, docker-arm64-image ]
+              node-image: [ << pipeline.parameters.default-node-image >>, "cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
           filters:
             branches:
               ignore: gh-pages
       - coverage:
+          matrix:
+            parameters:
+              exe: [ docker-amd64-image, docker-arm64-image ]
+              node-image: [ << pipeline.parameters.default-node-image >> ]
           filters:
             branches:
               ignore: gh-pages
@@ -143,7 +192,7 @@ workflows:
               ignore: gh-pages
       - deploy-preview:
           requires:
-            - tests-node-18
+            - tests
             - coverage
           filters:
             branches:
