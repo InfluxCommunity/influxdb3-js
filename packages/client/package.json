@@ -1,6 +1,6 @@
 {
   "name": "@influxdata/influxdb3-client",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "The Client that provides a simple and convenient way to interact with InfluxDB 3.",
   "scripts": {
     "build": "yarn cp ../../README.md ./README.md && yarn run clean && yarn run build:browser && yarn run build:node",
