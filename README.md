@@ -188,6 +188,13 @@ for await (const row of queryPointsResult) {
 }
 ```
 
+### gRPC Compression
+
+The JavaScript client supports gRPC response compression.
+
+If the server chooses to compress query responses (e.g., with gzip), the client
+will automatically decompress them — no extra configuration is required.
+
 ## Examples
 
 For more advanced usage, see [examples](https://github.com/InfluxCommunity/influxdb3-js/blob/HEAD/examples/README.md).
