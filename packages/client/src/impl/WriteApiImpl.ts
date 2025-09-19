@@ -142,6 +142,7 @@ export default class WriteApiImpl implements WriteApi {
         ...writeOptions?.headers,
       },
       gzipThreshold: writeOptionsOrDefault.gzipThreshold,
+      timeout: writeOptionsOrDefault.timeout,
     }
 
     this._transport.send(
