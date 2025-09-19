@@ -6,9 +6,17 @@
 
 > :warning: **Breaking Changes**: Node v18 support is dropped because it is end of life.
 
+### Features
+
+1. [#622](https://github.com/InfluxCommunity/influxdb3-js/pull/622):
+   - Deprecated ConnectionOptions.timeout.
+   - Added ConnectionOptions.queryTimeout and ConnectionOptions.writeTimeout.
+   - Added QueryOptions.timeout and WriteOptions.timeout.
+   - Users can pass timeout directly to the query and write functions.
+
 ### CI
 
-1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix the pipeline matrix.
+1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipelines not downloading the correct node images.
 
 ### Docs
 
