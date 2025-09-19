@@ -166,12 +166,14 @@ export default class InfluxDBClient {
    * @param database - database to write into
    * @param org - organization to write into
    * @param writeOptions - write options
+   * @param timeout - timeout of the request
    */
   async write(
     data: WritableData,
     database?: string,
     org?: string,
-    writeOptions?: Partial<WriteOptions>
+    writeOptions?: Partial<WriteOptions>,
+    timeout?: number
   ): Promise<void> {
     const options = this._mergeWriteOptions(writeOptions)
 
@@ -181,7 +183,8 @@ export default class InfluxDBClient {
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
       org,
-      options
+      options,
+      timeout
     )
   }
 
