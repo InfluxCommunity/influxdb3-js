@@ -23,22 +23,28 @@ function sendTestData(
   return new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error('timeouted')), 10000)
     let data = ''
-    new NodeHttpTransport(connectionOptions).send('/test', '', sendOptions, {
-      next(chunk: any) {
-        data += chunk.toString()
+    new NodeHttpTransport(connectionOptions).send(
+      '/test',
+      '',
+      sendOptions,
+      {
+        next(chunk: any) {
+          data += chunk.toString()
+        },
+        error(error: any) {
+          clearTimeout(timeout)
+          reject(error)
+        },
+        complete(): void {
+          clearTimeout(timeout)
+          resolve(data)
+        },
+        useCancellable(cancellable: Cancellable) {
+          if (setCancellable) setCancellable(cancellable)
+        },
       },
-      error(error: any) {
-        clearTimeout(timeout)
-        reject(error)
-      },
-      complete(): void {
-        clearTimeout(timeout)
-        resolve(data)
-      },
-      useCancellable(cancellable: Cancellable) {
-        if (setCancellable) setCancellable(cancellable)
-      },
-    }, timeoutOverride)
+      timeoutOverride
+    )
   })
 }
 async function iterateTestData(
@@ -352,7 +358,12 @@ describe('NodeHttpTransport', () => {
       })
       it(`passing timeout directly to send function`, async () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 100000}, {method: 'GET'},undefined, 100)
+        await sendTestData(
+          {...transportOptions, timeout: 100000},
+          {method: 'GET'},
+          undefined,
+          100
+        )
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -1293,19 +1304,21 @@ describe('NodeHttpTransport', () => {
       expect(extra).equals('yes')
     })
     it(`passing timeout directly to request function`, async () => {
-      nock(transportOptions.host)
-        .get('/test')
-        .delay(2000)
-        .reply(  200)
-        .persist()
+      nock(transportOptions.host).get('/test').delay(2000).reply(200).persist()
       const transport = new NodeHttpTransport({
         ...transportOptions,
         timeout: 10,
-      });
+      })
       try {
-        await transport.request('/test', '', {
-          method: 'GET',
-        }, undefined, 10)
+        await transport.request(
+          '/test',
+          '',
+          {
+            method: 'GET',
+          },
+          undefined,
+          10
+        )
         expect.fail('must not succeed')
       } catch (e: any) {
         expect(e.toString()).to.include('timed')

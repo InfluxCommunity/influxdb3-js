@@ -74,7 +74,7 @@ export class NodeHttpTransport implements Transport {
       protocol: url.protocol,
       hostname: url.hostname,
     }
-    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    this._contextPath = proxyUrl ? _url : (url.path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -177,46 +177,52 @@ export class NodeHttpTransport implements Transport {
     let contentType: string
     let responseStatusCode: number | undefined
     return new Promise((resolve, reject) => {
-      this.send(path, body as string, options, {
-        responseStarted(headers: Headers, statusCode?: number) {
-          if (responseStarted) {
-            responseStarted(headers, statusCode)
-          }
-          contentType = String(headers['content-type'])
-          responseStatusCode = statusCode
-        },
-        next: (data: Uint8Array): void => {
-          buffer = Buffer.concat([buffer, data])
-        },
-        complete: (): void => {
-          const responseType = options.headers?.accept ?? contentType
-          try {
-            if (responseStatusCode === 204) {
-              // ignore body of NO_CONTENT response
-              resolve(undefined)
+      this.send(
+        path,
+        body as string,
+        options,
+        {
+          responseStarted(headers: Headers, statusCode?: number) {
+            if (responseStarted) {
+              responseStarted(headers, statusCode)
             }
-            if (responseType.includes('json')) {
-              if (buffer.length) {
-                resolve(JSON.parse(buffer.toString('utf8')))
-              } else {
+            contentType = String(headers['content-type'])
+            responseStatusCode = statusCode
+          },
+          next: (data: Uint8Array): void => {
+            buffer = Buffer.concat([buffer, data])
+          },
+          complete: (): void => {
+            const responseType = options.headers?.accept ?? contentType
+            try {
+              if (responseStatusCode === 204) {
+                // ignore body of NO_CONTENT response
                 resolve(undefined)
               }
-            } else if (
-              responseType.includes('text') ||
-              responseType.startsWith('application/csv')
-            ) {
-              resolve(buffer.toString('utf8'))
-            } else {
-              resolve(buffer)
+              if (responseType.includes('json')) {
+                if (buffer.length) {
+                  resolve(JSON.parse(buffer.toString('utf8')))
+                } else {
+                  resolve(undefined)
+                }
+              } else if (
+                responseType.includes('text') ||
+                responseType.startsWith('application/csv')
+              ) {
+                resolve(buffer.toString('utf8'))
+              } else {
+                resolve(buffer)
+              }
+            } catch (e) {
+              reject(e)
             }
-          } catch (e) {
+          },
+          error: (e: Error): void => {
             reject(e)
-          }
+          },
         },
-        error: (e: Error): void => {
-          reject(e)
-        },
-      }, timeout)
+        timeout
+      )
     })
   }
 
@@ -235,7 +241,14 @@ export class NodeHttpTransport implements Transport {
     const requestMessage = await new Promise<Record<string, any>>(
       (resolve, reject) => {
         nestedReject = reject
-        this._createRequestMessage(path, body, options, resolve, wrapReject, timeout)
+        this._createRequestMessage(
+          path,
+          body,
+          options,
+          resolve,
+          wrapReject,
+          timeout
+        )
       }
     )
     if (requestMessage.signal?.addEventListener) {
