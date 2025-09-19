@@ -53,7 +53,8 @@ export default class WriteApiImpl implements WriteApi {
     lines: string[],
     bucket: string,
     org?: string,
-    writeOptions?: Partial<WriteOptions>
+    writeOptions?: Partial<WriteOptions>,
+    timeout?: number
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
@@ -148,7 +149,8 @@ export default class WriteApiImpl implements WriteApi {
       this._createWritePath(bucket, writeOptionsOrDefault, org),
       lines.join('\n'),
       sendOptions,
-      callbacks
+      callbacks,
+      timeout
     )
 
     return promise
