@@ -382,7 +382,12 @@ describe('query api tests', () => {
 
     await expectThrowsAsync(
       async () => {
-        const data = client.query('SELECT * FROM wumpus','CI_TEST',undefined, 0)
+        const data = client.query(
+          'SELECT * FROM wumpus',
+          'CI_TEST',
+          undefined,
+          0
+        )
         await data.next()
       },
       /^Deadline exceeded.*/,
