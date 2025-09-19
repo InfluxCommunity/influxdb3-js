@@ -1,5 +1,9 @@
 ## 1.5.0 [unreleased]
 
+### Features
+
+1. [#622](https://github.com/InfluxCommunity/influxdb3-js/pull/622): Support setting timeout directly to query and write functions.
+
 ### CI
 
 1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipeline not downloading the correct node images.
