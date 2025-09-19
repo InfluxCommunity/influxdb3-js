@@ -439,5 +439,54 @@ describe('Write', () => {
         }
       }
     })
+    it('timeout passing directly to write function', async function () {
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .delay(1000)
+        .reply(function (_uri, _requestBody) {
+          return [200, '', {}]
+        })
+        .persist()
+
+      const client: InfluxDBClient = new InfluxDBClient({...clientOptions})
+      try {
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1),
+          DATABASE,
+          undefined,
+          undefined,
+          10
+        )
+        expect.fail('failure expected')
+      } catch (e: any) {
+        expect(e.toString()).to.include('timed')
+      }
+    }).timeout(2000)
+    it('timeout in write function will override timeout in ClientOptions', async function () {
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .delay(1000)
+        .reply(function (_uri, _requestBody) {
+          return [200, '', {}]
+        })
+        .persist()
+
+      const client: InfluxDBClient = new InfluxDBClient({
+        ...clientOptions,
+        timeout: 1000000,
+      })
+      try {
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1),
+          DATABASE,
+          undefined,
+          undefined,
+          10
+        )
+        expect.fail('failure expected')
+      } catch (e: any) {
+        expect(e.toString()).to.include('timed')
+      }
+    }).timeout(2000)
   })
 })

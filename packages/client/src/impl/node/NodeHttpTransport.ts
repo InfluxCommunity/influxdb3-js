@@ -125,12 +125,14 @@ export class NodeHttpTransport implements Transport {
    * @param body - message body
    * @param options
    * @param callbacks - communication callbacks
+   * @param timeout - timeout of the request
    */
   send(
     path: string,
     body: string,
     options: SendOptions,
-    callbacks?: Partial<CommunicationObserver<any>>
+    callbacks?: Partial<CommunicationObserver<any>>,
+    timeout?: number
   ): void {
     const cancellable = new CancellableImpl()
     if (callbacks && callbacks.useCancellable)
@@ -143,7 +145,8 @@ export class NodeHttpTransport implements Transport {
         this._request(message, cancellable, callbacks)
       },
       /* istanbul ignore next - hard to simulate failure, manually reviewed */
-      (err: Error) => callbacks?.error && callbacks.error(err)
+      (err: Error) => callbacks?.error && callbacks.error(err),
+      timeout
     )
   }
 
@@ -155,13 +158,15 @@ export class NodeHttpTransport implements Transport {
    * @param body
    * @param options - send options
    * @param responseStarted
+   * @param timeout - timeout of the request
    * @returns Promise of response body
    */
   request(
     path: string,
     body: any,
     options: SendOptions,
-    responseStarted?: ResponseStartedFn
+    responseStarted?: ResponseStartedFn,
+    timeout?: number
   ): Promise<any> {
     if (!body) {
       body = ''
@@ -211,14 +216,15 @@ export class NodeHttpTransport implements Transport {
         error: (e: Error): void => {
           reject(e)
         },
-      })
+      }, timeout)
     })
   }
 
   async *iterate(
     path: string,
     body: string,
-    options: SendOptions
+    options: SendOptions,
+    timeout?: number
   ): AsyncIterableIterator<Uint8Array> {
     let terminationError: Error | undefined = undefined
     let nestedReject: (e: Error) => void
@@ -229,7 +235,7 @@ export class NodeHttpTransport implements Transport {
     const requestMessage = await new Promise<Record<string, any>>(
       (resolve, reject) => {
         nestedReject = reject
-        this._createRequestMessage(path, body, options, resolve, wrapReject)
+        this._createRequestMessage(path, body, options, resolve, wrapReject, timeout)
       }
     )
     if (requestMessage.signal?.addEventListener) {
@@ -264,6 +270,10 @@ export class NodeHttpTransport implements Transport {
    *
    * @param path - API path starting with '/' and containing also query parameters
    * @param body - request body, will be utf-8 encoded
+   * @param sendOptions
+   * @param resolve
+   * @param reject
+   * @param timeout - timeout of the request
    * @returns a configuration object that is suitable for making the request
    */
   private _createRequestMessage(
@@ -271,7 +281,8 @@ export class NodeHttpTransport implements Transport {
     body: string,
     sendOptions: SendOptions,
     resolve: (req: http.RequestOptions) => void,
-    reject: (err: Error) => void
+    reject: (err: Error) => void,
+    timeout?: number
   ): void {
     const bodyBuffer = Buffer.from(body, 'utf-8')
     const headers: {[key: string]: any} = {
@@ -290,6 +301,7 @@ export class NodeHttpTransport implements Transport {
         ...headers,
         ...sendOptions.headers,
       },
+      timeout: timeout ?? this._defaultOptions.timeout,
     }
     if (sendOptions.signal) {
       options.signal = sendOptions.signal
