@@ -370,4 +370,47 @@ describe('query api tests', () => {
       'RpcError'
     )
   })
+
+  it('passing timeout directly to query function', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 10000,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus','CI_TEST',undefined, 0)
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
+
+  it('passing timeout directly to queryPoints function', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 10000,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.queryPoints(
+          'SELECT * FROM wumpus',
+          'CI_TEST',
+          undefined,
+          0
+        )
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
 })
