@@ -1,5 +1,9 @@
 ## 1.5.0 [unreleased]
 
+### CI
+
+1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipeline not downloading the correct node images.
+
 ## 1.4.0 [2025-09-15]
 
 ### CI
