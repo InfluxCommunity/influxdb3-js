@@ -10,7 +10,6 @@ executors:
     parameters:
       node-image:
         type: string
-        default: << pipeline.parameters.default-node-image >>
     docker:
       - image: <<parameters.node-image>>
       - image: influxdb:3-core
@@ -22,7 +21,6 @@ executors:
     parameters:
       node-image:
         type: string
-        default: << pipeline.parameters.default-node-image >>
     docker:
       - image: <<parameters.node-image>>
       - image: influxdb:3-core
