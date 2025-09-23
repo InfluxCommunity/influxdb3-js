@@ -174,7 +174,7 @@ workflows:
           matrix:
             parameters:
               exe: [ docker-amd64-image, docker-arm64-image ]
-              node-image: [ << pipeline.parameters.default-node-image >>, "cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
+              node-image: ["cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
           filters:
             branches:
               ignore: gh-pages
