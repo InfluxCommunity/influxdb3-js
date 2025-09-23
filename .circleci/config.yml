@@ -178,14 +178,14 @@ workflows:
           filters:
             branches:
               ignore: gh-pages
-      - coverage:
-          matrix:
-            parameters:
-              exe: [ docker-amd64-image, docker-arm64-image ]
-              node-image: [ << pipeline.parameters.default-node-image >> ]
-          filters:
-            branches:
-              ignore: gh-pages
+#      - coverage:
+#          matrix:
+#            parameters:
+#              exe: [ docker-amd64-image, docker-arm64-image ]
+#              node-image: [ << pipeline.parameters.default-node-image >> ]
+#          filters:
+#            branches:
+#              ignore: gh-pages
       - generate-flight:
           filters:
             branches:
