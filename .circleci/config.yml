@@ -80,11 +80,13 @@ jobs:
     parameters:
       node-image:
         type: string
-#        default: << pipeline.parameters.default-node-image >>
+        default: << pipeline.parameters.default-node-image >>
       exe:
-        type: executor
+        type: string
         default: docker-amd64-image
-    executor: << parameters.exe >>
+    executor:
+      name: << parameters.exe >>
+      node-image: << parameters.node-image >>
     steps:
       - checkout
       - init-dependencies
@@ -121,7 +123,7 @@ jobs:
         type: string
         default: << pipeline.parameters.default-node-image >>
       exe:
-        type: executor
+        type: string
         default: docker-amd64-image
     executor: << parameters.exe >>
     steps:
