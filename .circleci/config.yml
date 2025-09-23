@@ -80,7 +80,7 @@ jobs:
     parameters:
       node-image:
         type: string
-        default: << pipeline.parameters.default-node-image >>
+#        default: << pipeline.parameters.default-node-image >>
       exe:
         type: executor
         default: docker-amd64-image
