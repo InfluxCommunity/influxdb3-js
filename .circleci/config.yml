@@ -10,6 +10,7 @@ executors:
     parameters:
       node-image:
         type: string
+        default: << pipeline.parameters.default-node-image >>
     docker:
       - image: <<parameters.node-image>>
       - image: influxdb:3-core
@@ -21,6 +22,7 @@ executors:
     parameters:
       node-image:
         type: string
+        default: << pipeline.parameters.default-node-image >>
     docker:
       - image: <<parameters.node-image>>
       - image: influxdb:3-core
@@ -78,6 +80,7 @@ jobs:
     parameters:
       node-image:
         type: string
+        default: << pipeline.parameters.default-node-image >>
       exe:
         type: executor
         default: docker-amd64-image
@@ -171,7 +174,7 @@ workflows:
           matrix:
             parameters:
               exe: [ docker-amd64-image, docker-arm64-image ]
-              node-image: ["cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0"]
+              node-image: [ << pipeline.parameters.default-node-image >>, "cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
           filters:
             branches:
               ignore: gh-pages
@@ -179,7 +182,7 @@ workflows:
           matrix:
             parameters:
               exe: [ docker-amd64-image, docker-arm64-image ]
-              node-image: [ "cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
+              node-image: [ << pipeline.parameters.default-node-image >> ]
           filters:
             branches:
               ignore: gh-pages
