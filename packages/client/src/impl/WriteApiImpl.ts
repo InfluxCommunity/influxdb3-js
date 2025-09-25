@@ -17,8 +17,13 @@ export default class WriteApiImpl implements WriteApi {
   private _transport: Transport
 
   constructor(private _options: ClientOptions) {
+    const option = {
+      host: _options.host,
+      token: _options.token,
+      timeout: _options.writeTimeout
+    }
     this._transport =
-      this._options.transport ?? impl.writeTransport(this._options)
+      this._options.transport ?? impl.writeTransport(option)
     this.doWrite = this.doWrite.bind(this)
   }
 
@@ -150,7 +155,7 @@ export default class WriteApiImpl implements WriteApi {
       lines.join('\n'),
       sendOptions,
       callbacks,
-      timeout
+      timeout ?? this._options.writeTimeout
     )
 
     return promise

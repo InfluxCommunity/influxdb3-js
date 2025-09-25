@@ -177,52 +177,46 @@ export class NodeHttpTransport implements Transport {
     let contentType: string
     let responseStatusCode: number | undefined
     return new Promise((resolve, reject) => {
-      this.send(
-        path,
-        body as string,
-        options,
-        {
-          responseStarted(headers: Headers, statusCode?: number) {
-            if (responseStarted) {
-              responseStarted(headers, statusCode)
+      this.send(path, body as string, options, {
+        responseStarted(headers: Headers, statusCode?: number) {
+          if (responseStarted) {
+            responseStarted(headers, statusCode)
+          }
+          contentType = String(headers['content-type'])
+          responseStatusCode = statusCode
+        },
+        next: (data: Uint8Array): void => {
+          buffer = Buffer.concat([buffer, data])
+        },
+        complete: (): void => {
+          const responseType = options.headers?.accept ?? contentType
+          try {
+            if (responseStatusCode === 204) {
+              // ignore body of NO_CONTENT response
+              resolve(undefined)
             }
-            contentType = String(headers['content-type'])
-            responseStatusCode = statusCode
-          },
-          next: (data: Uint8Array): void => {
-            buffer = Buffer.concat([buffer, data])
-          },
-          complete: (): void => {
-            const responseType = options.headers?.accept ?? contentType
-            try {
-              if (responseStatusCode === 204) {
-                // ignore body of NO_CONTENT response
+            if (responseType.includes('json')) {
+              if (buffer.length) {
+                resolve(JSON.parse(buffer.toString('utf8')))
+              } else {
                 resolve(undefined)
               }
-              if (responseType.includes('json')) {
-                if (buffer.length) {
-                  resolve(JSON.parse(buffer.toString('utf8')))
-                } else {
-                  resolve(undefined)
-                }
-              } else if (
-                responseType.includes('text') ||
-                responseType.startsWith('application/csv')
-              ) {
-                resolve(buffer.toString('utf8'))
-              } else {
-                resolve(buffer)
-              }
-            } catch (e) {
-              reject(e)
+            } else if (
+              responseType.includes('text') ||
+              responseType.startsWith('application/csv')
+            ) {
+              resolve(buffer.toString('utf8'))
+            } else {
+              resolve(buffer)
             }
-          },
-          error: (e: Error): void => {
+          } catch (e) {
             reject(e)
-          },
+          }
         },
-        timeout
-      )
+        error: (e: Error): void => {
+          reject(e)
+        },
+      } ,timeout)
     })
   }
 

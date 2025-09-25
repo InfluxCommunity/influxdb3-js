@@ -7,20 +7,32 @@ import {QParamType} from './QueryApi'
 export interface ConnectionOptions {
   /** base host URL */
   host: string
+
   /** authentication token */
   token?: string
+
   /** token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge. */
   authScheme?: string
+
   /**
    * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
    * @defaultValue 10000
+   * @Deprecated: Please use more specific properties writeTimeout and queryTimeout
    */
   timeout?: number
+
   /**
    * stream timeout for query (grpc timeout). The gRPC doesn't apply the socket timeout to operations as is defined above. To successfully close a call to the gRPC endpoint, the queryTimeout must be specified. Without this timeout, a gRPC call might end up in an infinite wait state.
    * @defaultValue 60000
    */
   queryTimeout?: number
+
+  /**
+   * timeout for writing data. Default to 10s
+   * @defaultValue 10000
+   */
+  writeTimeout?: number
+
   /**
    * default database for write query if not present as argument.
    */
@@ -54,9 +66,10 @@ export interface ConnectionOptions {
 }
 
 /** default connection options */
-export const DEFAULT_ConnectionOptions: Partial<ConnectionOptions> = {
-  timeout: 10000,
-  queryTimeout: 60000,
+export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
+  timeout: undefined, // Will be removed in the future.
+  queryTimeout: 60_000,
+  writeTimeout: 10_000,
 }
 
 /**

@@ -371,13 +371,38 @@ describe('query api tests', () => {
     )
   })
 
+  it('timeout in ClientOptions should not effecting query timeout', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      timeout: 0,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query(
+          'SELECT * FROM wumpus',
+          'CI_TEST',
+          undefined,
+          0
+        )
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
+
   it('passing timeout directly to query function', async function () {
     this.timeout(3000)
     const client: InfluxDBClient = new InfluxDBClient({
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
       database: 'CI_TEST',
-      queryTimeout: 10000,
+      queryTimeout: 10_000,
+      timeout: 10_000,
     })
 
     await expectThrowsAsync(
@@ -401,7 +426,8 @@ describe('query api tests', () => {
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
       database: 'CI_TEST',
-      queryTimeout: 10000,
+      queryTimeout: 10_000,
+      timeout: 10_000,
     })
 
     await expectThrowsAsync(

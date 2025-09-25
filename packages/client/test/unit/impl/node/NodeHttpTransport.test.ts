@@ -325,7 +325,7 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
+        await sendTestData({...transportOptions}, {method: 'GET'})
           .then(() => {
             throw new Error('must not succeed')
           })
