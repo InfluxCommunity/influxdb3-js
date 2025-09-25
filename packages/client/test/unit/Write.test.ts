@@ -452,11 +452,11 @@ describe('Write', () => {
         ...clientOptions,
         timeout: 100,
       }
-      const client: InfluxDBClient = new InfluxDBClient(option);
+      const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
-          DATABASE,
+          DATABASE
         )
         expect.fail('failure expected')
       } catch (e: any) {
@@ -476,11 +476,11 @@ describe('Write', () => {
         ...clientOptions,
         writeTimeout: 100,
       }
-      const client: InfluxDBClient = new InfluxDBClient(option);
+      const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
-          DATABASE,
+          DATABASE
         )
         expect.fail('failure expected')
       } catch (e: any) {
@@ -501,7 +501,7 @@ describe('Write', () => {
         timeout: 30_000,
         writeTimeout: 20_000,
       }
-      const client: InfluxDBClient = new InfluxDBClient(option);
+      const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
@@ -529,7 +529,7 @@ describe('Write', () => {
         timeout: 100,
         writeTimeout: 100_000,
       }
-      const client: InfluxDBClient = new InfluxDBClient(option);
+      const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
