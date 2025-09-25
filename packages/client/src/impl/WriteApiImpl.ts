@@ -17,8 +17,12 @@ export default class WriteApiImpl implements WriteApi {
   private _transport: Transport
 
   constructor(private _options: ClientOptions) {
-    this._transport =
-      this._options.transport ?? impl.writeTransport(this._options)
+    const option = {
+      host: _options.host,
+      token: _options.token,
+      timeout: _options.writeTimeout,
+    }
+    this._transport = this._options.transport ?? impl.writeTransport(option)
     this.doWrite = this.doWrite.bind(this)
   }
 
@@ -53,7 +57,8 @@ export default class WriteApiImpl implements WriteApi {
     lines: string[],
     bucket: string,
     org?: string,
-    writeOptions?: Partial<WriteOptions>
+    writeOptions?: Partial<WriteOptions>,
+    timeout?: number
   ): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self: WriteApiImpl = this
@@ -148,7 +153,8 @@ export default class WriteApiImpl implements WriteApi {
       this._createWritePath(bucket, writeOptionsOrDefault, org),
       lines.join('\n'),
       sendOptions,
-      callbacks
+      callbacks,
+      timeout ?? this._options.writeTimeout
     )
 
     return promise

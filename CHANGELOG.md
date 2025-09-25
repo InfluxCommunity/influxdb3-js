@@ -1,8 +1,15 @@
 ## 1.5.0 [unreleased]
 
+### Features
+
+1. [#622](https://github.com/InfluxCommunity/influxdb3-js/pull/622):
+   - Deprecated ConnectionOptions.timeout.
+   - New ConnectionOptions.queryTimeout and ConnectionOptions.writeTimeout added.
+   - Support setting timeout directly to query and write functions.
+
 ### CI
 
-1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipeline not downloading the correct node images.
+1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipelines not downloading the correct node images.
 
 ## 1.4.0 [2025-09-15]
 

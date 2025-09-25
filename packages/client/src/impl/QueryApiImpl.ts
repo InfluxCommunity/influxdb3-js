@@ -27,7 +27,7 @@ export default class QueryApiImpl implements QueryApi {
   private _defaultHeaders: Record<string, string> | undefined
 
   constructor(private _options: ConnectionOptions) {
-    const {host, queryTimeout, grpcOptions} = this._options
+    const {host, grpcOptions} = this._options
 
     this._defaultHeaders = this._options.headers
     let clientOptions: ClientOptions = {}
@@ -37,7 +37,6 @@ export default class QueryApiImpl implements QueryApi {
 
     this._transport = impl.queryTransport({
       host: host,
-      timeout: queryTimeout,
       clientOptions: {...clientOptions},
     })
     this._flightClient = new FlightServiceClient(this._transport)
@@ -85,7 +84,8 @@ export default class QueryApiImpl implements QueryApi {
   private async *_queryRawBatches(
     query: string,
     database: string,
-    options: QueryOptions
+    options: QueryOptions,
+    timeout?: number
   ) {
     if (options.params && queryHasParams(query)) {
       allParamsMatched(query, options.params)
@@ -100,6 +100,7 @@ export default class QueryApiImpl implements QueryApi {
 
     const meta = this.prepareMetadata(options.headers)
     const rpcOptions: RpcOptions = {meta}
+    rpcOptions.timeout = timeout ?? this._options.queryTimeout
 
     const flightDataStream = client.doGet(ticket, rpcOptions)
 
@@ -121,9 +122,10 @@ export default class QueryApiImpl implements QueryApi {
   async *query(
     query: string,
     database: string,
-    options: QueryOptions
+    options: QueryOptions,
+    timeout?: number
   ): AsyncGenerator<Record<string, any>, void, void> {
-    const batches = this._queryRawBatches(query, database, options)
+    const batches = this._queryRawBatches(query, database, options, timeout)
 
     for await (const batch of batches) {
       for (const batchRow of batch) {
@@ -140,9 +142,10 @@ export default class QueryApiImpl implements QueryApi {
   async *queryPoints(
     query: string,
     database: string,
-    options: QueryOptions
+    options: QueryOptions,
+    timeout?: number
   ): AsyncGenerator<PointValues, void, void> {
-    const batches = this._queryRawBatches(query, database, options)
+    const batches = this._queryRawBatches(query, database, options, timeout)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {

@@ -126,6 +126,7 @@ export default class InfluxDBClient {
     this._writeApi = new WriteApiImpl({
       transport: this._transport,
       ...this._options,
+      writeTimeout: this._options.timeout ?? this._options.writeTimeout,
     })
   }
 
@@ -166,12 +167,14 @@ export default class InfluxDBClient {
    * @param database - database to write into
    * @param org - organization to write into
    * @param writeOptions - write options
+   * @param timeout - timeout of the request
    */
   async write(
     data: WritableData,
     database?: string,
     org?: string,
-    writeOptions?: Partial<WriteOptions>
+    writeOptions?: Partial<WriteOptions>,
+    timeout?: number
   ): Promise<void> {
     const options = this._mergeWriteOptions(writeOptions)
 
@@ -181,7 +184,8 @@ export default class InfluxDBClient {
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
       org,
-      options
+      options,
+      timeout
     )
   }
 
@@ -191,6 +195,7 @@ export default class InfluxDBClient {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryOptions - The options for the query (default: \{ type: 'sql' \}).
+   * @param timeout - timeout for the call
    * @example
    * ```typescript
    *    client.query('SELECT * from net', 'traffic_db', {
@@ -207,7 +212,8 @@ export default class InfluxDBClient {
     query: string,
     database?: string,
     queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
-      DEFAULT_QueryOptions
+      DEFAULT_QueryOptions,
+    timeout?: number
   ): AsyncGenerator<Record<string, any>, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.query(
@@ -215,7 +221,8 @@ export default class InfluxDBClient {
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      options as QueryOptions
+      options as QueryOptions,
+      timeout
     )
   }
 
@@ -225,6 +232,7 @@ export default class InfluxDBClient {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param queryOptions - The type of query (default: \{type: 'sql'\}).
+   * @param timeout - timeout for the call
    * @example
    *
    * ```typescript
@@ -240,7 +248,8 @@ export default class InfluxDBClient {
     query: string,
     database?: string,
     queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
-      DEFAULT_QueryOptions
+      DEFAULT_QueryOptions,
+    timeout?: number
   ): AsyncGenerator<PointValues, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.queryPoints(
@@ -248,7 +257,8 @@ export default class InfluxDBClient {
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      options as QueryOptions
+      options as QueryOptions,
+      timeout
     )
   }
 
