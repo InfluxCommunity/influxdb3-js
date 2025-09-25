@@ -2,7 +2,7 @@
 
 ### Features
 
-1. [#622](https://github.com/InfluxCommunity/influxdb3-js/pull/622): 
+1. [#622](https://github.com/InfluxCommunity/influxdb3-js/pull/622):
    - Deprecated ConnectionOptions.timeout.
    - New ConnectionOptions.queryTimeout and ConnectionOptions.writeTimeout added.
    - Support setting timeout directly to query and write functions.
