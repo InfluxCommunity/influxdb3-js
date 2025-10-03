@@ -377,7 +377,7 @@ describe('query api tests', () => {
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
       database: 'CI_TEST',
-      timeout: 0,
+      timeout: 10_000,
       queryTimeout: 0,
     })
 
