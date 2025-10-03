@@ -18,7 +18,6 @@ function sendTestData(
   connectionOptions: ConnectionOptions,
   sendOptions: SendOptions,
   setCancellable?: (cancellable: Cancellable) => void,
-  timeoutOverride?: number
 ): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error('timeouted')), 10000)
@@ -42,22 +41,19 @@ function sendTestData(
         useCancellable(cancellable: Cancellable) {
           if (setCancellable) setCancellable(cancellable)
         },
-      },
-      timeoutOverride
+      }
     )
   })
 }
 async function iterateTestData(
   connectionOptions: ConnectionOptions,
   sendOptions: SendOptions,
-  timeoutOverride?: number
 ): Promise<string> {
   let data = ''
   for await (const chunk of new NodeHttpTransport(connectionOptions).iterate(
     '/test',
     '',
     sendOptions,
-    timeoutOverride
   )) {
     data += chunk.toString()
   }
@@ -325,7 +321,7 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions}, {method: 'GET'})
+        await sendTestData({...transportOptions}, {method: 'GET', timeout: 100})
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -338,7 +334,7 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
+        await sendTestData({...transportOptions, timeout: 10_000}, {method: 'GET', timeout: 100})
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -359,10 +355,9 @@ describe('NodeHttpTransport', () => {
       it(`passing timeout directly to send function`, async () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await sendTestData(
-          {...transportOptions, timeout: 100000},
-          {method: 'GET'},
+          {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
+          {timeout: 100, method: "GET"},
           undefined,
-          100
         )
           .then(() => {
             throw new Error('must not succeed')
@@ -881,9 +876,8 @@ describe('NodeHttpTransport', () => {
       it(`passing timeout directly to iterate function`, async () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await iterateTestData(
-          {...transportOptions, timeout: 100000},
-          {method: 'GET'},
-          10
+          {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
+          {method: 'GET', timeout: 100},
         )
           .then(() => {
             throw new Error('must not succeed')
@@ -1315,9 +1309,9 @@ describe('NodeHttpTransport', () => {
           '',
           {
             method: 'GET',
+            timeout: 100
           },
           undefined,
-          10
         )
         expect.fail('must not succeed')
       } catch (e: any) {

@@ -16,14 +16,12 @@ export default interface WriteApi {
    * @param bucket
    * @param org
    * @param writeOptions
-   * @param timeout - timeout of the request
    */
   doWrite(
     lines: string[],
     bucket: string,
     org?: string,
     writeOptions?: Partial<WriteOptions>,
-    timeout?: number
   ): Promise<void>
 
   /**

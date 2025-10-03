@@ -13,14 +13,12 @@ export default interface QueryApi {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param options - options applied to the query (default: { type: 'sql'}).
-   * @param timeout - timeout for the call
    * @returns An async generator that yields maps of string keys to any values.
    */
   query(
     query: string,
     database: string,
     options: QueryOptions,
-    timeout?: number
   ): AsyncGenerator<Record<string, any>, void, void>
 
   /**
@@ -29,14 +27,12 @@ export default interface QueryApi {
    * @param query - The query string.
    * @param database - The name of the database to query.
    * @param options - Options for the query (default: {type: 'sql'}).
-   * @param timeout - timeout for the call
    * @returns An async generator that yields PointValues object.
    */
   queryPoints(
     query: string,
     database: string,
     options: QueryOptions,
-    timeout?: number
   ): AsyncGenerator<PointValues, void, void>
 
   close(): Promise<void>

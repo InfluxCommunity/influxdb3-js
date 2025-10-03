@@ -11,6 +11,8 @@ export interface SendOptions {
   gzipThreshold?: number
   /** Abort signal */
   signal?: AbortSignal
+  /** Timeout of the request */
+  timeout?: number
 }
 
 /**
@@ -24,14 +26,12 @@ export interface Transport {
    * @param requestBody - HTTP request body
    * @param options  - send options
    * @param callbacks - communication callbacks to received data in Uint8Array
-   * @param timeout - timeout of the request
    */
   send(
     path: string,
     requestBody: string,
     options: SendOptions,
     callbacks?: Partial<CommunicationObserver<Uint8Array>>,
-    timeout?: number
   ): void
 
   /**
@@ -42,7 +42,6 @@ export interface Transport {
    * @param requestBody - request body
    * @param options - send options
    * @param responseStarted
-   * @param timeout - timeout of the request
    * @returns response data
    */
   request(
@@ -50,7 +49,6 @@ export interface Transport {
     requestBody: any,
     options: SendOptions,
     responseStarted?: ResponseStartedFn,
-    timeout?: number
   ): Promise<any>
 
   /**
@@ -60,13 +58,11 @@ export interface Transport {
    * @param path - HTTP request path
    * @param requestBody - request body
    * @param options - send options
-   * @param timeout - timeout of the request
    * @returns async iterable
    */
   iterate(
     path: string,
     requestBody: any,
     options: SendOptions,
-    timeout?: number
   ): AsyncIterableIterator<Uint8Array>
 }

@@ -28,12 +28,6 @@ export interface ConnectionOptions {
   queryTimeout?: number
 
   /**
-   * timeout for writing data. Default to 10s
-   * @defaultValue 10000
-   */
-  writeTimeout?: number
-
-  /**
    * default database for write query if not present as argument.
    */
   database?: string
@@ -68,8 +62,7 @@ export interface ConnectionOptions {
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
   timeout: undefined, // Will be removed in the future.
-  queryTimeout: 60_000,
-  writeTimeout: 10_000,
+  queryTimeout: 60_000
 }
 
 /**
@@ -144,6 +137,8 @@ export interface WriteOptions {
    * ```
    */
   defaultTags?: {[key: string]: string}
+  /** Timeout for the writing. */
+  timeout?: number
 }
 
 /** default writeOptions */
@@ -183,6 +178,8 @@ export interface QueryOptions {
   /** GRPC specific Parameters to be set when instantiating a client
    * See supported channel options in @grpc/grpc-js/README.md. **/
   grpcOptions?: Record<string, any>
+  /** Timeout for the query. */
+  timeout?: number
 }
 
 /** Default QueryOptions */

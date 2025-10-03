@@ -474,7 +474,7 @@ describe('Write', () => {
         .persist()
       const option: ClientOptions = {
         ...clientOptions,
-        writeTimeout: 100,
+        timeout: 100,
       }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {
@@ -499,7 +499,6 @@ describe('Write', () => {
       const option: ClientOptions = {
         ...clientOptions,
         timeout: 30_000,
-        writeTimeout: 20_000,
       }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {
@@ -507,8 +506,7 @@ describe('Write', () => {
           Point.measurement('test').setFloatField('value', 1),
           DATABASE,
           undefined,
-          undefined,
-          100
+          {timeout: 100}
         )
         expect.fail('failure expected')
       } catch (e: any) {
@@ -516,7 +514,7 @@ describe('Write', () => {
       }
     }).timeout(2000)
 
-    it('timeout > writeTimeout for backward comparability reason', async function () {
+    it('ClientOptions.timeout > WriteOptions.writeTimeout for backward comparability reason', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .delay(1000)
@@ -526,14 +524,15 @@ describe('Write', () => {
         .persist()
       const option: ClientOptions = {
         ...clientOptions,
-        timeout: 100,
-        writeTimeout: 100_000,
+        timeout: 10_000
       }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
-          DATABASE
+          DATABASE,
+          undefined,
+          {timeout: 100}
         )
         expect.fail('failure expected')
       } catch (e: any) {

@@ -85,7 +85,6 @@ export default class QueryApiImpl implements QueryApi {
     query: string,
     database: string,
     options: QueryOptions,
-    timeout?: number
   ) {
     if (options.params && queryHasParams(query)) {
       allParamsMatched(query, options.params)
@@ -100,7 +99,7 @@ export default class QueryApiImpl implements QueryApi {
 
     const meta = this.prepareMetadata(options.headers)
     const rpcOptions: RpcOptions = {meta}
-    rpcOptions.timeout = timeout ?? this._options.queryTimeout
+    rpcOptions.timeout = options.timeout ?? this._options.queryTimeout
 
     const flightDataStream = client.doGet(ticket, rpcOptions)
 
@@ -123,9 +122,8 @@ export default class QueryApiImpl implements QueryApi {
     query: string,
     database: string,
     options: QueryOptions,
-    timeout?: number
   ): AsyncGenerator<Record<string, any>, void, void> {
-    const batches = this._queryRawBatches(query, database, options, timeout)
+    const batches = this._queryRawBatches(query, database, options)
 
     for await (const batch of batches) {
       for (const batchRow of batch) {
@@ -143,9 +141,8 @@ export default class QueryApiImpl implements QueryApi {
     query: string,
     database: string,
     options: QueryOptions,
-    timeout?: number
   ): AsyncGenerator<PointValues, void, void> {
-    const batches = this._queryRawBatches(query, database, options, timeout)
+    const batches = this._queryRawBatches(query, database, options)
 
     for await (const batch of batches) {
       for (let rowIndex = 0; rowIndex < batch.numRows; rowIndex++) {

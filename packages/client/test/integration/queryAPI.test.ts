@@ -377,7 +377,7 @@ describe('query api tests', () => {
       host: `http://localhost:${server.port}`,
       token: 'TEST_TOKEN',
       database: 'CI_TEST',
-      timeout: 0,
+      timeout: 10_000,
     })
 
     await expectThrowsAsync(
@@ -385,8 +385,7 @@ describe('query api tests', () => {
         const data = client.query(
           'SELECT * FROM wumpus',
           'CI_TEST',
-          undefined,
-          0
+          { timeout: 0}
         )
         await data.next()
       },
@@ -410,8 +409,7 @@ describe('query api tests', () => {
         const data = client.query(
           'SELECT * FROM wumpus',
           'CI_TEST',
-          undefined,
-          0
+          { timeout: 0}
         )
         await data.next()
       },
@@ -435,8 +433,7 @@ describe('query api tests', () => {
         const data = client.queryPoints(
           'SELECT * FROM wumpus',
           'CI_TEST',
-          undefined,
-          0
+          {timeout: 0}
         )
         await data.next()
       },
