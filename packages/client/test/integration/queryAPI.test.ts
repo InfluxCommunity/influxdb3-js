@@ -383,10 +383,7 @@ describe('query api tests', () => {
 
     await expectThrowsAsync(
       async () => {
-        const data = client.query(
-          'SELECT * FROM wumpus',
-          'CI_TEST',
-        )
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
         await data.next()
       },
       /^Deadline exceeded.*/,
@@ -405,11 +402,9 @@ describe('query api tests', () => {
 
     await expectThrowsAsync(
       async () => {
-        const data = client.query(
-          'SELECT * FROM wumpus',
-          'CI_TEST',
-          { timeout: 0}
-        )
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
         await data.next()
       },
       /^Deadline exceeded.*/,
@@ -429,11 +424,9 @@ describe('query api tests', () => {
 
     await expectThrowsAsync(
       async () => {
-        const data = client.query(
-          'SELECT * FROM wumpus',
-          'CI_TEST',
-          { timeout: 0}
-        )
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
         await data.next()
       },
       /^Deadline exceeded.*/,
@@ -453,11 +446,9 @@ describe('query api tests', () => {
 
     await expectThrowsAsync(
       async () => {
-        const data = client.queryPoints(
-          'SELECT * FROM wumpus',
-          'CI_TEST',
-          {timeout: 0}
-        )
+        const data = client.queryPoints('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
         await data.next()
       },
       /^Deadline exceeded.*/,

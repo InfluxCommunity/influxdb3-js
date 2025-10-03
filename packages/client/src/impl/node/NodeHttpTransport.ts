@@ -74,7 +74,7 @@ export class NodeHttpTransport implements Transport {
       protocol: url.protocol,
       hostname: url.hostname,
     }
-    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    this._contextPath = proxyUrl ? _url : (url.path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -218,7 +218,7 @@ export class NodeHttpTransport implements Transport {
   async *iterate(
     path: string,
     body: string,
-    options: SendOptions,
+    options: SendOptions
   ): AsyncIterableIterator<Uint8Array> {
     let terminationError: Error | undefined = undefined
     let nestedReject: (e: Error) => void
@@ -229,13 +229,7 @@ export class NodeHttpTransport implements Transport {
     const requestMessage = await new Promise<Record<string, any>>(
       (resolve, reject) => {
         nestedReject = reject
-        this._createRequestMessage(
-          path,
-          body,
-          options,
-          resolve,
-          wrapReject,
-        )
+        this._createRequestMessage(path, body, options, resolve, wrapReject)
       }
     )
     if (requestMessage.signal?.addEventListener) {
@@ -280,7 +274,7 @@ export class NodeHttpTransport implements Transport {
     body: string,
     sendOptions: SendOptions,
     resolve: (req: http.RequestOptions) => void,
-    reject: (err: Error) => void,
+    reject: (err: Error) => void
   ): void {
     const bodyBuffer = Buffer.from(body, 'utf-8')
     const headers: {[key: string]: any} = {

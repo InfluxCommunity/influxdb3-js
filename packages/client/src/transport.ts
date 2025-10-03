@@ -31,7 +31,7 @@ export interface Transport {
     path: string,
     requestBody: string,
     options: SendOptions,
-    callbacks?: Partial<CommunicationObserver<Uint8Array>>,
+    callbacks?: Partial<CommunicationObserver<Uint8Array>>
   ): void
 
   /**
@@ -48,7 +48,7 @@ export interface Transport {
     path: string,
     requestBody: any,
     options: SendOptions,
-    responseStarted?: ResponseStartedFn,
+    responseStarted?: ResponseStartedFn
   ): Promise<any>
 
   /**
@@ -63,6 +63,6 @@ export interface Transport {
   iterate(
     path: string,
     requestBody: any,
-    options: SendOptions,
+    options: SendOptions
   ): AsyncIterableIterator<Uint8Array>
 }

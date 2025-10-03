@@ -875,7 +875,7 @@ describe('NodeHttpTransport', () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await iterateTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
-          {method: 'GET', timeout: 100},
+          {method: 'GET', timeout: 100}
         )
           .then(() => {
             throw new Error('must not succeed')

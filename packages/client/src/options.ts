@@ -62,7 +62,7 @@ export interface ConnectionOptions {
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
   timeout: undefined, // Will be removed in the future.
-  queryTimeout: 60_000
+  queryTimeout: 60_000,
 }
 
 /**
