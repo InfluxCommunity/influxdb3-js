@@ -316,7 +316,7 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions}, {method: 'GET', timeout: 100})
+        await sendTestData({...transportOptions, timeout: 10_000, queryTimeout: 10_000}, {method: 'GET', timeout: 100})
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -350,7 +350,7 @@ describe('NodeHttpTransport', () => {
             expect(e.toString()).to.include('timed')
           })
       })
-      it(`passing timeout directly to send function`, async () => {
+      it(`passing timeout directly to send function will have highest priority`, async () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await sendTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},

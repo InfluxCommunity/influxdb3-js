@@ -17,13 +17,14 @@ export interface ConnectionOptions {
   /**
    * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
    * @defaultValue 10000
-   * @Deprecated: Please use more specific properties writeTimeout and queryTimeout
+   * @Deprecated: Please use more specific properties like WriteOptions.timeout.
    */
   timeout?: number
 
   /**
    * stream timeout for query (grpc timeout). The gRPC doesn't apply the socket timeout to operations as is defined above. To successfully close a call to the gRPC endpoint, the queryTimeout must be specified. Without this timeout, a gRPC call might end up in an infinite wait state.
    * @defaultValue 60000
+   * @Deprecated: Please use more specific properties like QueryOptions.timeout.
    */
   queryTimeout?: number
 
@@ -61,7 +62,7 @@ export interface ConnectionOptions {
 
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
-  timeout: undefined, // Will be removed in the future.
+  timeout: 10_000, // Will be removed in the future.
   queryTimeout: 60_000,
 }
 
