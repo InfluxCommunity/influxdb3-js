@@ -20,7 +20,6 @@ export default class WriteApiImpl implements WriteApi {
     const option = {
       host: _options.host,
       token: _options.token,
-      timeout: _options?.timeout,
     }
     this._transport = this._options.transport ?? impl.writeTransport(option)
     this.doWrite = this.doWrite.bind(this)
