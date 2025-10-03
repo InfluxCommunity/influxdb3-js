@@ -329,7 +329,10 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 10_000}, {method: 'GET', timeout: 100})
+        await sendTestData(
+          {...transportOptions, timeout: 10_000},
+          {method: 'GET', timeout: 100}
+        )
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -351,8 +354,8 @@ describe('NodeHttpTransport', () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await sendTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
-          {timeout: 100, method: "GET"},
-          undefined,
+          {timeout: 100, method: 'GET'},
+          undefined
         )
           .then(() => {
             throw new Error('must not succeed')
@@ -1304,9 +1307,9 @@ describe('NodeHttpTransport', () => {
           '',
           {
             method: 'GET',
-            timeout: 100
+            timeout: 100,
           },
-          undefined,
+          undefined
         )
         expect.fail('must not succeed')
       } catch (e: any) {

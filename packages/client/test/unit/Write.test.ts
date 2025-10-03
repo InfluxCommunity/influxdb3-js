@@ -497,7 +497,7 @@ describe('Write', () => {
         .persist()
       const option: ClientOptions = {
         ...clientOptions,
-        timeout: 10_000
+        timeout: 10_000,
       }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {

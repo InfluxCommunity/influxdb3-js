@@ -125,7 +125,7 @@ export default class InfluxDBClient {
     this._transport = impl.writeTransport(this._options)
     this._writeApi = new WriteApiImpl({
       transport: this._transport,
-      ...this._options
+      ...this._options,
     })
   }
 
@@ -207,7 +207,7 @@ export default class InfluxDBClient {
     query: string,
     database?: string,
     queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
-      DEFAULT_QueryOptions,
+      DEFAULT_QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.query(
@@ -215,7 +215,7 @@ export default class InfluxDBClient {
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      options as QueryOptions,
+      options as QueryOptions
     )
   }
 
@@ -240,7 +240,7 @@ export default class InfluxDBClient {
     query: string,
     database?: string,
     queryOptions: Partial<QueryOptions> = this._options.queryOptions ??
-      DEFAULT_QueryOptions,
+      DEFAULT_QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
     const options = this._mergeQueryOptions(queryOptions)
     return this._queryApi.queryPoints(
@@ -248,7 +248,7 @@ export default class InfluxDBClient {
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),
-      options as QueryOptions,
+      options as QueryOptions
     )
   }
 
