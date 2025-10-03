@@ -17,43 +17,38 @@ import {CollectedLogs, collectLogging} from '../../../util'
 function sendTestData(
   connectionOptions: ConnectionOptions,
   sendOptions: SendOptions,
-  setCancellable?: (cancellable: Cancellable) => void,
+  setCancellable?: (cancellable: Cancellable) => void
 ): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     const timeout = setTimeout(() => reject(new Error('timeouted')), 10000)
     let data = ''
-    new NodeHttpTransport(connectionOptions).send(
-      '/test',
-      '',
-      sendOptions,
-      {
-        next(chunk: any) {
-          data += chunk.toString()
-        },
-        error(error: any) {
-          clearTimeout(timeout)
-          reject(error)
-        },
-        complete(): void {
-          clearTimeout(timeout)
-          resolve(data)
-        },
-        useCancellable(cancellable: Cancellable) {
-          if (setCancellable) setCancellable(cancellable)
-        },
-      }
-    )
+    new NodeHttpTransport(connectionOptions).send('/test', '', sendOptions, {
+      next(chunk: any) {
+        data += chunk.toString()
+      },
+      error(error: any) {
+        clearTimeout(timeout)
+        reject(error)
+      },
+      complete(): void {
+        clearTimeout(timeout)
+        resolve(data)
+      },
+      useCancellable(cancellable: Cancellable) {
+        if (setCancellable) setCancellable(cancellable)
+      },
+    })
   })
 }
 async function iterateTestData(
   connectionOptions: ConnectionOptions,
-  sendOptions: SendOptions,
+  sendOptions: SendOptions
 ): Promise<string> {
   let data = ''
   for await (const chunk of new NodeHttpTransport(connectionOptions).iterate(
     '/test',
     '',
-    sendOptions,
+    sendOptions
   )) {
     data += chunk.toString()
   }

@@ -84,7 +84,7 @@ export default class QueryApiImpl implements QueryApi {
   private async *_queryRawBatches(
     query: string,
     database: string,
-    options: QueryOptions,
+    options: QueryOptions
   ) {
     if (options.params && queryHasParams(query)) {
       allParamsMatched(query, options.params)
@@ -121,7 +121,7 @@ export default class QueryApiImpl implements QueryApi {
   async *query(
     query: string,
     database: string,
-    options: QueryOptions,
+    options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void> {
     const batches = this._queryRawBatches(query, database, options)
 
@@ -140,7 +140,7 @@ export default class QueryApiImpl implements QueryApi {
   async *queryPoints(
     query: string,
     database: string,
-    options: QueryOptions,
+    options: QueryOptions
   ): AsyncGenerator<PointValues, void, void> {
     const batches = this._queryRawBatches(query, database, options)
 

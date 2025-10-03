@@ -18,7 +18,7 @@ export default interface QueryApi {
   query(
     query: string,
     database: string,
-    options: QueryOptions,
+    options: QueryOptions
   ): AsyncGenerator<Record<string, any>, void, void>
 
   /**
@@ -32,7 +32,7 @@ export default interface QueryApi {
   queryPoints(
     query: string,
     database: string,
-    options: QueryOptions,
+    options: QueryOptions
   ): AsyncGenerator<PointValues, void, void>
 
   close(): Promise<void>

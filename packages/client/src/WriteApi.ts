@@ -21,7 +21,7 @@ export default interface WriteApi {
     lines: string[],
     bucket: string,
     org?: string,
-    writeOptions?: Partial<WriteOptions>,
+    writeOptions?: Partial<WriteOptions>
   ): Promise<void>
 
   /**
