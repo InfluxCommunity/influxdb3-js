@@ -67,7 +67,9 @@ export interface ConnectionOptions {
 
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
-  timeout: 10_000, // Will be removed in the future.
+  // Legacy timeout property. Will be removed in the future. Use writeTimeout or WriteOptions.timeout instead.
+  timeout: 10_000,
+  writeTimeout: 10_000,
   queryTimeout: 60_000,
 }
 
