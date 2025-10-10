@@ -1302,7 +1302,7 @@ describe('NodeHttpTransport', () => {
       nock(transportOptions.host).get('/test').delay(2000).reply(200).persist()
       const transport = new NodeHttpTransport({
         ...transportOptions,
-        timeout: 10,
+        timeout: 10_000,
       })
       try {
         await transport.request(

@@ -440,7 +440,7 @@ describe('Write', () => {
       }
     })
 
-    it('timeout by WriteOptions.timeout', async function () {
+    it('timeout when passing timeout directly to write function will have the highest priority', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .delay(1000)
@@ -448,7 +448,14 @@ describe('Write', () => {
           return [200, '', {}]
         })
         .persist()
-      const option: ClientOptions = {...clientOptions}
+      const option: ClientOptions = {
+        ...clientOptions,
+        timeout: 10_000,
+        writeTimeout: 10_000,
+        writeOptions: {
+          timeout: 10_000,
+        },
+      }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
@@ -463,7 +470,7 @@ describe('Write', () => {
       }
     }).timeout(2000)
 
-    it('timeout by timeout prop in ClientOptions', async function () {
+    it('timeout by timeout property in ClientOptions', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .delay(1000)
@@ -487,7 +494,7 @@ describe('Write', () => {
       }
     }).timeout(2000)
 
-    it('WriteOptions.timeout > ClientOptions.timeout', async function () {
+    it('WriteOptions.timeout > legacy timeout and new property writeTimeout', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
         .delay(1000)
@@ -498,14 +505,16 @@ describe('Write', () => {
       const option: ClientOptions = {
         ...clientOptions,
         timeout: 10_000,
+        writeTimeout: 10_000,
+        writeOptions: {
+          timeout: 100,
+        },
       }
       const client: InfluxDBClient = new InfluxDBClient(option)
       try {
         await client.write(
           Point.measurement('test').setFloatField('value', 1),
-          DATABASE,
-          undefined,
-          {timeout: 100}
+          DATABASE
         )
         expect.fail('failure expected')
       } catch (e: any) {
