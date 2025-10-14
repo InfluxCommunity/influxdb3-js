@@ -17,11 +17,8 @@ export default class WriteApiImpl implements WriteApi {
   private _transport: Transport
 
   constructor(private _options: ClientOptions) {
-    const option = {
-      host: _options.host,
-      token: _options.token,
-    }
-    this._transport = this._options.transport ?? impl.writeTransport(option)
+    this._transport =
+      this._options.transport ?? impl.writeTransport(this._options)
     this.doWrite = this.doWrite.bind(this)
   }
 

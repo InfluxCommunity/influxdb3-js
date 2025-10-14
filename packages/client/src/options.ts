@@ -145,7 +145,7 @@ export interface WriteOptions {
    * ```
    */
   defaultTags?: {[key: string]: string}
-  /** Timeout for the writing. */
+  /**  Specific timeout for the writing call. If not set, the value from {@link ConnectionOptions.writeTimeout} is used by default.  */
   timeout?: number
 }
 
@@ -186,7 +186,7 @@ export interface QueryOptions {
   /** GRPC specific Parameters to be set when instantiating a client
    * See supported channel options in @grpc/grpc-js/README.md. **/
   grpcOptions?: Record<string, any>
-  /** Timeout for the query. */
+  /**  Specific timeout for the query. If not set, the value from {@link ConnectionOptions.queryTimeout} is used by default.  */
   timeout?: number
 }
 

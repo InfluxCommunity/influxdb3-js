@@ -263,10 +263,10 @@ export class NodeHttpTransport implements Transport {
    * Creates configuration for a specific request.
    *
    * @param path - API path starting with '/' and containing also query parameters
-   * @param body - request body, will be utf-8 encoded
-   * @param sendOptions
-   * @param resolve
-   * @param reject
+   * @param body - Request body, will be utf-8 encoded
+   * @param sendOptions - Options for sending a request message
+   * @param resolve - Resolve callback
+   * @param reject - Reject callback
    * @returns a configuration object that is suitable for making the request
    */
   private _createRequestMessage(
