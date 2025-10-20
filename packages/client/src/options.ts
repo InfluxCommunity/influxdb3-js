@@ -15,8 +15,7 @@ export interface ConnectionOptions {
   authScheme?: string
 
   /**
-   * socket timeout. 10000 milliseconds by default in node.js. Not applicable in browser (option is ignored).
-   * @defaultValue 10000
+   * socket timeout. Not applicable in browser (option is ignored).
    * @Deprecated: Please use more specific properties like writeTimeout or WriteOptions.timeout.
    */
   timeout?: number
@@ -68,7 +67,7 @@ export interface ConnectionOptions {
 /** default connection options */
 export const DEFAULT_ConnectionOptions: Readonly<Partial<ConnectionOptions>> = {
   // Legacy timeout property. Will be removed in the future. Use writeTimeout or WriteOptions.timeout instead.
-  timeout: 10_000,
+  timeout: undefined,
   writeTimeout: 10_000,
   queryTimeout: 60_000,
 }

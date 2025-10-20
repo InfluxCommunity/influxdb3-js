@@ -73,6 +73,7 @@ export class NodeHttpTransport implements Transport {
       port: url.port,
       protocol: url.protocol,
       hostname: url.hostname,
+      timeout: nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
     this._contextPath = proxyUrl ? _url : url.path ?? ''
     if (this._contextPath.endsWith('/')) {
@@ -259,6 +260,7 @@ export class NodeHttpTransport implements Transport {
       yield chunk
     }
   }
+
   /**
    * Creates configuration for a specific request.
    *
@@ -285,6 +287,7 @@ export class NodeHttpTransport implements Transport {
       const authScheme = this._authScheme ?? 'Token'
       headers.authorization = `${authScheme} ${this._token}`
     }
+
     const options: {[key: string]: any} = {
       ...this._defaultOptions,
       path: this._contextPath + path,
