@@ -138,7 +138,7 @@ export default class InfluxDBClient {
 
     this._transport = impl.writeTransport({
       ...this._options,
-      writeTimeout: writeTimeout
+      writeTimeout: writeTimeout,
     })
     this._writeApi = new WriteApiImpl({
       transport: this._transport,

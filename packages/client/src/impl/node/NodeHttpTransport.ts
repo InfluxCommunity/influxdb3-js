@@ -73,9 +73,10 @@ export class NodeHttpTransport implements Transport {
       port: url.port,
       protocol: url.protocol,
       hostname: url.hostname,
-      timeout: nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
+      timeout:
+        nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
-    this._contextPath = proxyUrl ? _url : url.path ?? ''
+    this._contextPath = proxyUrl ? _url : (url.path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
