@@ -129,7 +129,7 @@ export default class InfluxDBClient {
     const writeTimeout =
       this._options.timeout ??
       this._options.writeOptions?.timeout ??
-      this._options.writeTimeout;
+      this._options.writeTimeout
 
     this._transport = impl.writeTransport({
       ...this._options,
