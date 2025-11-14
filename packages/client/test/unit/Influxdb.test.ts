@@ -1039,10 +1039,9 @@ at 'ClientOptions.database'
       expect(version).to.equal('3.0')
     })
   })
-
 })
 
-function getInfuxDbClient(host: string = 'http://test:8086') {
+function getInfuxDbClient(host = 'http://test:8086') {
   return new InfluxDBClient({
     host: host,
     token: 'TEST_TOKEN',

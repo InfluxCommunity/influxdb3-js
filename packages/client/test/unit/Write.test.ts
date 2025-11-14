@@ -103,7 +103,6 @@ describe('Write', () => {
         expect.fail(e)
       }
     })
-
   })
 
   describe('usage of server API', () => {
