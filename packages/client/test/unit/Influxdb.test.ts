@@ -1033,7 +1033,9 @@ at 'ClientOptions.database'
       nock('http://test:8086/prefix/prefix1')
         .get('/ping')
         .reply(200, {version: '3.0'})
-      const version = await getInfuxDbClient("http://test:8086/prefix/prefix1").getServerVersion()
+      const version = await getInfuxDbClient(
+        'http://test:8086/prefix/prefix1'
+      ).getServerVersion()
       expect(version).to.equal('3.0')
     })
   })

@@ -86,8 +86,8 @@ describe('Write', () => {
     })
 
     it('writing with path prefix', async () => {
-      nock("http://localhost:8086")
-        .post("/prefix/prefix1/api/v2/write?bucket=database&precision=ns")
+      nock('http://localhost:8086')
+        .post('/prefix/prefix1/api/v2/write?bucket=database&precision=ns')
         .reply(function (_uri, _requestBody) {
           return [201, '', {}]
         })
