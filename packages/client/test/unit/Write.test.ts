@@ -84,6 +84,26 @@ describe('Write', () => {
         )
       )
     })
+
+    it('writing with path prefix', async () => {
+      nock("http://localhost:8086")
+        .post("/prefix/prefix1/api/v2/write?bucket=database&precision=ns")
+        .reply(function (_uri, _requestBody) {
+          return [201, '', {}]
+        })
+        .persist()
+
+      try {
+        const client = new InfluxDBClient({
+          host: 'http://localhost:8086/prefix/prefix1',
+          token: 'a',
+        })
+        await client.write('test value=1', DATABASE)
+      } catch (e: Error | any) {
+        expect.fail(e)
+      }
+    })
+
   })
 
   describe('usage of server API', () => {

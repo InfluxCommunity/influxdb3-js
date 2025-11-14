@@ -1027,11 +1027,22 @@ at 'ClientOptions.database'
         })
     })
   })
+
+  describe('test path prefix', () => {
+    it('should return database version', async () => {
+      nock('http://test:8086/prefix/prefix1')
+        .get('/ping')
+        .reply(200, {version: '3.0'})
+      const version = await getInfuxDbClient("http://test:8086/prefix/prefix1").getServerVersion()
+      expect(version).to.equal('3.0')
+    })
+  })
+
 })
 
-function getInfuxDbClient() {
+function getInfuxDbClient(host: string = 'http://test:8086') {
   return new InfluxDBClient({
-    host: 'http://test:8086',
+    host: host,
     token: 'TEST_TOKEN',
     database: 'TEST_DATABASE',
   })
