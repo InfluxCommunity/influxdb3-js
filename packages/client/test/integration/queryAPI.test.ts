@@ -370,4 +370,89 @@ describe('query api tests', () => {
       'RpcError'
     )
   })
+
+  it('timeout in ClientOptions', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      timeout: 10_000,
+      queryTimeout: 0,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
+
+  it('timeout in ClientOptions should not effecting query timeout', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      timeout: 10_000,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
+
+  it('passing timeout directly to query function', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 10_000,
+      timeout: 10_000,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.query('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
+
+  it('passing timeout directly to queryPoints function', async function () {
+    this.timeout(3000)
+    const client: InfluxDBClient = new InfluxDBClient({
+      host: `http://localhost:${server.port}`,
+      token: 'TEST_TOKEN',
+      database: 'CI_TEST',
+      queryTimeout: 10_000,
+      timeout: 10_000,
+    })
+
+    await expectThrowsAsync(
+      async () => {
+        const data = client.queryPoints('SELECT * FROM wumpus', 'CI_TEST', {
+          timeout: 0,
+        })
+        await data.next()
+      },
+      /^Deadline exceeded.*/,
+      'RpcError'
+    )
+  })
 })
