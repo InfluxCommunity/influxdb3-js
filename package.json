@@ -44,11 +44,11 @@
     "lerna": "^8.0.0",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
-    "typedoc": "^0.28.9",
-    "tmp": "^0.2.4"
+    "tmp": "^0.2.4",
+    "typedoc": "^0.28.9"
   },
   "overrides": {
-    "external-editor" : {
+    "external-editor": {
       "tmp": "latest"
     }
   },
