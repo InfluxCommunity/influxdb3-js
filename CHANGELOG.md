@@ -1,8 +1,10 @@
-## 1.5.0 [unreleased]
+## 2.0.0 [unreleased]
+
+> :warning: **Breaking Changes**: Node v18 support is dropped because it is end of life.
 
 ### CI
 
-1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipeline not downloading the correct node images.
+1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix the pipeline matrix.
 
 ## 1.4.0 [2025-09-15]
 
