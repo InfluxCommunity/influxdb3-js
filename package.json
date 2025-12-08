@@ -38,7 +38,7 @@
   "devDependencies": {
     "@types/node": "^24",
     "gh-pages": "^6.0.0",
-    "lerna": "^8.0.0",
+    "lerna": "^9.0.3",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
     "typedoc": "^0.28.9",
