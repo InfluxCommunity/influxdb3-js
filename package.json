@@ -41,9 +41,9 @@
   "devDependencies": {
     "@types/node": "^24",
     "gh-pages": "^6.0.0",
-    "lerna": "^8.0.0",
+    "lerna": "^9.0.3",
     "prettier": "^3.0.0",
-    "rimraf": "^5.0.0",
+    "rimraf": "^6.1.2",
     "tmp": "^0.2.4",
     "typedoc": "^0.28.9"
   },
@@ -53,6 +53,6 @@
     }
   },
   "resolutions": {
-    "jackspeak": "2.1.1"
+    "jackspeak": "4.1.1"
   }
 }
