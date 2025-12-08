@@ -67,7 +67,7 @@
     "@types/sinon": "^21.0.0",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.1",
-    "chai": "^4.2.0",
+    "chai": "^6.2.1",
     "esbuild": "^0.27.1",
     "esbuild-runner": "^2.2.1",
     "eslint": "^9.32.0",
