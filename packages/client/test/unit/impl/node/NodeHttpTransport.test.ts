@@ -543,7 +543,11 @@ describe('NodeHttpTransport', () => {
         server = http.createServer()
         server.listen(() => {
           const addr = server.address() as AddressInfo
-          url = `http://${addr.address}:${addr.port}`
+          let address = addr.address
+          if (address === '::') {
+            address = 'localhost'
+          }
+          url = `http://${address}:${addr.port}`
           resolve()
         })
       })
