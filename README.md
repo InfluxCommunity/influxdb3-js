@@ -204,6 +204,7 @@ headers.set('grpc-accept-encoding', 'identity,deflate,gzip');
 ```
 
 This means:
+
 - The client always advertises support for gzip and deflate compression
 - If the server supports compression, responses will be compressed
 - There is no per-client or per-call option to disable response decompression
