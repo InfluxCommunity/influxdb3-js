@@ -190,10 +190,42 @@ for await (const row of queryPointsResult) {
 
 ### gRPC Compression
 
-The JavaScript client supports gRPC response compression.
+The JavaScript client has **gRPC response compression enabled by default** for all query operations.
 
 If the server chooses to compress query responses (e.g., with gzip), the client
 will automatically decompress them — no extra configuration is required.
+
+#### Why Response Compression Cannot Be Disabled
+
+The `grpc-accept-encoding` header is hardcoded in the underlying `@grpc/grpc-js` library:
+
+```javascript
+headers.set('grpc-accept-encoding', 'identity,deflate,gzip');
+```
+
+This means:
+
+- The client always advertises support for gzip and deflate compression
+- If the server supports compression, responses will be compressed
+- There is no per-client or per-call option to disable response decompression
+
+#### Request Compression
+
+Request compression (client-to-server) can be configured using the `grpcOptions` setting:
+
+```typescript
+const client = new InfluxDBClient({
+  host: 'https://your-influxdb-host',
+  token: 'your-token',
+  grpcOptions: {
+    // 0 = none/identity, 1 = deflate, 2 = gzip
+    'grpc.default_compression_algorithm': 2,
+  },
+})
+```
+
+Although, InfluxDB servers may not support compressed requests and will reject them
+with an error like `Content is compressed with 'gzip' which isn't supported`.
 
 ## Examples
 
