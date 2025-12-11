@@ -4,6 +4,10 @@
 
 1. [#626](https://github.com/InfluxCommunity/influxdb3-js/pull/626) Fix pipeline not downloading the correct node images.
 
+### Docs
+
+1. [#645](https://github.com/InfluxCommunity/influxdb3-js/pull/645): Document gRPC compression.
+
 ## 1.4.0 [2025-09-15]
 
 ### CI
