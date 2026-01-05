@@ -3,7 +3,8 @@ version: 2.1
 parameters:
   default-node-image:
     type: string
-    default: "cimg/node:18.19"
+    # The oldest supported LTS version of Node.js
+    default: "cimg/node:20.19"
 
 executors:
   docker-amd64-image:
@@ -176,7 +177,8 @@ workflows:
           matrix:
             parameters:
               exe: [ docker-amd64-image, docker-arm64-image ]
-              node-image: [ << pipeline.parameters.default-node-image >>, "cimg/node:20.9.0", "cimg/node:21.4", "cimg/node:22.12.0" ]
+              # Only use LTS versions and the current Active version of Node.js
+              node-image: [ << pipeline.parameters.default-node-image >>, "cimg/node:22.21", "cimg/node:24.11", "cimg/node:25.2" ]
           filters:
             branches:
               ignore: gh-pages
