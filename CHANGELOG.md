@@ -1,3 +1,5 @@
+## 2.1.0 [unreleased]
+
 ## 2.0.0 [2026-01-08]
 
 > :warning: **Breaking Changes**: Node v18 support is dropped because it is end of life.
