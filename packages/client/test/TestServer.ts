@@ -140,6 +140,7 @@ export class MockService {
             length: 1,
             nodes: [new FieldNode(0, 0)],
             buffers: [{offset: 0, length: 0}],
+            compression: null,
           })
         ),
         appMetadata: new Uint8Array(0),
