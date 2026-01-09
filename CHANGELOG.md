@@ -1,5 +1,9 @@
 ## 2.1.0 [unreleased]
 
+### CI
+
+1. [#655](https://github.com/InfluxCommunity/influxdb3-js/pull/655) Add support for arrow-js v21
+
 ## 2.0.0 [2026-01-08]
 
 > :warning: **Breaking Changes**: Node v18 support is dropped because it is end of life.
