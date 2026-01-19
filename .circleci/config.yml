@@ -198,6 +198,4 @@ workflows:
           requires:
             - tests
             - coverage
-          filters:
-            branches:
-              only: main
+          filters: pipeline.git.branch == "main" and pipeline.schedule.name != "Nightly"
