@@ -194,6 +194,12 @@ workflows:
           filters:
             branches:
               ignore: gh-pages
+  build-deploy:
+    when:
+      or:
+        - equal: [ 'scheduled_pipeline', '<< pipeline.trigger_source >>' ]
+        - equal: [ '<< pipeline.schedule.name >>', Nightly' ]
+    jobs:
       - deploy-preview:
           requires:
             - tests
