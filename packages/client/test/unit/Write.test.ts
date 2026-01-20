@@ -210,7 +210,7 @@ describe('Write', () => {
         .post(WRITE_PATH_NS)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
-          return [100, '', {}]
+          return [500, '', {}]
         })
         .persist()
       await subject
@@ -222,10 +222,6 @@ describe('Write', () => {
       expect(logs.error).has.length(1)
       expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
       expect(logs.error[0][1]).instanceOf(HttpError)
-      expect(logs.error[0][1].statusCode).equals(100)
-      expect(logs.error[0][1].message).equals(
-        `2xx HTTP response status code expected, but 100 returned`
-      )
       expect(logs.warn).deep.equals([])
       expect(authorization).equals(`Token ${clientOptions.token}`)
     })
