@@ -1,5 +1,7 @@
 import {assert, expect} from 'chai'
 import {setLogger} from '../src/util/logger'
+import {Cancellable, ConnectionOptions, SendOptions} from '../src'
+import NodeHttpTransport from '../src/impl/node/NodeHttpTransport'
 
 let previous: any
 
@@ -100,4 +102,47 @@ export const expectResolve = async (method: () => void): Promise<void> => {
       `Method should resolve without error: ${method}.  But caught ${error}`
     )
   }
+}
+
+export const sendTestData = (
+  connectionOptions: ConnectionOptions,
+  sendOptions: SendOptions,
+  setCancellable?: (cancellable: Cancellable) => void
+): Promise<string> => {
+  return new Promise<string>((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('timeouted')), 10000)
+    let data = ''
+    new NodeHttpTransport(connectionOptions).send('/test', '', sendOptions, {
+      next(chunk: any) {
+        console.log(chunk)
+        data += chunk.toString()
+      },
+      error(error: any) {
+        clearTimeout(timeout)
+        reject(error)
+      },
+      complete(): void {
+        clearTimeout(timeout)
+        resolve(data)
+      },
+      useCancellable(cancellable: Cancellable) {
+        if (setCancellable) setCancellable(cancellable)
+      },
+    })
+  })
+}
+
+export const iterateTestData = async (
+  connectionOptions: ConnectionOptions,
+  sendOptions: SendOptions
+): Promise<string> => {
+  let data = ''
+  for await (const chunk of new NodeHttpTransport(connectionOptions).iterate(
+    '/test',
+    '',
+    sendOptions
+  )) {
+    data += chunk.toString()
+  }
+  return data
 }

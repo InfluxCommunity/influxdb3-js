@@ -1,5 +1,9 @@
 ## 2.1.0 [unreleased]
 
+### Features
+
+1. [#675](https://github.com/InfluxCommunity/influxdb3-js/pull/675) Add support for Nock v14.
+
 ### CI
 
 1. [#655](https://github.com/InfluxCommunity/influxdb3-js/pull/655) Add support for arrow-js v21
