@@ -3,6 +3,7 @@
 ### CI
 
 1. [#655](https://github.com/InfluxCommunity/influxdb3-js/pull/655) Add support for arrow-js v21
+1. [#678](https://github.com/InfluxCommunity/influxdb3-js/pull/678): Turn off deploy workflow for Nighly builds.
 
 ## 2.0.0 [2026-01-08]
 
