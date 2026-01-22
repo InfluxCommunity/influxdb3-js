@@ -1,7 +1,7 @@
 import {defineConfig} from 'tsup'
 import {esbuildGzipOutJsPlugin} from '../../scripts/esbuild-gzip-js'
 import {readFile} from 'fs/promises'
-import pkg from './package.json'
+import pkg from './package.json' with {type: 'json'}
 
 const minify = !(process.env.ESBUILD_MINIFY === '0')
 
