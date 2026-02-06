@@ -13,6 +13,9 @@ export default interface WriteApi {
    * Write lines of [Line Protocol](https://bit.ly/2QL99fu).
    *
    * @param lines - InfluxDB Line Protocol
+   * @param bucket - InfluxDB bucket to write to
+   * @param org - InfluxDB organization of bucket
+   * @param writeOptions - Write call-specific options
    */
   doWrite(
     lines: string[],
