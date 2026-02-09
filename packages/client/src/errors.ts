@@ -4,10 +4,9 @@ function formatErrorMessage(node: any): string | undefined {
   if (!node || typeof node !== 'object' || Array.isArray(node)) {
     return undefined
   }
-  const code = typeof node.code === 'string' ? node.code : undefined
   const message = typeof node.message === 'string' ? node.message : undefined
   if (message) {
-    return code ? `${code}: ${message}` : message
+    return message
   }
 
   const errorText = typeof node.error === 'string' ? node.error : undefined

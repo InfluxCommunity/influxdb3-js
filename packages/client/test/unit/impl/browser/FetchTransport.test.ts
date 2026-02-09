@@ -285,7 +285,7 @@ describe('FetchTransport', () => {
           (e: any) => {
             expect(e).property('body').equals(body)
             expect(e).property('json').deep.equals(JSON.parse(body))
-            expect(e).property('message').equals('mycode: mymsg')
+            expect(e).property('message').equals('mymsg')
             expect(e).property('code').equals('mycode')
           }
         )
