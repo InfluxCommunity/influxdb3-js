@@ -100,6 +100,7 @@ export default class QueryApiImpl implements QueryApi {
 
     const meta = this.prepareMetadata(options.headers)
     const rpcOptions: RpcOptions = {meta}
+    rpcOptions.timeout = options.timeout ?? this._options.queryTimeout
 
     const flightDataStream = client.doGet(ticket, rpcOptions)
 

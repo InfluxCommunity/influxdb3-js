@@ -11,6 +11,8 @@ export interface SendOptions {
   gzipThreshold?: number
   /** Abort signal */
   signal?: AbortSignal
+  /** Timeout of the request */
+  timeout?: number
 }
 
 /**
@@ -39,6 +41,7 @@ export interface Transport {
    * @param path - HTTP request path
    * @param requestBody - request body
    * @param options - send options
+   * @param responseStarted - Callback called before issuing the request
    * @returns response data
    */
   request(

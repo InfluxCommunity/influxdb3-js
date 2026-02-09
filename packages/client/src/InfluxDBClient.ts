@@ -120,9 +120,21 @@ export default class InfluxDBClient {
       this._options.host = host.substring(0, host.length - 1)
     if (typeof this._options.token !== 'string')
       throw new IllegalArgumentError('No token specified!')
-    this._queryApi = new QueryApiImpl(this._options)
+    this._queryApi = new QueryApiImpl({
+      ...this._options,
+      queryTimeout:
+        this._options.queryOptions?.timeout ?? this._options?.queryTimeout,
+    })
 
-    this._transport = impl.writeTransport(this._options)
+    const writeTimeout =
+      this._options.timeout ??
+      this._options.writeOptions?.timeout ??
+      this._options.writeTimeout
+
+    this._transport = impl.writeTransport({
+      ...this._options,
+      writeTimeout: writeTimeout,
+    })
     this._writeApi = new WriteApiImpl({
       transport: this._transport,
       ...this._options,

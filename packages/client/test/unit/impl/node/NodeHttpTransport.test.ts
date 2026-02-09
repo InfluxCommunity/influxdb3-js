@@ -316,7 +316,10 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
+        await sendTestData(
+          {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
+          {method: 'GET', timeout: 100}
+        )
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -329,7 +332,10 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .delayConnection(2000)
           .reply(200, 'ok')
-        await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
+        await sendTestData(
+          {...transportOptions, timeout: 10_000},
+          {method: 'GET', timeout: 100}
+        )
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -340,6 +346,20 @@ describe('NodeHttpTransport', () => {
       it(`fails on response timeout`, async () => {
         nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
         await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e) => {
+            expect(e.toString()).to.include('timed')
+          })
+      })
+      it(`passing timeout directly to send function will have highest priority`, async () => {
+        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        await sendTestData(
+          {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
+          {timeout: 100, method: 'GET'},
+          undefined
+        )
           .then(() => {
             throw new Error('must not succeed')
           })
@@ -794,6 +814,19 @@ describe('NodeHttpTransport', () => {
             expect(e.toString()).to.include('timed')
           })
       })
+      it(`passing timeout directly to iterate function`, async () => {
+        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        await iterateTestData(
+          {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
+          {method: 'GET', timeout: 100}
+        )
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e) => {
+            expect(e.toString()).to.include('timed')
+          })
+      })
       it(`truncates error messages`, async () => {
         let bigMessage = 'this is a big error message'
         while (bigMessage.length < 1001) bigMessage += bigMessage
@@ -1140,6 +1173,27 @@ describe('NodeHttpTransport', () => {
       })
       expect(data).equals('..')
       expect(extra).equals('yes')
+    })
+    it(`passing timeout directly to request function`, async () => {
+      nock(transportOptions.host).get('/test').delay(2000).reply(200).persist()
+      const transport = new NodeHttpTransport({
+        ...transportOptions,
+        timeout: 10_000,
+      })
+      try {
+        await transport.request(
+          '/test',
+          '',
+          {
+            method: 'GET',
+            timeout: 100,
+          },
+          undefined
+        )
+        expect.fail('must not succeed')
+      } catch (e: any) {
+        expect(e.toString()).to.include('timed')
+      }
     })
   })
 })
