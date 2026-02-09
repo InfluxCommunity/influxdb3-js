@@ -1,5 +1,59 @@
 import {Headers} from './results'
 
+function formatErrorMessage(node: any): string | undefined {
+  if (!node || typeof node !== 'object' || Array.isArray(node)) {
+    return undefined
+  }
+  const code = typeof node.code === 'string' ? node.code : undefined
+  const message = typeof node.message === 'string' ? node.message : undefined
+  if (message) {
+    return code ? `${code}: ${message}` : message
+  }
+
+  const errorText = typeof node.error === 'string' ? node.error : undefined
+  const data = node.data
+  if (errorText && Array.isArray(data)) {
+    const details: string[] = []
+    for (const item of data) {
+      if (!item || typeof item !== 'object' || Array.isArray(item)) {
+        continue
+      }
+      const lineNumber = item.line_number
+      const errorMessage = item.error_message
+      const originalLine = item.original_line
+      if (
+        lineNumber !== undefined &&
+        lineNumber !== null &&
+        typeof errorMessage === 'string' &&
+        errorMessage.length > 0 &&
+        typeof originalLine === 'string' &&
+        originalLine.length > 0
+      ) {
+        details.push(
+          `\tline ${lineNumber}: ${errorMessage} (${originalLine})`
+        )
+      } else if (typeof errorMessage === 'string' && errorMessage.length > 0) {
+        details.push(`\t${errorMessage}`)
+      }
+    }
+    if (details.length) {
+      return `${errorText}:\n${details.join('\n')}`
+    }
+    return errorText
+  }
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    const errorMessage = (data as {error_message?: unknown}).error_message
+    if (typeof errorMessage === 'string' && errorMessage.length > 0) {
+      return errorMessage
+    }
+  }
+  if (errorText) {
+    return errorText
+  }
+
+  return undefined
+}
+
 /** IllegalArgumentError is thrown when illegal argument is supplied. */
 export class IllegalArgumentError extends Error {
   /* istanbul ignore next */
@@ -33,25 +87,16 @@ export class HttpError extends Error {
     if (message) {
       this.message = message
     } else if (body) {
-      // Edge may not set Content-Type header
+      // Core/Enterprise may not set Content-Type header
       if (contentType?.startsWith('application/json') || !contentType) {
         try {
           this.json = JSON.parse(body)
-          this.message = this.json.message
-          this.code = this.json.code
-          if (!this.message) {
-            interface EdgeBody {
-              error?: string
-              data?: {
-                error_message?: string
-              }
-            }
-            const eb: EdgeBody = this.json as EdgeBody
-            if (eb.data?.error_message) {
-              this.message = eb.data.error_message
-            } else if (eb.error) {
-              this.message = eb.error
-            }
+          if (typeof this.json?.code === 'string') {
+            this.code = this.json.code
+          }
+          const parsedMessage = formatErrorMessage(this.json)
+          if (parsedMessage) {
+            this.message = parsedMessage
           }
         } catch (e) {
           // silently ignore, body string is still available
