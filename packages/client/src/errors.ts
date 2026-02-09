@@ -29,9 +29,7 @@ function formatErrorMessage(node: any): string | undefined {
         typeof originalLine === 'string' &&
         originalLine.length > 0
       ) {
-        details.push(
-          `\tline ${lineNumber}: ${errorMessage} (${originalLine})`
-        )
+        details.push(`\tline ${lineNumber}: ${errorMessage} (${originalLine})`)
       } else if (typeof errorMessage === 'string' && errorMessage.length > 0) {
         details.push(`\t${errorMessage}`)
       }
