@@ -11,7 +11,7 @@ export interface ConnectionOptions {
   /** authentication token */
   token?: string
 
-  /** token authentication scheme. Not set for Cloud access, set to 'Bearer' for Edge. */
+  /** token authentication scheme. Not set for Cloud access, set to 'Bearer' for Core/Enterprise. */
   authScheme?: string
 
   /**
