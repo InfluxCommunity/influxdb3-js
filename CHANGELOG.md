@@ -2,7 +2,7 @@
 
 ### Bugfix
 
-1. [#688](https://github.com/InfluxCommunity/influxdb3-js/pull/688) InfluxDB 3 Core/Enterprise write errors details handling.
+1. [#688](https://github.com/InfluxCommunity/influxdb3-js/pull/688): InfluxDB 3 Core/Enterprise write errors details handling.
 
 ## 2.0.0 [2026-01-08]
 
