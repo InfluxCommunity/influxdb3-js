@@ -47,7 +47,7 @@ describe('errors', () => {
         ).message
       ).equals('parsing failed for write_lp endpoint')
     })
-    it('verifies Edge error without detail message', () => {
+    it('verifies Core/Enterprise error without detail message', () => {
       expect(
         new HttpError(
           400,
@@ -56,16 +56,75 @@ describe('errors', () => {
         ).message
       ).equals('parsing failed for write_lp endpoint')
     })
-    it('verifies Edge error with detail message', () => {
+    it('verifies Core/Enterprise error with detail message', () => {
       expect(
         new HttpError(
           400,
           'Bad Request',
-          '{"error": "parsing failed for write_lp endpoint", "data": {"error_message": "invalid field value in line protocol for field \'value\' on line 0"}}' // Edge
+          '{"error": "parsing failed for write_lp endpoint", "data": {"error_message": "invalid field value in line protocol for field \'value\' on line 0"}}'
         ).message
       ).equals(
         "invalid field value in line protocol for field 'value' on line 0"
       )
+    })
+    it('verifies v3 error format with code and message', () => {
+      const err = new HttpError(
+        400,
+        'Bad Request',
+        '{"code":"internal","message":"parsing failed for write_lp endpoint"}'
+      )
+      expect(err.message).equals('parsing failed for write_lp endpoint')
+      expect(err.code).equals('internal')
+    })
+    it('verifies v3 write error format with details', () => {
+      const body = JSON.stringify({
+        error: 'partial write of line protocol occurred',
+        data: [
+          {
+            error_message: 'invalid column type for column v',
+            line_number: 2,
+            original_line: '**.DBG.remote_***',
+          },
+          {
+            error_message: 'only error message',
+          },
+          null,
+        ],
+      })
+      expect(new HttpError(400, 'Bad Request', body).message).equals(
+        'partial write of line protocol occurred:\n' +
+          '\tline 2: invalid column type for column v (**.DBG.remote_***)\n' +
+          '\tonly error message'
+      )
+    })
+    it('verifies v3 write error format without details', () => {
+      const body = JSON.stringify({
+        error: 'partial write of line protocol occurred',
+        data: [{line_number: 2}],
+      })
+      expect(new HttpError(400, 'Bad Request', body).message).equals(
+        'partial write of line protocol occurred'
+      )
+    })
+    it('verifies v3 write error message includes details', () => {
+      const body = JSON.stringify({
+        error: 'partial write of line protocol occurred',
+        data: [
+          {
+            error_message:
+              "invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float",
+            line_number: 2,
+            original_line: 'testa6a3ad v=1 17702',
+          },
+        ],
+      })
+      const message = new HttpError(400, 'Bad Request', body).message
+      expect(message).to.include('partial write of line protocol occurred')
+      expect(message).to.include('line 2')
+      expect(message).to.include(
+        "invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float"
+      )
+      expect(message).to.include('testa6a3ad v=1 17702')
     })
   })
   describe('http error values', () => {
