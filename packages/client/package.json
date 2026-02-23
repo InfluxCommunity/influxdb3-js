@@ -70,7 +70,7 @@
     "chai": "^6.2.1",
     "esbuild": "^0.27.1",
     "esbuild-runner": "^2.2.1",
-    "eslint": "^9.32.0",
+    "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.0.1",
     "eslint-formatter-junit": "^9.0.1",
     "eslint-plugin-prettier": "^5.0.0",
