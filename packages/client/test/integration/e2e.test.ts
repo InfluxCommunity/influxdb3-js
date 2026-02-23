@@ -12,6 +12,7 @@ import {
   RpcOptions,
   ServerStreamingCall,
 } from '@protobuf-ts/runtime-rpc'
+
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
