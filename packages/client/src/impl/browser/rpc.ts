@@ -6,8 +6,12 @@ export const createQueryTransport: CreateQueryTransport = ({
   timeout,
   clientOptions,
 }) => {
-  const {interceptors} = clientOptions ?? {}
+  if (clientOptions?.grpcOptions || clientOptions?.queryOptions?.grpcOptions) {
+    console.warn(`Detected grpcClientOptions: such options are ignored in the GrpcWebFetchTransport:\n
+    ${JSON.stringify(clientOptions)}`)
+  }
 
+  const {interceptors} = clientOptions ?? {}
   return new GrpcWebFetchTransport({
     baseUrl: host,
     timeout,
