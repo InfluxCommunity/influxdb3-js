@@ -1,4 +1,10 @@
 import {InfluxDBClient} from '@influxdata/influxdb3-client'
+import {
+  MethodInfo,
+  NextServerStreamingFn,
+  RpcOptions,
+  ServerStreamingCall,
+} from '@protobuf-ts/runtime-rpc'
 
 /*
 This example shows the ways in which grpc options can be defined
@@ -30,6 +36,22 @@ async function main() {
       grpcOptions: {
         'grpc.max_receive_message_length': 1024 * 1024 * 10,
         'grpc.max_send_message_length': 65536,
+        interceptors: [
+          {
+            interceptServerStreaming(
+              next: NextServerStreamingFn,
+              method: MethodInfo,
+              input: object,
+              options: RpcOptions
+            ): ServerStreamingCall {
+              // This interceptor adds an authorization header to every server streaming call.
+              if (options.meta) {
+                options.meta['authorization'] = 'Token my-token'
+              }
+              return next(method, input, options)
+            },
+          },
+        ],
       },
     },
   })
