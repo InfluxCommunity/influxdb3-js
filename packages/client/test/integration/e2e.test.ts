@@ -5,7 +5,6 @@ import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
-;
 import {
   MethodInfo,
   NextServerStreamingFn,
@@ -13,8 +12,7 @@ import {
   RpcOptions,
   ServerStreamingCall,
 } from '@protobuf-ts/runtime-rpc'
-
-(BigInt.prototype as any).toJSON = function () {
+;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
 const getEnvVariables = () => {
