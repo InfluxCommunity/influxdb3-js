@@ -8,11 +8,9 @@ import {iterateTestData, sendTestData} from '../util'
 import {
   MethodInfo,
   NextServerStreamingFn,
-  RpcError,
   RpcOptions,
   ServerStreamingCall,
 } from '@protobuf-ts/runtime-rpc'
-
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -487,7 +485,7 @@ describe('e2e test', () => {
         for await (const row of queryResult) {
           expect.fail('not expected!', row)
         }
-      } catch (e: RpcError | any) {
+      } catch (e: any) {
         expect(e.message).to.contains('Unauthenticated')
       }
     }).timeout(5_000)
