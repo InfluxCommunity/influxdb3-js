@@ -6,6 +6,8 @@
 
 1. [#688](https://github.com/InfluxCommunity/influxdb3-js/pull/688): InfluxDB 3 Core/Enterprise write errors details handling.
 
+1. [#701](https://github.com/InfluxCommunity/influxdb3-js/pull/701): Support passing interceptor functions to the Flight client.
+
 ## 2.0.0 [2026-01-08]
 
 > :warning: **Breaking Changes**: Node v18 support is dropped because it is end of life.
