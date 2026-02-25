@@ -478,31 +478,6 @@ describe('e2e test', () => {
         },
       })
       try {
-        const client = new InfluxDBClient({
-          host: url,
-          database,
-          token,
-          queryOptions: {
-            grpcOptions: {
-              interceptors: [
-                {
-                  interceptServerStreaming(
-                    next: NextServerStreamingFn,
-                    method: MethodInfo,
-                    input: object,
-                    options: RpcOptions
-                  ): ServerStreamingCall {
-                    if (options.meta) {
-                      options.meta['authorization'] =
-                        'This is an incorrect token'
-                    }
-                    return next(method, input, options)
-                  },
-                },
-              ],
-            },
-          },
-        })
         const query = 'SELECT * FROM weathers LIMIT 10'
         const queryResult = client.query(query)
         const iterator = queryResult[Symbol.asyncIterator]()
