@@ -1,5 +1,5 @@
 import {InfluxDBClient} from '@influxdata/influxdb3-client'
-import {
+import type {
   MethodInfo,
   NextServerStreamingFn,
   RpcOptions,
