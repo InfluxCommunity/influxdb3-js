@@ -15,6 +15,6 @@ export const createQueryTransport: CreateQueryTransport = ({
   return new GrpcWebFetchTransport({
     baseUrl: host,
     timeout,
-    interceptors
+    interceptors,
   })
 }
