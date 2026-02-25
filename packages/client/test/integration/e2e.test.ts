@@ -453,6 +453,30 @@ describe('e2e test', () => {
 
     it('query with incorrect token set by interceptor', async () => {
       const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        database,
+        token,
+        queryOptions: {
+          grpcOptions: {
+            interceptors: [
+              {
+                interceptServerStreaming(
+                  next: NextServerStreamingFn,
+                  method: MethodInfo,
+                  input: object,
+                  options: RpcOptions
+                ): ServerStreamingCall {
+                  if (options.meta) {
+                    options.meta['authorization'] = 'This is an incorrect token'
+                  }
+                  return next(method, input, options)
+                },
+              },
+            ],
+          },
+        },
+      })
       try {
         const client = new InfluxDBClient({
           host: url,
@@ -492,6 +516,8 @@ describe('e2e test', () => {
         )
       } catch (e: any) {
         expect(e.message).to.contains('Unauthenticated')
+      } finally {
+        await client.close()
       }
     }).timeout(5_000)
 
