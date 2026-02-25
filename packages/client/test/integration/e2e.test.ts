@@ -479,12 +479,17 @@ describe('e2e test', () => {
             },
           },
         })
-
         const query = 'SELECT * FROM weathers LIMIT 10'
         const queryResult = client.query(query)
-        for await (const row of queryResult) {
-          expect.fail('not expected!', row)
-        }
+        const iterator = queryResult[Symbol.asyncIterator]()
+        await rejects(
+          async () => {
+            await iterator.next()
+          },
+          (err: any) =>
+            typeof err?.message === 'string' &&
+            err.message.includes('Unauthenticated')
+        )
       } catch (e: any) {
         expect(e.message).to.contains('Unauthenticated')
       }

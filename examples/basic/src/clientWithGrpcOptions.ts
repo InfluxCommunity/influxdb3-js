@@ -46,7 +46,7 @@ async function main() {
             ): ServerStreamingCall {
               // This interceptor adds an authorization header to every server streaming call.
               if (options.meta) {
-                options.meta['authorization'] = 'Token my-token'
+                options.meta['authorization'] = 'Bearer my-token'
               }
               return next(method, input, options)
             },
