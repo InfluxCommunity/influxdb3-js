@@ -5,13 +5,9 @@ import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
-import type {
-  MethodInfo,
-  NextServerStreamingFn,
-  RpcOptions,
-  ServerStreamingCall,
-} from '@protobuf-ts/runtime-rpc'
-;(BigInt.prototype as any).toJSON = function () {
+import type {MethodInfo, NextServerStreamingFn, RpcOptions, ServerStreamingCall,} from '@protobuf-ts/runtime-rpc';
+
+(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
 const getEnvVariables = () => {
@@ -488,13 +484,11 @@ describe('e2e test', () => {
         } catch (err: any) {
           rpcErr = err
         }
-        const expected = '"Unauthenticated" or "401"'
-        const actual = String(rpcErr?.message)
-        const isAuthMessage =
-          actual.includes('Unauthenticated') || actual.includes('401')
-        if (!isAuthMessage) {
+        const expected = 'UNAUTHENTICATED'
+        const actual = String(rpcErr?.code)
+        if (actual !== expected) {
           throw new Error(
-            `Expected error message to include "${expected}", but received: ${actual}`
+            `Expected error code ${expected}, but received: ${actual}`
           )
         }
       } finally {
