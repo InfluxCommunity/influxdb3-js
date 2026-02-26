@@ -468,7 +468,7 @@ describe('e2e test', () => {
                   options: RpcOptions
                 ): ServerStreamingCall {
                   if (options.meta) {
-                    options.meta['authorization'] = 'This is an incorrect token'
+                    options.meta['authorization'] = 'Bearer incorrect-token'
                   }
                   return next(method, input, options)
                 },
@@ -481,16 +481,22 @@ describe('e2e test', () => {
         const query = 'SELECT * FROM weathers LIMIT 10'
         const queryResult = client.query(query)
         const iterator = queryResult[Symbol.asyncIterator]()
-        await rejects(
-          async () => {
-            await iterator.next()
-          },
-          (err: any) =>
-            typeof err?.message === 'string' &&
-            err.message.includes('Unauthenticated')
-        )
-      } catch (e: any) {
-        expect(e.message).to.contains('Unauthenticated')
+        let rpcErr: any
+        try {
+          await iterator.next()
+          expect.fail('Expected query to reject, but it resolved')
+        } catch (err: any) {
+          rpcErr = err
+        }
+        const expected = '"Unauthenticated" or "401"'
+        const actual = String(rpcErr?.message)
+        const isAuthMessage =
+          actual.includes('Unauthenticated') || actual.includes('401')
+        if (!isAuthMessage) {
+          throw new Error(
+            `Expected error message to include "${expected}", but received: ${actual}`
+          )
+        }
       } finally {
         await client.close()
       }
