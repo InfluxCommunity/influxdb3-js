@@ -5,7 +5,12 @@ import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
-import type {MethodInfo, NextServerStreamingFn, RpcOptions, ServerStreamingCall,} from '@protobuf-ts/runtime-rpc';
+import type {
+  MethodInfo,
+  NextServerStreamingFn,
+  RpcOptions,
+  ServerStreamingCall
+} from '@protobuf-ts/runtime-rpc'
 
 (BigInt.prototype as any).toJSON = function () {
   return this.toString()
