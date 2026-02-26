@@ -1,5 +1,9 @@
 ## 2.2.0 [unreleased]
 
+### Features
+
+1. [#701](https://github.com/InfluxCommunity/influxdb3-js/pull/701): Support passing interceptor functions to the Flight client.
+
 ## 2.1.0 [2026-02-19]
 
 ### Bugfix

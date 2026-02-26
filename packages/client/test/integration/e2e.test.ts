@@ -5,6 +5,12 @@ import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
+import type {
+  MethodInfo,
+  NextServerStreamingFn,
+  RpcOptions,
+  ServerStreamingCall,
+} from '@protobuf-ts/runtime-rpc'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
@@ -444,6 +450,51 @@ describe('e2e test', () => {
       }
       expect(count).to.be.greaterThan(0)
     }).timeout(10_000)
+
+    it('query with incorrect token set by interceptor', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        database,
+        token,
+        queryOptions: {
+          grpcOptions: {
+            interceptors: [
+              {
+                interceptServerStreaming(
+                  next: NextServerStreamingFn,
+                  method: MethodInfo,
+                  input: object,
+                  options: RpcOptions
+                ): ServerStreamingCall {
+                  if (options.meta) {
+                    options.meta['authorization'] = 'This is an incorrect token'
+                  }
+                  return next(method, input, options)
+                },
+              },
+            ],
+          },
+        },
+      })
+      try {
+        const query = 'SELECT * FROM weathers LIMIT 10'
+        const queryResult = client.query(query)
+        const iterator = queryResult[Symbol.asyncIterator]()
+        await rejects(
+          async () => {
+            await iterator.next()
+          },
+          (err: any) =>
+            typeof err?.message === 'string' &&
+            err.message.includes('Unauthenticated')
+        )
+      } catch (e: any) {
+        expect(e.message).to.contains('Unauthenticated')
+      } finally {
+        await client.close()
+      }
+    }).timeout(5_000)
 
     it('queries to points with parameters', async () => {
       const {database, token, url} = getEnvVariables()
