@@ -18,7 +18,7 @@ export const createTransport: CreateQueryTransport = ({
     host: url,
     channelCredentials: channelCredentials,
     clientOptions: otherClientOptions,
-    interceptors,
+    interceptors: interceptors,
     timeout: timeout,
   })
 }
