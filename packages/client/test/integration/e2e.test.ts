@@ -9,10 +9,9 @@ import type {
   MethodInfo,
   NextServerStreamingFn,
   RpcOptions,
-  ServerStreamingCall
+  ServerStreamingCall,
 } from '@protobuf-ts/runtime-rpc'
-
-(BigInt.prototype as any).toJSON = function () {
+;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
 }
 const getEnvVariables = () => {
