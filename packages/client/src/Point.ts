@@ -465,6 +465,7 @@ export class Point {
    * Creates an InfluxDB protocol line out of this instance.
    * @param convertTimePrecision - settings control serialization of a point timestamp and can also add default tags,
    * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
+   * @param tagOrder - optional array of tag names to control their order in the output
    * @returns an InfluxDB protocol line out of this instance
    */
   public toLineProtocol(
