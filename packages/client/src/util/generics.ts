@@ -13,7 +13,8 @@ export type WritableData = ArrayLike<string> | ArrayLike<Point> | string | Point
 
 export const writableDataToLineProtocol = (
   data: WritableData,
-  defaultTags?: {[key: string]: string}
+  defaultTags?: {[key: string]: string},
+  tagOrder?: string[]
 ): string[] => {
   const arrayData = (
     isArrayLike(data) && typeof data !== 'string'
@@ -27,6 +28,6 @@ export const writableDataToLineProtocol = (
   return isLine
     ? (arrayData as string[])
     : (arrayData as Point[])
-        .map((p) => p.toLineProtocol(undefined, defaultTags))
+        .map((p) => p.toLineProtocol(undefined, defaultTags, tagOrder))
         .filter(isDefined)
 }

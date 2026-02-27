@@ -188,7 +188,7 @@ export default class InfluxDBClient {
     const options = this._mergeWriteOptions(writeOptions)
 
     await this._writeApi.doWrite(
-      writableDataToLineProtocol(data, options?.defaultTags),
+      writableDataToLineProtocol(data, options?.defaultTags, options?.tagOrder),
       database ??
         this._options.database ??
         throwReturn(new Error(argumentErrorMessage)),

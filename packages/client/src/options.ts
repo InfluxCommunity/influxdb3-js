@@ -144,6 +144,14 @@ export interface WriteOptions {
    * ```
    */
   defaultTags?: {[key: string]: string}
+  /**
+   * Preferred order of tags in line protocol serialization.
+   * Tags listed here are written first, in the same order.
+   * Remaining tags are appended in lexicographical order.
+   *
+   * This helps control first-write column order in InfluxDB 3.
+   */
+  tagOrder?: string[]
   /**  Specific timeout for the writing call. If not set, the value from {@link ConnectionOptions.writeTimeout} is used by default.  */
   timeout?: number
 }
