@@ -225,7 +225,9 @@ describe('Write', () => {
         DATABASE
       )
       expect(messages).to.have.length(1)
-      expect(messages[0]).to.equal('test,host=h1,region=us-east,rack=r1 value=1')
+      expect(messages[0]).to.equal(
+        'test,host=h1,region=us-east,rack=r1 value=1'
+      )
     })
 
     it('fails on write response status not being 2xx', async () => {
