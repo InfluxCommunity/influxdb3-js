@@ -75,6 +75,7 @@
     "eslint-formatter-junit": "^9.0.1",
     "eslint-plugin-prettier": "^5.0.0",
     "follow-redirects": "^1.14.7",
+    "globals": "^17.3.0",
     "mocha": "^11.0.1",
     "mocha-junit-reporter": "^2.0.2",
     "nock": "^14.0.10",
