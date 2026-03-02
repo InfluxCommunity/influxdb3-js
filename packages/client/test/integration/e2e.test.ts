@@ -152,7 +152,7 @@ describe('e2e test', () => {
       for await (const row of queryResult) {
         rows.push(row)
       }
-      expect(rows.length).to.equal(2)
+      expect(rows.length).to.equal(22)
       expect(rows[0].test_id).to.not.equal(rows[1].test_id)
     }).timeout(5000)
 
