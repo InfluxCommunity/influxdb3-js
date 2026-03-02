@@ -30,6 +30,21 @@ describe('writableDataToLineProtocol', () => {
     }, `does not start with 'test blah=123.6'`)
   })
 
+  it('should apply tag order when converting Point to line protocol', () => {
+    const point = Point.measurement('test')
+      .setTag('host', 'h1')
+      .setFloatField('blah', 123.6)
+      .setTimestamp('')
+    const output = writableDataToLineProtocol(
+      point,
+      {region: 'us-east', rack: 'r1'},
+      ['host', 'region']
+    )
+    expect(output).to.deep.equal([
+      'test,host=h1,region=us-east,rack=r1 blah=123.6',
+    ])
+  })
+
   it('should convert array-like Point to line protocol', () => {
     const point1 = Point.measurement('test').setFloatField('blah', 123.6)
     const date = Date.now()

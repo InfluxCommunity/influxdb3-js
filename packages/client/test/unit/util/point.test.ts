@@ -224,6 +224,9 @@ describe('point', () => {
       'measurement,c=d,a=f,tag=b a=T 123'
     )
     expect(point.toLineProtocol()).to.equal('measurement,a=f,tag=b a=T 123')
+    expect(point.toLineProtocol(undefined, defaultTags, ['tag', 'a'])).to.equal(
+      'measurement,tag=b,a=f,c=d a=T 123'
+    )
 
     point.removeTag('a')
 
@@ -231,6 +234,9 @@ describe('point', () => {
       'measurement,a=b,c=d,tag=b a=T 123'
     )
     expect(point.toLineProtocol()).to.equal('measurement,tag=b a=T 123')
+    expect(point.toLineProtocol(undefined, defaultTags, ['tag', 'a'])).to.equal(
+      'measurement,tag=b,a=b,c=d a=T 123'
+    )
   })
 
   it('has fields', () => {

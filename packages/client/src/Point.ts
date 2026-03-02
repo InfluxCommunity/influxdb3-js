@@ -26,6 +26,44 @@ const fieldToLPString: {
   }
 }
 
+const collectDefaultTagNames = (
+  pointTagNames: string[],
+  defaultTags?: {[key: string]: string}
+): string[] => {
+  if (!defaultTags) {
+    return []
+  }
+  const pointTagNamesSet = new Set(pointTagNames)
+  return Object.keys(defaultTags)
+    .filter((name) => !pointTagNamesSet.has(name))
+    .sort()
+}
+
+const applyPreferredTagOrder = (
+  tagNames: string[],
+  tagOrder?: string[]
+): string[] => {
+  if (!tagOrder || tagOrder.length === 0) {
+    return tagNames
+  }
+
+  const remaining = new Set(tagNames)
+  const ordered: string[] = []
+  const seen = new Set<string>()
+
+  for (const tagName of tagOrder) {
+    if (!tagName || seen.has(tagName) || !remaining.has(tagName)) {
+      continue
+    }
+    ordered.push(tagName)
+    seen.add(tagName)
+    remaining.delete(tagName)
+  }
+
+  const sortedRemaining = Array.from(remaining).sort()
+  return ordered.concat(sortedRemaining)
+}
+
 /**
  * Point defines values of a single measurement.
  */
@@ -427,11 +465,13 @@ export class Point {
    * Creates an InfluxDB protocol line out of this instance.
    * @param convertTimePrecision - settings control serialization of a point timestamp and can also add default tags,
    * nanosecond timestamp precision is used when no `settings` or no `settings.convertTime` is supplied.
+   * @param tagOrder - optional array of tag names to control their order in the output
    * @returns an InfluxDB protocol line out of this instance
    */
   public toLineProtocol(
     convertTimePrecision?: TimeConverter | WritePrecision,
-    defaultTags?: {[key: string]: string}
+    defaultTags?: {[key: string]: string},
+    tagOrder?: string[]
   ): string | undefined {
     if (!this._values.getMeasurement()) return undefined
     let fieldsLine = ''
@@ -450,33 +490,21 @@ export class Point {
       })
     if (fieldsLine.length === 0) return undefined // no fields present
     let tagsLine = ''
-    const tagNames = this._values.getTagNames()
+    const pointTagNames = this._values.getTagNames().sort()
+    const defaultTagNames = collectDefaultTagNames(pointTagNames, defaultTags)
+    const orderedTagNames = applyPreferredTagOrder(
+      defaultTagNames.concat(pointTagNames),
+      tagOrder
+    )
 
-    if (defaultTags) {
-      const tagNamesSet = new Set(tagNames)
-      const defaultNames = Object.keys(defaultTags)
-      for (let i: number = defaultNames.length; i--; ) {
-        if (tagNamesSet.has(defaultNames[i])) {
-          defaultNames.splice(i, 1)
-        }
-      }
-      defaultNames.sort().forEach((x) => {
-        if (x) {
-          const val = defaultTags[x]
-          if (val) {
-            tagsLine += ','
-            tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
-          }
-        }
-      })
-    }
-
-    tagNames.sort().forEach((x) => {
-      if (x) {
-        const val = this._values.getTag(x)
-        if (val) {
+    orderedTagNames.forEach((name) => {
+      if (name) {
+        const pointTagValue = this._values.getTag(name)
+        const value =
+          pointTagValue !== undefined ? pointTagValue : defaultTags?.[name]
+        if (value) {
           tagsLine += ','
-          tagsLine += `${escape.tag(x)}=${escape.tag(val)}`
+          tagsLine += `${escape.tag(name)}=${escape.tag(value)}`
         }
       }
     })

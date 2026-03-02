@@ -203,6 +203,33 @@ describe('Write', () => {
         }
       )
     })
+    it('applies tagOrder in write options', async () => {
+      useSubject({
+        defaultTags: {region: 'us-east', rack: 'r1'},
+        tagOrder: ['host', 'region'],
+      })
+      const messages: string[] = []
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri, requestBody) {
+          messages.push(requestBody.toString())
+          return [204, '', {}]
+        })
+        .persist()
+
+      await subject.write(
+        Point.measurement('test')
+          .setTag('host', 'h1')
+          .setFloatField('value', 1)
+          .setTimestamp(''),
+        DATABASE
+      )
+      expect(messages).to.have.length(1)
+      expect(messages[0]).to.equal(
+        'test,host=h1,region=us-east,rack=r1 value=1'
+      )
+    })
+
     it('fails on write response status not being 2xx', async () => {
       useSubject({})
       let authorization: any
