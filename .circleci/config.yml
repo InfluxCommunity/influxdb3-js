@@ -105,8 +105,8 @@ jobs:
             yarn build
             yarn test:ci
             yarn typedoc
-      - store_test_results:
-          path: ./reports
+#      - store_test_results:
+#          path: ./reports
 
   generate-flight:
     docker:
