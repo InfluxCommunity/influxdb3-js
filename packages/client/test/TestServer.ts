@@ -1,11 +1,34 @@
 import * as fsv from './generated/flight/Flight.grpc-server'
 import * as grpc from '@grpc/grpc-js'
+import {
+  sendUnaryData,
+  ServerDuplexStream,
+  ServerUnaryCall,
+  ServerWritableStream,
+  UntypedHandleCall,
+} from '@grpc/grpc-js'
 import * as flt from '../src/generated/flight/Flight'
 import {MetadataVersion} from 'apache-arrow/fb/metadata-version'
 import {FieldNode, Message} from 'apache-arrow/ipc/metadata/message'
 import {MessageHeader} from 'apache-arrow/fb/message-header'
 import {Schema} from 'apache-arrow/Arrow.node'
-import {Log, setLogger, consoleLogger} from '../src'
+import {consoleLogger, Log, setLogger} from '../src'
+import {
+  Action,
+  ActionType,
+  Criteria,
+  Empty,
+  FlightData,
+  FlightDescriptor,
+  FlightInfo,
+  HandshakeRequest,
+  HandshakeResponse,
+  PollInfo,
+  PutResult,
+  Result,
+  SchemaResult,
+  Ticket,
+} from './generated/flight/Flight'
 
 setLogger({
   error(message: string, error) {
@@ -340,48 +363,88 @@ export class MockService {
   }
 }
 
+/**
+ * Extend this abstract class and implementing only the Flight methods that you need.
+ * This class can be used with `TestServer` to create a mock
+ * Flight Server for testing purpose. Please check the example below.
+ *
+ */
+// const service = new (class extends BaseFlightService {
+//   doGet(call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>): void {
+//     const table = new Table({
+//       gpu: vectorFromArray(['amd', null], new Utf8()),
+//       model: vectorFromArray([2009, 2018], new Int32()),
+//     })
+//     const messageReader = new MessageReader(tableToIPC(table))
+//     let message = messageReader.readMessage()
+//     while (message) {
+//       const dataBody = messageReader.readMessageBody(message.bodyLength)
+//       call.write({
+//         dataHeader: Message.encode(message),
+//         appMetadata: new Uint8Array(0),
+//         dataBody: dataBody || undefined,
+//       })
+//       message = messageReader.readMessage()
+//     }
+//     call.end()
+//   }
+// })()
+// const port = 5555
+// const testServer = new TestServer(service, port)
+// await testServer.start()
+export abstract class BaseFlightService implements fsv.IFlightService {
+  [name: string]: UntypedHandleCall
+
+  doAction(_call: ServerWritableStream<Action, Result>): void {}
+
+  doExchange(_call: ServerDuplexStream<FlightData, FlightData>): void {}
+
+  doGet(_call: ServerWritableStream<Ticket, FlightData>): void {}
+
+  doPut(_call: ServerDuplexStream<FlightData, PutResult>): void {}
+
+  getFlightInfo(
+    _call: ServerUnaryCall<FlightDescriptor, FlightInfo>,
+    _callback: sendUnaryData<FlightInfo>
+  ): void {}
+
+  getSchema(
+    _call: ServerUnaryCall<FlightDescriptor, SchemaResult>,
+    _callback: sendUnaryData<SchemaResult>
+  ): void {}
+
+  handshake(
+    _call: ServerDuplexStream<HandshakeRequest, HandshakeResponse>
+  ): void {}
+
+  listActions(_call: ServerWritableStream<Empty, ActionType>): void {}
+
+  listFlights(_call: ServerWritableStream<Criteria, FlightInfo>): void {}
+
+  pollFlightInfo(
+    _call: ServerUnaryCall<FlightDescriptor, PollInfo>,
+    _callback: sendUnaryData<PollInfo>
+  ): void {}
+}
+
 /*
     Since this is to be used only for testing for now use insecure
     todo - implement security - should be able to check TLS
  */
 export class TestServer {
-  service: fsv.IFlightService
-  port: number
+  readonly service: fsv.IFlightService
+  readonly port: number
+  readonly server: grpc.Server
 
-  server: grpc.Server
-
-  constructor()
-
-  constructor(svc: fsv.IFlightService)
-
-  constructor(port: number)
-
-  constructor(...args: Array<any>) {
-    switch (args.length) {
-      case 0:
-        this.service = MockService.service
-        this.port = DEFAULT_PORT
-        break
-      case 1:
-        if (args[0] == null) {
-          throw Error('Attempt to create null service')
-        }
-        if (typeof args[0] == 'number') {
-          this.port = args[0]
-        } else {
-          // todo add type guard
-          this.service = args[0]
-        }
-        break
-      default:
-        throw Error(`Unsupported arguments in ${args}`)
-    }
+  constructor(service = MockService.service, port = DEFAULT_PORT) {
+    this.service = service
+    this.port = port
     this.server = new grpc.Server()
   }
 
   start = async (): Promise<void> => {
-    await this.server.addService(fsv.flightServiceDefinition, this.service)
-    await this.server.bindAsync(
+    this.server.addService(fsv.flightServiceDefinition, this.service)
+    this.server.bindAsync(
       `0.0.0.0:${this.port}`,
       grpc.ServerCredentials.createInsecure(),
       (err, port) => {
@@ -397,7 +460,7 @@ export class TestServer {
   }
 
   shutdown = async (): Promise<void> => {
-    await this.server.tryShutdown((err) => {
+    this.server.tryShutdown((err) => {
       if (err) {
         Log.error.call(Log, `Failed to shutdown server:`, err)
         return Promise.reject(err)
