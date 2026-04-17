@@ -174,6 +174,12 @@ export default class InfluxDBClient {
 
   /**
    * Write data into specified database.
+   *
+   * Warning: If you provided ONLY ONE Point, and that Point
+   * contains fields with null/undefined values, those fields will not be written to InfluxDB.
+   * If such fields are later queried explicitly, for example,
+   * `SELECT field_with_value, field_with_null_value FROM my_table` an error will be thrown.
+   *
    * @param data - data to write
    * @param database - database to write into
    * @param org - organization to write into
