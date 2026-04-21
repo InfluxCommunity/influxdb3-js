@@ -5,7 +5,6 @@ import {InfluxDBClient, Point, PointValues} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
-import {it, describe} from 'mocha'
 import type {
   MethodInfo,
   NextServerStreamingFn,
