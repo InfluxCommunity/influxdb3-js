@@ -3,7 +3,7 @@
   "compilerOptions": {
     "resolveJsonModule": true,
     "lib": ["DOM", "es2023"],
-    "types": ["mocha"]
+    "types": ["mocha", "node"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["*.js"]
