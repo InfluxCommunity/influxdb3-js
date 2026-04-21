@@ -1,8 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["DOM", "es2018"],
-    "ignoreDeprecations": "6.0" // Temporary fix for https://github.com/egoist/tsup/issues/1388
+    "lib": ["DOM", "es2018"]
   },
   "include": ["*.ts"]
 }
