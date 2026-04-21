@@ -7,6 +7,7 @@
 1. [#707](https://github.com/InfluxCommunity/influxdb3-js/pull/707): Support passing interceptor functions to the Flight client.
 2. [#711](https://github.com/InfluxCommunity/influxdb3-js/pull/711): Support custom tag order via `tagOrder` write option.
    See [Sort tags by priority](https://docs.influxdata.com/influxdb3/enterprise/write-data/best-practices/schema-design/#sort-tags-by-query-priority) for more.
+3. [#766](https://github.com/InfluxCommunity/influxdb3-js/pull/766): Upgrade typescript to 6.0.3.
 
 ## 2.1.0 [2026-02-19]
 
