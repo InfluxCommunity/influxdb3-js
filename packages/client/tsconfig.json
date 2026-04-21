@@ -2,8 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "resolveJsonModule": true,
-    "lib": ["DOM", "es2023"],
-    "ignoreDeprecations": "6.0" // Temporary fix for https://github.com/egoist/tsup/issues/1388
+    "lib": ["DOM", "es2023"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"],
   "exclude": ["*.js"]
