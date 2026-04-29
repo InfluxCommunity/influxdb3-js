@@ -420,7 +420,7 @@ describe('Write', () => {
         .catch((e) => {
           expect(e).instanceOf(IllegalArgumentError)
           expect(e.message).equals(
-            'invalid write options: NoSync cannot be used in V2 API'
+            'invalid write options: noSync cannot be used with useV2Api'
           )
         })
       expect(logs.error).to.length(0)
