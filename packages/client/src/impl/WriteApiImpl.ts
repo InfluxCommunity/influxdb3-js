@@ -77,11 +77,10 @@ export default class WriteApiImpl implements WriteApi {
       ...DEFAULT_WriteOptions,
       ...writeOptions,
     }
+
     if (writeOptionsOrDefault.useV2Api && writeOptionsOrDefault.noSync) {
-      return Promise.reject(
-        new IllegalArgumentError(
-          'invalid write options: NoSync cannot be used in V2 API'
-        )
+      throw new IllegalArgumentError(
+        'invalid write options: NoSync cannot be used in V2 API'
       )
     }
 
