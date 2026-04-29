@@ -1,7 +1,13 @@
 import NodeHttpTransport from '../../src/impl/node/NodeHttpTransport'
 import nock from 'nock'
 import {expect} from 'chai'
-import {InfluxDBClient, Point, PointValues} from '../../src'
+import {
+  HttpError,
+  InfluxDBClient,
+  PartialWriteError,
+  Point,
+  PointValues,
+} from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
 import {iterateTestData, sendTestData} from '../util'
@@ -572,6 +578,88 @@ describe('e2e test', () => {
       }
       expect(count).to.be.greaterThan(0)
     }).timeout(7_000)
+
+    it('reports partial write details when acceptPartial=true (default)', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        token,
+      })
+
+      const lp = [
+        'home,room=Sunroom temp=96 1735545600',
+        'home,room=Sunroom temp="hi" 1735545610',
+        'home,room=Sunroom temp=88i 1735545620',
+      ].join('\n')
+
+      try {
+        await client.write(lp, database)
+        expect.fail('failure expected')
+      } catch (e: any) {
+        expect(e).instanceOf(PartialWriteError)
+        expect(e.message).to.include('partial write of line protocol occurred')
+        expect(e.lineErrors).to.have.length(2)
+        expect(e.lineErrors[0].lineNumber).to.equal(2)
+        expect(e.lineErrors[1].lineNumber).to.equal(3)
+      } finally {
+        await client.close()
+      }
+    }).timeout(10_000)
+
+    it('reports write_lp parsing failure details when acceptPartial=false', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        token,
+      })
+
+      const lp = [
+        'home,room=Sunroom temp=96 1735545600',
+        'home,room=Sunroom temp="hi" 1735545610',
+        'home,room=Sunroom temp=88i 1735545620',
+      ].join('\n')
+
+      try {
+        await client.write(lp, database, undefined, {
+          acceptPartial: false,
+        })
+        expect.fail('failure expected')
+      } catch (e: any) {
+        expect(e).instanceOf(PartialWriteError)
+        expect(e.message).to.include('parsing failed for write_lp endpoint')
+        expect(e.lineErrors).to.have.length(1)
+        expect(e.lineErrors[0].lineNumber).to.equal(2)
+      } finally {
+        await client.close()
+      }
+    }).timeout(10_000)
+
+    it('uses v2 compatibility endpoint and returns non-structured error', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        token,
+      })
+
+      const lp = [
+        'home,room=Sunroom temp=96 1735545600',
+        'home,room=Sunroom temp="hi" 1735545610',
+        'home,room=Sunroom temp=88i 1735545620',
+      ].join('\n')
+
+      try {
+        await client.write(lp, database, undefined, {
+          useV2Api: true,
+        })
+        expect.fail('failure expected')
+      } catch (e: any) {
+        expect(e).instanceOf(HttpError)
+        expect(e).not.instanceOf(PartialWriteError)
+        expect(e.message).to.include('line protocol parse failed')
+      } finally {
+        await client.close()
+      }
+    }).timeout(10_000)
   })
   describe('with node http', () => {
     const port = 65535

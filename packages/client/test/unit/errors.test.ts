@@ -5,6 +5,7 @@ import {
   RequestTimedOutError,
   AbortError,
   IllegalArgumentError,
+  PartialWriteError,
 } from '../../src'
 
 describe('errors', () => {
@@ -64,7 +65,7 @@ describe('errors', () => {
           '{"error": "parsing failed for write_lp endpoint", "data": {"error_message": "invalid field value in line protocol for field \'value\' on line 0"}}'
         ).message
       ).equals(
-        "invalid field value in line protocol for field 'value' on line 0"
+        "parsing failed for write_lp endpoint:\n\tinvalid field value in line protocol for field 'value' on line 0"
       )
     })
     it('verifies v3 error format with code and message', () => {
@@ -126,6 +127,15 @@ describe('errors', () => {
       )
       expect(message).to.include('testa6a3ad v=1 17702')
     })
+    it('verifies v3 write error message with untyped data fallback details', () => {
+      const body = JSON.stringify({
+        error: 'partial write of line protocol occurred',
+        data: ['bad line', true, null],
+      })
+      expect(new HttpError(400, 'Bad Request', body).message).equals(
+        'partial write of line protocol occurred:\n\tbad line\n\ttrue'
+      )
+    })
   })
   describe('http error values', () => {
     it('propagate headers', () => {
@@ -148,6 +158,64 @@ describe('errors', () => {
       } else {
         expect.fail('httpError.headers should be defined')
       }
+    })
+  })
+  describe('PartialWriteError', () => {
+    it('is created from typed data array', () => {
+      const error = new HttpError(
+        400,
+        'Bad Request',
+        JSON.stringify({
+          error: 'partial write of line protocol occurred',
+          data: [
+            {
+              error_message: 'bad value',
+              line_number: 2,
+              original_line: 'm,t=a value=1',
+            },
+          ],
+        }),
+        'application/json'
+      )
+      const partial = PartialWriteError.fromHttpError(error)
+      expect(partial).instanceOf(PartialWriteError)
+      expect(partial?.lineErrors).to.deep.equal([
+        {
+          lineNumber: 2,
+          errorMessage: 'bad value',
+          originalLine: 'm,t=a value=1',
+        },
+      ])
+    })
+    it('is created from single data object', () => {
+      const error = new HttpError(
+        400,
+        'Bad Request',
+        JSON.stringify({
+          error: 'parsing failed for write_lp endpoint',
+          data: {
+            error_message: 'bad value',
+            line_number: 2,
+            original_line: 'm,t=a value=1',
+          },
+        }),
+        'application/json'
+      )
+      const partial = PartialWriteError.fromHttpError(error)
+      expect(partial).instanceOf(PartialWriteError)
+      expect(partial?.lineErrors).to.have.length(1)
+    })
+    it('is not created for non-partial-write error', () => {
+      const error = new HttpError(
+        400,
+        'Bad Request',
+        JSON.stringify({
+          code: 'invalid',
+          message: 'write buffer error: line protocol parse failed: bad value',
+        }),
+        'application/json'
+      )
+      expect(PartialWriteError.fromHttpError(error)).to.equal(undefined)
     })
   })
 })

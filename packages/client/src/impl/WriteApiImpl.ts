@@ -9,7 +9,7 @@ import {
 import {Transport} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
-import {HttpError} from '../errors'
+import {HttpError, IllegalArgumentError, PartialWriteError} from '../errors'
 import {impl} from './implSelector'
 
 export default class WriteApiImpl implements WriteApi {
@@ -33,17 +33,20 @@ export default class WriteApiImpl implements WriteApi {
     let path: string
     const query: string[] = []
     if (org) query.push(`org=${encodeURIComponent(org)}`)
-    if (writeOptions.noSync) {
-      // Setting no_sync=true is supported only in the v3 API.
-      path = `/api/v3/write_lp`
-      query.push(`db=${encodeURIComponent(bucket)}`)
-      query.push(`precision=${precisionToV3ApiString(precision)}`)
-      query.push(`no_sync=true`)
-    } else {
-      // By default, use the v2 API.
+    if (writeOptions.useV2Api) {
       path = `/api/v2/write`
       query.push(`bucket=${encodeURIComponent(bucket)}`)
       query.push(`precision=${precisionToV2ApiString(precision)}`)
+    } else {
+      path = `/api/v3/write_lp`
+      query.push(`db=${encodeURIComponent(bucket)}`)
+      query.push(`precision=${precisionToV3ApiString(precision)}`)
+      if (writeOptions.noSync) {
+        query.push(`no_sync=true`)
+      }
+      if (writeOptions.acceptPartial === false) {
+        query.push(`accept_partial=false`)
+      }
     }
 
     return `${path}?${query.join('&')}`
@@ -74,6 +77,13 @@ export default class WriteApiImpl implements WriteApi {
       ...DEFAULT_WriteOptions,
       ...writeOptions,
     }
+    if (writeOptionsOrDefault.useV2Api && writeOptionsOrDefault.noSync) {
+      return Promise.reject(
+        new IllegalArgumentError(
+          'invalid write options: NoSync cannot be used in V2 API'
+        )
+      )
+    }
 
     let responseStatusCode: number | undefined
     let headers: Headers
@@ -96,19 +106,11 @@ export default class WriteApiImpl implements WriteApi {
           callbacks.complete()
           return
         }
-        if (
-          error instanceof HttpError &&
-          error.statusCode == 405 &&
-          writeOptionsOrDefault.noSync
-        ) {
-          error = new HttpError(
-            error.statusCode,
-            "Server doesn't support write with noSync=true " +
-              '(supported by InfluxDB 3 Core/Enterprise servers only).',
-            error.body,
-            error.contentType,
-            error.headers
-          )
+        if (error instanceof HttpError) {
+          const partialWriteError = PartialWriteError.fromHttpError(error)
+          if (partialWriteError) {
+            error = partialWriteError
+          }
         }
         Log.error(`Write to InfluxDB failed.`, error)
         reject(error)

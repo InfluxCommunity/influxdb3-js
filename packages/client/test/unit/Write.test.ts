@@ -3,6 +3,8 @@ import nock from 'nock' // WARN: nock must be imported before NodeHttpTransport,
 import {
   ClientOptions,
   HttpError,
+  IllegalArgumentError,
+  PartialWriteError,
   WriteOptions,
   Point,
   InfluxDBClient,
@@ -20,8 +22,10 @@ const clientOptions: ClientOptions = {
 const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v2/write?bucket=${DATABASE}&precision=ns`
+const WRITE_PATH_NS = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
 const WRITE_PATH_NS_V3_NO_SYNC = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&no_sync=true`
+const WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&accept_partial=false`
+const WRITE_PATH_NS_V2 = `/api/v2/write?bucket=${DATABASE}&precision=ns`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
@@ -324,7 +328,7 @@ describe('Write', () => {
       expect(universal).equals('substance')
       expect(particular).equals('attribute')
     })
-    it('calls v2 api if noSync is not provided', async () => {
+    it('calls v3 api by default', async () => {
       useSubject({})
       nock(clientOptions.host)
         .post(WRITE_PATH_NS)
@@ -338,7 +342,7 @@ describe('Write', () => {
       expect(logs.warn).to.length(0)
       expect(nock.isDone()).to.be.true
     })
-    it('calls v2 api if noSync=false', async () => {
+    it('calls v3 api if noSync=false', async () => {
       useSubject({
         noSync: false,
       })
@@ -370,14 +374,85 @@ describe('Write', () => {
       expect(logs.warn).to.length(0)
       expect(nock.isDone()).to.be.true
     })
-    it('fails if noSync=true but server supports only v2 api', async () => {
+    it('calls v3 api with accept_partial=false', async () => {
       useSubject({
-        noSync: true,
+        acceptPartial: false,
       })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V3_NO_SYNC)
+        .post(WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE)
         .reply(function (_uri) {
-          return [405, '']
+          return [204, {}]
+        })
+        .persist()
+
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+
+    it('calls v2 api if useV2Api=true', async () => {
+      useSubject({
+        useV2Api: true,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V2)
+        .reply(function (_uri) {
+          return [204, {}]
+        })
+        .persist()
+
+      await subject.write('test value=1', DATABASE)
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+
+    it('fails validation if useV2Api=true and noSync=true', async () => {
+      useSubject({
+        useV2Api: true,
+        noSync: true,
+      })
+
+      await subject
+        .write('test value=1', DATABASE)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).instanceOf(IllegalArgumentError)
+          expect(e.message).equals(
+            'invalid write options: NoSync cannot be used in V2 API'
+          )
+        })
+      expect(logs.error).to.length(0)
+      expect(logs.warn).to.length(0)
+    })
+
+    it('returns PartialWriteError for v3 partial write data array', async () => {
+      useSubject({})
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS)
+        .reply(function (_uri) {
+          return [
+            400,
+            JSON.stringify({
+              error: 'partial write of line protocol occurred',
+              data: [
+                {
+                  error_message:
+                    "invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::string",
+                  line_number: 2,
+                  original_line: 'home,room=Sunroom te',
+                },
+                {
+                  error_message:
+                    "invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::integer",
+                  line_number: 3,
+                  original_line: 'home,room=Sunroom te',
+                },
+              ],
+            }),
+            {'content-type': 'application/json'},
+          ]
         })
         .persist()
 
@@ -385,17 +460,78 @@ describe('Write', () => {
         .write('test value=1', DATABASE)
         .then(() => expect.fail('failure expected'))
         .catch((e) => {
-          expect(e).to.be.ok
+          expect(e).instanceOf(PartialWriteError)
+          expect(e.lineErrors).to.have.length(2)
         })
-      expect(logs.error).has.length(1)
-      expect(logs.error[0][0]).equals('Write to InfluxDB failed.')
-      expect(logs.error[0][1]).instanceOf(HttpError)
-      expect(logs.error[0][1].statusCode).equals(405)
-      expect(logs.error[0][1].message).contain(
-        `Server doesn't support write with noSync=true (supported by InfluxDB 3 Core/Enterprise servers only).`
-      )
+      expect(logs.error).to.length(1)
       expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
 
+    it('returns PartialWriteError for v3 write_lp parsing failed object data', async () => {
+      useSubject({
+        acceptPartial: false,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE)
+        .reply(function (_uri) {
+          return [
+            400,
+            JSON.stringify({
+              error: 'parsing failed for write_lp endpoint',
+              data: {
+                error_message:
+                  "invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::string",
+                line_number: 2,
+                original_line: 'home,room=Sunroom te',
+              },
+            }),
+            {'content-type': 'application/json'},
+          ]
+        })
+        .persist()
+
+      await subject
+        .write('test value=1', DATABASE)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).instanceOf(PartialWriteError)
+          expect(e.lineErrors).to.have.length(1)
+          expect(e.message).contains('parsing failed for write_lp endpoint')
+        })
+      expect(logs.error).to.length(1)
+      expect(logs.warn).to.length(0)
+      expect(nock.isDone()).to.be.true
+    })
+
+    it('returns HttpError for v2 compatibility with rejected write', async () => {
+      useSubject({
+        useV2Api: true,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V2)
+        .reply(function (_uri) {
+          return [
+            400,
+            JSON.stringify({
+              code: 'invalid',
+              message:
+                "write buffer error: line protocol parse failed: invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::string",
+            }),
+            {'content-type': 'application/json'},
+          ]
+        })
+        .persist()
+
+      await subject
+        .write('test value=1', DATABASE)
+        .then(() => expect.fail('failure expected'))
+        .catch((e) => {
+          expect(e).instanceOf(HttpError)
+          expect(e).not.instanceOf(PartialWriteError)
+        })
+      expect(logs.error).to.length(1)
+      expect(logs.warn).to.length(0)
       expect(nock.isDone()).to.be.true
     })
   })
