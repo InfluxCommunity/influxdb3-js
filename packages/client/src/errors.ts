@@ -54,7 +54,9 @@ function parseTypedLineErrors(
   return lineErrors.length > 0 ? lineErrors : undefined
 }
 
-function parseSingleLineError(data: unknown): PartialWriteLineError | undefined {
+function parseSingleLineError(
+  data: unknown
+): PartialWriteLineError | undefined {
   return toLineError(data)
 }
 
