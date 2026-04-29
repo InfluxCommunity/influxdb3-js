@@ -66,13 +66,6 @@ export default class WriteApiImpl implements WriteApi {
     if (lines.length <= 0 || (lines.length === 1 && lines[0] === ''))
       return Promise.resolve()
 
-    let resolve: (value: void | PromiseLike<void>) => void
-    let reject: (reason?: any) => void
-    const promise = new Promise<void>((res, rej) => {
-      resolve = res
-      reject = rej
-    })
-
     const writeOptionsOrDefault: WriteOptions = {
       ...DEFAULT_WriteOptions,
       ...writeOptions,
@@ -83,6 +76,13 @@ export default class WriteApiImpl implements WriteApi {
         'invalid write options: NoSync cannot be used in V2 API'
       )
     }
+
+    let resolve: (value: void | PromiseLike<void>) => void
+    let reject: (reason?: any) => void
+    const promise = new Promise<void>((res, rej) => {
+      resolve = res
+      reject = rej
+    })
 
     let responseStatusCode: number | undefined
     let headers: Headers
