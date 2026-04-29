@@ -196,7 +196,8 @@ export class PartialWriteError extends HttpError {
     message: string,
     readonly lineErrors: PartialWriteLineError[]
   ) {
-    super(statusCode, statusMessage, body, contentType, headers, message)
+    super(statusCode, statusMessage, body, contentType, headers)
+    this.message = message
     this.name = 'PartialWriteError'
     Object.setPrototypeOf(this, PartialWriteError.prototype)
   }
