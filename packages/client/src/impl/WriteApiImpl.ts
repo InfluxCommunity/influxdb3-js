@@ -73,7 +73,7 @@ export default class WriteApiImpl implements WriteApi {
 
     if (writeOptionsOrDefault.useV2Api && writeOptionsOrDefault.noSync) {
       throw new IllegalArgumentError(
-        'invalid write options: NoSync cannot be used in V2 API'
+        'invalid write options: noSync cannot be used with useV2Api'
       )
     }
 
