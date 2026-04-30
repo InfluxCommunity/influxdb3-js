@@ -328,84 +328,47 @@ describe('Write', () => {
       expect(universal).equals('substance')
       expect(particular).equals('attribute')
     })
-    it('calls v3 api by default', async () => {
-      useSubject({})
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
-        .reply(function (_uri) {
-          return [204, '', {'retry-after': '1'}]
-        })
-        .persist()
+    ;[
+      {
+        title: 'calls v3 api by default',
+        writeOptions: {},
+        path: WRITE_PATH_NS,
+      },
+      {
+        title: 'calls v3 api if noSync=false',
+        writeOptions: {noSync: false},
+        path: WRITE_PATH_NS,
+      },
+      {
+        title: 'calls v3 api if noSync=true',
+        writeOptions: {noSync: true},
+        path: WRITE_PATH_NS_V3_NO_SYNC,
+      },
+      {
+        title: 'calls v3 api with accept_partial=false',
+        writeOptions: {acceptPartial: false},
+        path: WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE,
+      },
+      {
+        title: 'calls v2 api if useV2Api=true',
+        writeOptions: {useV2Api: true},
+        path: WRITE_PATH_NS_V2,
+      },
+    ].forEach(({title, writeOptions, path}) => {
+      it(title, async () => {
+        useSubject(writeOptions)
+        nock(clientOptions.host)
+          .post(path)
+          .reply(function (_uri) {
+            return [204, {}]
+          })
+          .persist()
 
-      await subject.write('test value=1', DATABASE)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
-    })
-    it('calls v3 api if noSync=false', async () => {
-      useSubject({
-        noSync: false,
+        await subject.write('test value=1', DATABASE)
+        expect(logs.error).to.length(0)
+        expect(logs.warn).to.length(0)
+        expect(nock.isDone()).to.be.true
       })
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
-        .reply(function (_uri) {
-          return [204, '', {'retry-after': '1'}]
-        })
-        .persist()
-
-      await subject.write('test value=1', DATABASE)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
-    })
-    it('calls v3 api if noSync=true', async () => {
-      useSubject({
-        noSync: true,
-      })
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V3_NO_SYNC)
-        .reply(function (_uri) {
-          return [204, {}]
-        })
-        .persist()
-
-      await subject.write('test value=1', DATABASE)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
-    })
-    it('calls v3 api with accept_partial=false', async () => {
-      useSubject({
-        acceptPartial: false,
-      })
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE)
-        .reply(function (_uri) {
-          return [204, {}]
-        })
-        .persist()
-
-      await subject.write('test value=1', DATABASE)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
-    })
-
-    it('calls v2 api if useV2Api=true', async () => {
-      useSubject({
-        useV2Api: true,
-      })
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri) {
-          return [204, {}]
-        })
-        .persist()
-
-      await subject.write('test value=1', DATABASE)
-      expect(logs.error).to.length(0)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
     })
 
     it('fails validation if useV2Api=true and noSync=true', async () => {
