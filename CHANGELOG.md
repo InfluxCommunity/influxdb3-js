@@ -2,7 +2,7 @@
 
 ### Build
 
-1. [#766](https://github.com/InfluxCommunity/influxdb3-js/pull/766): Upgrade typescript to 6.0.3.
+1. [#775](https://github.com/InfluxCommunity/influxdb3-js/pull/775): Upgrade typescript to 6.0.3.
 
 ## 2.2.0 [2026-04-23]
 
