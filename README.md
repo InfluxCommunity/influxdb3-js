@@ -177,7 +177,9 @@ You can set it in client `writeOptions`, per-write options, or via
 connection/env (`writeUseV2Api`, `INFLUX_WRITE_USE_V2_API`).
 
 With `useV2Api`, `acceptPartial` is ignored and rejected writes return flat v2
-errors.
+errors. `noSync` cannot be used with `useV2Api`; this combination is rejected
+before request dispatch with:
+`invalid write options: noSync cannot be used with useV2Api`.
 
 ### Query data
 
