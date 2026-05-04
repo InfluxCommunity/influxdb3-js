@@ -77,6 +77,7 @@ describe('e2e test', () => {
         .setFloatField('max', max1)
         .setIntegerField('testId', testId)
       await client.write(point, database)
+      await sleep(500)
 
       const query = `SELECT *
                    FROM "stat"
@@ -142,6 +143,7 @@ describe('e2e test', () => {
           weathers,location=A temperature=0i,test_id="${time1}"
           weathers,location=B temperature=1i,test_id="${time2}"
           `)
+      await sleep(500)
       const query = `
       SELECT location, temperature, test_id
       FROM "weathers"
@@ -315,6 +317,7 @@ describe('e2e test', () => {
         `host15,tag=empty name="intel",mem_total=2048,disk_free=100i,temperature=100.86,isActive=true,testId="${testId}" ${time}`,
         database
       )
+      await sleep(500)
 
       const sql = `Select *
                  from host15

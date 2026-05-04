@@ -595,8 +595,12 @@ describe('NodeHttpTransport', () => {
       await waitForCondition(() => cancellable && resume)
       expect(spy.next.callCount).equals(1)
       cancellable?.cancel()
-      await waitForCondition(() => spy.complete.callCount == 1)
-    })
+      await waitForCondition(
+        () => spy.complete.callCount == 1,
+        'response is completed after cancel',
+        500
+      )
+    }).timeout(3_000)
     it(`is paused after the second chunk and then read fully`, async () => {
       let resume: (() => void) | undefined
       let chunkNumber = 0
