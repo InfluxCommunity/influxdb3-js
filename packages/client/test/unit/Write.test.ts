@@ -377,15 +377,24 @@ describe('Write', () => {
         noSync: true,
       })
 
-      await subject
-        .write('test value=1', DATABASE)
-        .then(() => expect.fail('failure expected'))
-        .catch((e) => {
-          expect(e).instanceOf(IllegalArgumentError)
-          expect(e.message).equals(
-            'invalid write options: noSync cannot be used with useV2Api'
-          )
-        })
+      const cases = [
+        {title: 'non-empty payload', payload: 'test value=1'},
+        {title: 'empty string payload', payload: ''},
+        {title: 'empty array payload', payload: [] as string[]},
+      ]
+
+      for (const c of cases) {
+        await subject
+          .write(c.payload, DATABASE)
+          .then(() => expect.fail(`failure expected for ${c.title}`))
+          .catch((e) => {
+            expect(e).instanceOf(IllegalArgumentError)
+            expect(e.message).equals(
+              'invalid write options: noSync cannot be used with useV2Api'
+            )
+          })
+      }
+
       expect(logs.error).to.length(0)
       expect(logs.warn).to.length(0)
     })
