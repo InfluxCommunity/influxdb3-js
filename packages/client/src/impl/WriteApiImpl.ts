@@ -108,7 +108,8 @@ export default class WriteApiImpl implements WriteApi {
           return
         }
         if (error instanceof HttpError) {
-          if (responseStatusCode === 405 && !writeOptionsOrDefault.useV2Api) {
+          const statusCode = responseStatusCode ?? error.statusCode
+          if (statusCode === 405 && !writeOptionsOrDefault.useV2Api) {
             error.message =
               "Server doesn't support v3 write API. Set useV2Api=true for v2 compatibility endpoint."
           }
