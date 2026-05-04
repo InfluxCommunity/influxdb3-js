@@ -92,6 +92,9 @@ export class AbortController {
     addEventListener: (type: string, listener: () => void): void => {
       this._listeners.push(listener)
     },
+    removeEventListener: (type: string, listener: () => void): void => {
+      this._listeners = this._listeners.filter((x) => x !== listener)
+    },
   }
   constructor(aborted = false) {
     this.signal.aborted = aborted
@@ -141,7 +144,7 @@ export function removeFetchApi(): void {
     beforeEmulation = undefined
     const globalVars = global as any
     globalVars.fetch = fetch
-    globalVars.abortController = abortController
+    globalVars.AbortController = abortController
     globalVars.textEncoder = textEncoder
   }
 }
