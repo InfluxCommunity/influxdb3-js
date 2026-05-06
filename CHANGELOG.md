@@ -1,5 +1,11 @@
 ## 2.3.0 [unreleased]
 
+### Breaking Changes
+
+1. [#773](https://github.com/InfluxCommunity/influxdb3-js/pull/773): Adds partial write support and aligns write routing with v3 defaults.
+   See [Partial writes](https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/#partial-writes) for more.
+   For InfluxDB Clustered, set `useV2Api: true` for writes.
+
 ### Build
 
 1. [#775](https://github.com/InfluxCommunity/influxdb3-js/pull/775): Upgrade typescript to 6.0.3.

@@ -159,6 +159,28 @@ await client.write(point, database, undefined, {
 })
 ```
 
+#### Accept partial writes and inspect failed lines
+
+Partial writes are enabled by default.
+Configure `acceptPartial` using client `writeOptions`, per-write options, or
+connection/env (`writeAcceptPartial`, `INFLUX_WRITE_ACCEPT_PARTIAL`).
+
+When only part of a v3 write request is rejected, the client throws
+`PartialWriteError` with structured `lineErrors`.
+If partial writes are disabled (`acceptPartial: false`), a rejected line causes
+the whole batch to be rejected.
+
+#### Compatibility with InfluxDB Clustered
+
+Set `useV2Api: true` to write through the v2 compatibility endpoint.
+You can set it in client `writeOptions`, per-write options, or via
+connection/env (`writeUseV2Api`, `INFLUX_WRITE_USE_V2_API`).
+
+With `useV2Api`, `acceptPartial` is ignored and rejected writes return flat v2
+errors. `noSync` cannot be used with `useV2Api`; this combination is rejected
+before request dispatch with:
+`invalid write options: noSync cannot be used with useV2Api`.
+
 ### Query data
 
 To query data stored in InfluxDB, call `client.query` with an SQL query and the database (or bucket) name. To change to using InfluxQL add a QueryOptions object with the type 'influxql' (e.g. `client.query(query, database, { type: 'influxql'})`).

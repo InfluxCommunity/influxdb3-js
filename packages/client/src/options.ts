@@ -108,6 +108,21 @@ export interface WriteOptions {
    * Default value: false.
    */
   noSync?: boolean
+  /**
+   * Allow partial success when some lines in a write batch are rejected.
+   *
+   * Default value: true.
+   */
+  acceptPartial?: boolean
+  /**
+   * Use the v2 compatibility write endpoint.
+   *
+   * This is intended for InfluxDB Clustered compatibility mode.
+   * When enabled, writes use /api/v2/write and ignore acceptPartial.
+   *
+   * Default value: false.
+   */
+  useV2Api?: boolean
   /** default tags
    *
    * @example Default tags using client config
@@ -161,6 +176,8 @@ export const DEFAULT_WriteOptions: WriteOptions = {
   precision: 'ns',
   gzipThreshold: 1000,
   noSync: false,
+  acceptPartial: true,
+  useV2Api: false,
 }
 
 export type QueryType = 'sql' | 'influxql'
@@ -224,6 +241,13 @@ export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
  * Parses connection string into `ClientOptions`.
  * @param connectionString - connection string
  */
+function ensureWriteOptions(options: ClientOptions): WriteOptions {
+  if (!options.writeOptions) {
+    options.writeOptions = {} as WriteOptions
+  }
+  return options.writeOptions as WriteOptions
+}
+
 export function fromConnectionString(connectionString: string): ClientOptions {
   if (!connectionString) {
     throw Error('Connection string not set!')
@@ -248,21 +272,28 @@ export function fromConnectionString(connectionString: string): ClientOptions {
     options.timeout = parseInt(url.searchParams.get('timeout') as string)
   }
   if (url.searchParams.has('precision')) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = parsePrecision(
+    ensureWriteOptions(options).precision = parsePrecision(
       url.searchParams.get('precision') as string
     )
   }
   if (url.searchParams.has('gzipThreshold')) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.gzipThreshold = parseInt(
+    ensureWriteOptions(options).gzipThreshold = parseInt(
       url.searchParams.get('gzipThreshold') as string
     )
   }
   if (url.searchParams.has('writeNoSync')) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.noSync = parseBoolean(
+    ensureWriteOptions(options).noSync = parseBoolean(
       url.searchParams.get('writeNoSync') as string
+    )
+  }
+  if (url.searchParams.has('writeAcceptPartial')) {
+    ensureWriteOptions(options).acceptPartial = parseBoolean(
+      url.searchParams.get('writeAcceptPartial') as string
+    )
+  }
+  if (url.searchParams.has('writeUseV2Api')) {
+    ensureWriteOptions(options).useV2Api = parseBoolean(
+      url.searchParams.get('writeUseV2Api') as string
     )
   }
 
@@ -295,20 +326,29 @@ export function fromEnv(): ClientOptions {
     options.timeout = parseInt(process.env.INFLUX_TIMEOUT.trim())
   }
   if (process.env.INFLUX_PRECISION) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.precision = parsePrecision(
+    ensureWriteOptions(options).precision = parsePrecision(
       process.env.INFLUX_PRECISION as string
     )
   }
   if (process.env.INFLUX_GZIP_THRESHOLD) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.gzipThreshold = parseInt(
+    ensureWriteOptions(options).gzipThreshold = parseInt(
       process.env.INFLUX_GZIP_THRESHOLD
     )
   }
   if (process.env.INFLUX_WRITE_NO_SYNC) {
-    if (!options.writeOptions) options.writeOptions = {} as WriteOptions
-    options.writeOptions.noSync = parseBoolean(process.env.INFLUX_WRITE_NO_SYNC)
+    ensureWriteOptions(options).noSync = parseBoolean(
+      process.env.INFLUX_WRITE_NO_SYNC
+    )
+  }
+  if (process.env.INFLUX_WRITE_ACCEPT_PARTIAL) {
+    ensureWriteOptions(options).acceptPartial = parseBoolean(
+      process.env.INFLUX_WRITE_ACCEPT_PARTIAL
+    )
+  }
+  if (process.env.INFLUX_WRITE_USE_V2_API) {
+    ensureWriteOptions(options).useV2Api = parseBoolean(
+      process.env.INFLUX_WRITE_USE_V2_API
+    )
   }
   if (process.env.INFLUX_GRPC_OPTIONS) {
     const optionSets = process.env.INFLUX_GRPC_OPTIONS.split(',')
