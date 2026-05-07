@@ -237,10 +237,6 @@ export interface ClientOptions extends ConnectionOptions {
  */
 export type WritePrecision = 'ns' | 'us' | 'ms' | 's'
 
-/**
- * Parses connection string into `ClientOptions`.
- * @param connectionString - connection string
- */
 function ensureWriteOptions(options: ClientOptions): WriteOptions {
   if (!options.writeOptions) {
     options.writeOptions = {} as WriteOptions
@@ -248,6 +244,10 @@ function ensureWriteOptions(options: ClientOptions): WriteOptions {
   return options.writeOptions as WriteOptions
 }
 
+/**
+ * Parses connection string into `ClientOptions`.
+ * @param connectionString - connection string
+ */
 export function fromConnectionString(connectionString: string): ClientOptions {
   if (!connectionString) {
     throw Error('Connection string not set!')
