@@ -601,8 +601,12 @@ describe('FetchTransport', () => {
         },
         spy
       )
-      // wait for resume being called
-      await waitForCondition(() => cancellable && resume)
+      // wait for resume/cancellable hooks to be wired (can be slower under CI load)
+      await waitForCondition(
+        () => cancellable && resume,
+        'resume and cancellable are set',
+        1000
+      )
       expect(spy.next.callCount).equals(1)
       cancellable?.cancel()
     })

@@ -459,11 +459,43 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
-    it('is created with precision, gzip threshold and writeNoSync', () => {
+    it('creates instance with acceptPartial=false', () => {
       expect(
         (
           new InfluxDBClient(
-            'https://localhost:8086?token=my-token&precision=us&gzipThreshold=128&writeNoSync=true'
+            'https://localhost:8086?token=my-token&writeAcceptPartial=false'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          acceptPartial: false,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with useV2Api=true', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&writeUseV2Api=true'
+          ) as any
+        )._options
+      ).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          useV2Api: true,
+        } as WriteOptions,
+      })
+    })
+    it('is created with precision, gzip threshold, writeNoSync, writeAcceptPartial and writeUseV2Api', () => {
+      expect(
+        (
+          new InfluxDBClient(
+            'https://localhost:8086?token=my-token&precision=us&gzipThreshold=128&writeNoSync=true&writeAcceptPartial=false&writeUseV2Api=true'
           ) as any
         )._options
       ).to.deep.equal({
@@ -474,6 +506,8 @@ at 'ClientOptions.database'
           precision: 'us' as WritePrecision,
           gzipThreshold: 128,
           noSync: true,
+          acceptPartial: false,
+          useV2Api: true,
         } as WriteOptions,
       })
     })
@@ -489,6 +523,8 @@ at 'ClientOptions.database'
       delete process.env['INFLUX_PRECISION']
       delete process.env['INFLUX_GZIP_THRESHOLD']
       delete process.env['INFLUX_WRITE_NO_SYNC']
+      delete process.env['INFLUX_WRITE_ACCEPT_PARTIAL']
+      delete process.env['INFLUX_WRITE_USE_V2_API']
       delete process.env['INFLUX_GRPC_OPTIONS']
     }
     it('fails on missing host', () => {
@@ -644,13 +680,43 @@ at 'ClientOptions.database'
         } as WriteOptions,
       })
     })
-    it('is created with host, token, precision, gzip threshold and write-no-sync', () => {
+    it('creates instance with acceptPartial=false', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_WRITE_ACCEPT_PARTIAL'] = 'false'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          acceptPartial: false,
+        } as WriteOptions,
+      })
+    })
+    it('creates instance with useV2Api=true', () => {
+      clear()
+      process.env['INFLUX_HOST'] = 'https://localhost:8086'
+      process.env['INFLUX_TOKEN'] = 'my-token'
+      process.env['INFLUX_WRITE_USE_V2_API'] = 'true'
+      expect((new InfluxDBClient() as any)._options).to.deep.equal({
+        ...DEFAULT_ConnectionOptions,
+        host: 'https://localhost:8086',
+        token: 'my-token',
+        writeOptions: {
+          useV2Api: true,
+        } as WriteOptions,
+      })
+    })
+    it('is created with host, token, precision, gzip threshold, write-no-sync, write-accept-partial and write-use-v2-api', () => {
       clear()
       process.env['INFLUX_HOST'] = 'https://localhost:8086'
       process.env['INFLUX_TOKEN'] = 'my-token'
       process.env['INFLUX_PRECISION'] = 'us'
       process.env['INFLUX_GZIP_THRESHOLD'] = '128'
       process.env['INFLUX_WRITE_NO_SYNC'] = 'true'
+      process.env['INFLUX_WRITE_ACCEPT_PARTIAL'] = 'false'
+      process.env['INFLUX_WRITE_USE_V2_API'] = 'true'
       expect((new InfluxDBClient() as any)._options).to.deep.equal({
         ...DEFAULT_ConnectionOptions,
         host: 'https://localhost:8086',
@@ -659,6 +725,8 @@ at 'ClientOptions.database'
           precision: 'us' as WritePrecision,
           gzipThreshold: 128,
           noSync: true,
+          acceptPartial: false,
+          useV2Api: true,
         } as WriteOptions,
       })
     })
@@ -809,7 +877,7 @@ at 'ClientOptions.database'
       let special: any
       let oneOff: any
       nock('http://test:8086')
-        .post(`/api/v2/write?bucket=${DATABASE}&precision=ns`)
+        .post(`/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`)
         .reply(
           204,
           function (_uri, _body, callback) {

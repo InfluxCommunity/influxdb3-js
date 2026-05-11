@@ -131,6 +131,13 @@ jobs:
       - checkout
       - init-dependencies
       - run:
+          name: Setup InfluxDB service
+          command: |
+            ./scripts/influxdb-setup.sh \
+              --export-url-as TESTING_INFLUXDB_URL \
+              --export-db-as TESTING_INFLUXDB_DATABASE \
+              --export-token-as TESTING_INFLUXDB_TOKEN
+      - run:
           name: Runs tests with coverage
           command: |
             yarn --version
