@@ -151,7 +151,6 @@ describe('Write', () => {
           const now = new Date()
           nock(clientOptions.host)
             .post(test.writePath)
-            .delay(1000)
             .reply(function (_uri, _requestBody) {
               expect(_uri.includes(`precision=${test.expectedPrecisionParam}`))
                 .true

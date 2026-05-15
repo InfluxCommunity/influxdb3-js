@@ -48,7 +48,8 @@ export const writableDataToLineProtocol = (
     ? (arrayData as string[])
     : (arrayData as Point[])
         .map((p) => {
-          return p.getTimestamp() instanceof Date
+          return p.getTimestamp() instanceof Date ||
+            p.getTimestamp() === undefined
             ? p.toLineProtocol(precision, defaultTags, tagOrder)
             : p.toLineProtocol(undefined, defaultTags, tagOrder)
         })
