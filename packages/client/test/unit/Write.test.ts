@@ -4,13 +4,13 @@ import {
   ClientOptions,
   HttpError,
   IllegalArgumentError,
-  PartialWriteError,
-  WriteOptions,
-  Point,
   InfluxDBClient,
+  PartialWriteError,
+  Point,
+  WriteOptions,
   WritePrecision,
 } from '../../src'
-import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
+import {CollectedLogs, collectLogging, unhandledRejections} from '../util'
 import zlib from 'zlib'
 import {rejects} from 'assert'
 import {isDefined} from '../../src/util/common'
@@ -88,6 +88,205 @@ describe('Write', () => {
         )
       )
     })
+    it('when timestamp == new Date(), precision == ns', async () => {
+      const tests = [
+        {
+          writePath: `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`,
+          writeOptions: {
+            precision: 'ns',
+          },
+        },
+        {
+          writePath: `/api/v2/write?bucket=${DATABASE}&precision=ns`,
+          writeOptions: {
+            precision: 'ns',
+            useV2Api: true,
+          },
+        },
+      ]
+
+      for (const test of tests) {
+        const now = new Date()
+        nock(clientOptions.host)
+          .post(test.writePath)
+          .delay(1000)
+          .reply(function (_uri, _requestBody) {
+            if (test.writeOptions.useV2Api === true) {
+              expect(_uri.includes('precision=ns')).true
+            } else {
+              expect(_uri.includes('precision=nanosecond')).true
+            }
+
+            const time = _requestBody.split(' ')[2]
+            expect(time).equals((now.getTime() * 1_000_000).toString())
+            return [200, '', {}]
+          })
+          .persist()
+
+        const option: ClientOptions = {
+          ...clientOptions,
+          writeOptions: {
+            precision: test.writeOptions.precision as WritePrecision,
+            useV2Api: test.writeOptions.useV2Api,
+          },
+        }
+        const client: InfluxDBClient = new InfluxDBClient(option)
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1).setTimestamp(now),
+          DATABASE
+        )
+      }
+    }).timeout(5000)
+
+    it('when timestamp == new Date(), precision == us', async () => {
+      const tests = [
+        {
+          writePath: `/api/v3/write_lp?db=${DATABASE}&precision=microsecond`,
+          writeOptions: {
+            precision: 'us',
+          },
+        },
+        {
+          writePath: `/api/v2/write?bucket=${DATABASE}&precision=us`,
+          writeOptions: {
+            precision: 'us',
+            useV2Api: true,
+          },
+        },
+      ]
+
+      for (const test of tests) {
+        const now = new Date()
+        nock(clientOptions.host)
+          .post(test.writePath)
+          .delay(1000)
+          .reply(function (_uri, _requestBody) {
+            if (test.writeOptions.useV2Api === true) {
+              expect(_uri.includes('precision=us')).true
+            } else {
+              expect(_uri.includes('precision=microsecond')).true
+            }
+
+            const time = _requestBody.split(' ')[2]
+            expect(time).equals((now.getTime() * 1_000).toString())
+            return [200, '', {}]
+          })
+          .persist()
+
+        const option: ClientOptions = {
+          ...clientOptions,
+          writeOptions: {
+            precision: test.writeOptions.precision as WritePrecision,
+            useV2Api: test.writeOptions.useV2Api,
+          },
+        }
+        const client: InfluxDBClient = new InfluxDBClient(option)
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1).setTimestamp(now),
+          DATABASE
+        )
+      }
+    }).timeout(5000)
+
+    it('when timestamp == new Date(), precision == ms', async () => {
+      const tests = [
+        {
+          writePath: `/api/v3/write_lp?db=${DATABASE}&precision=millisecond`,
+          writeOptions: {
+            precision: 'ms',
+          },
+        },
+        {
+          writePath: `/api/v2/write?bucket=${DATABASE}&precision=ms`,
+          writeOptions: {
+            precision: 'ms',
+            useV2Api: true,
+          },
+        },
+      ]
+
+      for (const test of tests) {
+        const now = new Date()
+        nock(clientOptions.host)
+          .post(test.writePath)
+          .delay(1000)
+          .reply(function (_uri, _requestBody) {
+            if (test.writeOptions.useV2Api === true) {
+              expect(_uri.includes('precision=ms')).true
+            } else {
+              expect(_uri.includes('precision=millisecond')).true
+            }
+
+            const time = _requestBody.split(' ')[2]
+            expect(time).equals(now.getTime().toString())
+            return [200, '', {}]
+          })
+          .persist()
+
+        const option: ClientOptions = {
+          ...clientOptions,
+          writeOptions: {
+            precision: test.writeOptions.precision as WritePrecision,
+            useV2Api: test.writeOptions.useV2Api,
+          },
+        }
+        const client: InfluxDBClient = new InfluxDBClient(option)
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1).setTimestamp(now),
+          DATABASE
+        )
+      }
+    }).timeout(5000)
+
+    it('when timestamp == new Date(), precision == s', async () => {
+      const tests = [
+        {
+          writePath: `/api/v3/write_lp?db=${DATABASE}&precision=second`,
+          writeOptions: {
+            precision: 's',
+          },
+        },
+        {
+          writePath: `/api/v2/write?bucket=${DATABASE}&precision=s`,
+          writeOptions: {
+            precision: 's',
+            useV2Api: true,
+          },
+        },
+      ]
+
+      for (const test of tests) {
+        const now = new Date()
+        nock(clientOptions.host)
+          .post(test.writePath)
+          .delay(1000)
+          .reply(function (_uri, _requestBody) {
+            if (test.writeOptions.useV2Api === true) {
+              expect(_uri.includes('precision=s')).true
+            } else {
+              expect(_uri.includes('precision=second')).true
+            }
+
+            const time = _requestBody.split(' ')[2]
+            expect(time).equals(Math.floor(now.getTime() / 1000).toString())
+            return [200, '', {}]
+          })
+          .persist()
+
+        const option: ClientOptions = {
+          ...clientOptions,
+          writeOptions: {
+            precision: test.writeOptions.precision as WritePrecision,
+            useV2Api: test.writeOptions.useV2Api,
+          },
+        }
+        const client: InfluxDBClient = new InfluxDBClient(option)
+        await client.write(
+          Point.measurement('test').setFloatField('value', 1).setTimestamp(now),
+          DATABASE
+        )
+      }
+    }).timeout(5000)
   })
 
   describe('usage of server API', () => {

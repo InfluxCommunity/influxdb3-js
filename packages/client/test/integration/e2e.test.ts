@@ -7,6 +7,7 @@ import {
   PartialWriteError,
   Point,
   PointValues,
+  WritePrecision,
 } from '../../src'
 import {rejects} from 'assert'
 import * as http from 'node:http'
@@ -660,6 +661,38 @@ describe('e2e test', () => {
         await client.close()
       }
     }).timeout(10_000)
+
+    it('successful writes when timestamp = new Date()', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        token,
+      })
+
+      const tests = [
+        {precision: 'ns'},
+        {precision: 'us'},
+        {precision: 'ms'},
+        {precision: 's'},
+      ]
+
+      for (const test of tests) {
+        try {
+          const point = Point.measurement('stat')
+            .setFloatField('avg', 1.2)
+            .setTimestamp(new Date())
+          await client.write(point, database, undefined, {
+            precision: test.precision as WritePrecision,
+          })
+          await client.write(point, database, undefined, {
+            precision: test.precision as WritePrecision,
+            useV2Api: true,
+          })
+        } catch (e: Error | any) {
+          expect.fail(e)
+        }
+      }
+    }).timeout(15_000)
   })
   describe('with node http', () => {
     const port = 65535

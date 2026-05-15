@@ -1,5 +1,6 @@
 import {Point} from '../Point'
 import {isArrayLike, isDefined} from './common'
+import {WritePrecision} from '../options'
 
 /**
  * The `WritableData` type represents different types of data that can be written.
@@ -14,7 +15,8 @@ export type WritableData = ArrayLike<string> | ArrayLike<Point> | string | Point
 export const writableDataToLineProtocol = (
   data: WritableData,
   defaultTags?: {[key: string]: string},
-  tagOrder?: string[]
+  tagOrder?: string[],
+  precision?: WritePrecision
 ): string[] => {
   const arrayData = (
     isArrayLike(data) && typeof data !== 'string'
@@ -28,6 +30,10 @@ export const writableDataToLineProtocol = (
   return isLine
     ? (arrayData as string[])
     : (arrayData as Point[])
-        .map((p) => p.toLineProtocol(undefined, defaultTags, tagOrder))
+        .map((p) => {
+          return p.getTimestamp() instanceof Date
+            ? p.toLineProtocol(precision, defaultTags, tagOrder)
+            : p.toLineProtocol(undefined, defaultTags, tagOrder)
+        })
         .filter(isDefined)
 }
