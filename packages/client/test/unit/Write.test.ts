@@ -149,13 +149,13 @@ describe('Write', () => {
 
         for (const test of tests) {
           const now = new Date()
+          let uri = ''
+          let timestamp = ''
           nock(clientOptions.host)
             .post(test.writePath)
             .reply(function (_uri, _requestBody) {
-              expect(_uri.includes(`precision=${test.expectedPrecisionParam}`))
-                .true
-              const time = _requestBody.split(' ')[2]
-              expect(time).equals(expectedTimestamp(now))
+              uri = _uri
+              timestamp = _requestBody.split(' ')[2]
               return [200, '', {}]
             })
             .persist()
@@ -173,6 +173,9 @@ describe('Write', () => {
               .setTimestamp(now),
             DATABASE
           )
+
+          expect(uri.includes(`precision=${test.expectedPrecisionParam}`)).true
+          expect(timestamp).equals(expectedTimestamp(now))
         }
       }
     }).timeout(20000)
