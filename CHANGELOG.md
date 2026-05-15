@@ -6,6 +6,10 @@
    See [Partial writes](https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/#partial-writes) for more.
    For InfluxDB Clustered, set `useV2Api: true` for writes.
 
+### Features
+
+1. [#790](https://github.com/InfluxCommunity/influxdb3-js/pull/790): When setting Point timestamp to `new Date()`, the timestamp sent to the servers will be converted to the precision set in `WriteOptions`.
+
 ### Build
 
 1. [#775](https://github.com/InfluxCommunity/influxdb3-js/pull/775): Upgrade typescript to 6.0.3.

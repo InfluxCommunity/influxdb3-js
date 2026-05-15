@@ -4,13 +4,13 @@ import {
   ClientOptions,
   HttpError,
   IllegalArgumentError,
-  PartialWriteError,
-  WriteOptions,
-  Point,
   InfluxDBClient,
+  PartialWriteError,
+  Point,
+  WriteOptions,
   WritePrecision,
 } from '../../src'
-import {collectLogging, CollectedLogs, unhandledRejections} from '../util'
+import {CollectedLogs, collectLogging, unhandledRejections} from '../util'
 import zlib from 'zlib'
 import {rejects} from 'assert'
 import {isDefined} from '../../src/util/common'
@@ -88,6 +88,97 @@ describe('Write', () => {
         )
       )
     })
+
+    it('when timestamp == new Date()', async () => {
+      const timestampPrecisionCases: Array<{
+        precision: WritePrecision
+        v3PrecisionParam: string
+        v2PrecisionParam: string
+        expectedTimestamp: (date: Date) => string
+      }> = [
+        {
+          precision: 'ns',
+          v3PrecisionParam: 'nanosecond',
+          v2PrecisionParam: 'ns',
+          expectedTimestamp: (date: Date) => `${date.getTime()}000000`,
+        },
+        {
+          precision: 'us',
+          v3PrecisionParam: 'microsecond',
+          v2PrecisionParam: 'us',
+          expectedTimestamp: (date: Date) => `${date.getTime()}000`,
+        },
+        {
+          precision: 'ms',
+          v3PrecisionParam: 'millisecond',
+          v2PrecisionParam: 'ms',
+          expectedTimestamp: (date: Date) => date.getTime().toString(),
+        },
+        {
+          precision: 's',
+          v3PrecisionParam: 'second',
+          v2PrecisionParam: 's',
+          expectedTimestamp: (date: Date) =>
+            Math.floor(date.getTime() / 1000).toString(),
+        },
+      ]
+
+      for (const {
+        precision,
+        v3PrecisionParam,
+        v2PrecisionParam,
+        expectedTimestamp,
+      } of timestampPrecisionCases) {
+        const tests = [
+          {
+            writePath: `/api/v3/write_lp?db=${DATABASE}&precision=${v3PrecisionParam}`,
+            expectedPrecisionParam: v3PrecisionParam,
+            writeOptions: {
+              precision,
+            },
+          },
+          {
+            writePath: `/api/v2/write?bucket=${DATABASE}&precision=${v2PrecisionParam}`,
+            expectedPrecisionParam: v2PrecisionParam,
+            writeOptions: {
+              precision,
+              useV2Api: true,
+            },
+          },
+        ]
+
+        for (const test of tests) {
+          const now = new Date()
+          let uri = ''
+          let timestamp = ''
+          nock(clientOptions.host)
+            .post(test.writePath)
+            .reply(function (_uri, _requestBody) {
+              uri = _uri
+              timestamp = _requestBody.split(' ')[2]
+              return [200, '', {}]
+            })
+            .persist()
+          const option: ClientOptions = {
+            ...clientOptions,
+            writeOptions: {
+              precision: test.writeOptions.precision,
+              useV2Api: test.writeOptions.useV2Api,
+            },
+          }
+          const client: InfluxDBClient = new InfluxDBClient(option)
+          await client.write(
+            Point.measurement('test')
+              .setFloatField('value', 1)
+              .setTimestamp(now),
+            DATABASE
+          )
+
+          expect(uri.includes(`precision=${test.expectedPrecisionParam}`)).true
+          expect(timestamp).equals(expectedTimestamp(now))
+        }
+      }
+    }).timeout(20000)
   })
 
   describe('usage of server API', () => {
