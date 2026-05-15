@@ -11,7 +11,20 @@ import {WritePrecision} from '../options'
  * - `string`: Represents lines of the [Line Protocol](https://bit.ly/2QL99fu).
  */
 export type WritableData = ArrayLike<string> | ArrayLike<Point> | string | Point
-
+/**
+ * Convert `WritableData` to an array of lines of [Line Protocol](https://bit.ly/2QL99fu)).
+ * If the data is an array of `Point` objects, it will be converted to lines of Line Protocol.
+ * If the data is a single `Point` object, it will be converted to a single line of Line Protocol.
+ * If the data is an array of lines of Line Protocol, it will be returned as is.
+ *
+ * @param data - data to write
+ * @param defaultTags - the default tags to apply to all points.
+ * @param tagOrder - preferred order of tags in line protocol serialization.
+ * Tags listed here are written first, in the same order.
+ * The remaining tags are appended in lexicographical order.
+ * This helps control first-write column order in InfluxDB 3.
+ * @param precision - the writing precision
+ */
 export const writableDataToLineProtocol = (
   data: WritableData,
   defaultTags?: {[key: string]: string},
