@@ -693,6 +693,38 @@ describe('e2e test', () => {
         }
       }
     }).timeout(15_000)
+
+    it('successful writes when timestamp = undefined', async () => {
+      const {database, token, url} = getEnvVariables()
+      const client = new InfluxDBClient({
+        host: url,
+        token,
+      })
+
+      const tests = [
+        {precision: 'ns'},
+        {precision: 'us'},
+        {precision: 'ms'},
+        {precision: 's'},
+      ]
+
+      for (const test of tests) {
+        try {
+          const point = Point.measurement('stat')
+            .setFloatField('avg', 1.2)
+            .setTimestamp(undefined)
+          await client.write(point, database, undefined, {
+            precision: test.precision as WritePrecision,
+          })
+          await client.write(point, database, undefined, {
+            precision: test.precision as WritePrecision,
+            useV2Api: true,
+          })
+        } catch (e: Error | any) {
+          expect.fail(e)
+        }
+      }
+    }).timeout(15_000)
   })
   describe('with node http', () => {
     const port = 65535
