@@ -1,14 +1,12 @@
 ## 2.3.0 [unreleased]
 
-### Breaking Changes
-
-1. [#773](https://github.com/InfluxCommunity/influxdb3-js/pull/773): Adds partial write support and aligns write routing with v3 defaults.
-   See [Partial writes](https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/#partial-writes) for more.
-   For InfluxDB Clustered, set `useV2Api: true` for writes.
-
 ### Features
 
 1. [#790](https://github.com/InfluxCommunity/influxdb3-js/pull/790): When setting Point timestamp to `new Date()`, the timestamp sent to the servers will be converted to the precision set in `WriteOptions`.
+2. [#796](https://github.com/InfluxCommunity/influxdb3-js/pull/796): Adds partial write support and API endpoint selection for writes.
+   - Writes use the V2 API endpoint by default.
+   - `noSync` requires the V3 API endpoint; `acceptPartial` applies only to the V3 API endpoint and is ignored when using the V2 API endpoint.
+   - See [Partial writes](https://docs.influxdata.com/influxdb3/core/write-data/http-api/v3-write-lp/#partial-writes) for more.
 
 ### Build
 
