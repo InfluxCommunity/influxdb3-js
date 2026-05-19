@@ -104,7 +104,7 @@ describe('errors', () => {
         data: [{line_number: 2}],
       })
       expect(new HttpError(400, 'Bad Request', body).message).equals(
-        'partial write of line protocol occurred'
+        'partial write of line protocol occurred:\n\t{"line_number":2}'
       )
     })
     it('verifies v3 write error message includes details', () => {
@@ -133,7 +133,16 @@ describe('errors', () => {
         data: ['bad line', true, null],
       })
       expect(new HttpError(400, 'Bad Request', body).message).equals(
-        'partial write of line protocol occurred:\n\tbad line\n\ttrue'
+        'partial write of line protocol occurred:\n\t"bad line"\n\ttrue'
+      )
+    })
+    it('formats line_number without original_line', () => {
+      const body = JSON.stringify({
+        error: 'partial write of line protocol occurred',
+        data: [{error_message: 'bad line', line_number: 3}],
+      })
+      expect(new HttpError(400, 'Bad Request', body).message).equals(
+        'partial write of line protocol occurred:\n\tline 3: bad line'
       )
     })
   })
@@ -199,6 +208,21 @@ describe('errors', () => {
             lineNumber: 2,
             errorMessage: 'bad value',
             originalLine: 'm,t=a value=1',
+          },
+        ],
+      },
+      {
+        title: 'is created from object with error_message and line_number only',
+        body: {
+          error: 'partial write of line protocol occurred',
+          data: {error_message: 'bad value', line_number: 3},
+        },
+        expectPartial: true,
+        expectedLineErrors: [
+          {
+            lineNumber: 3,
+            errorMessage: 'bad value',
+            originalLine: '',
           },
         ],
       },

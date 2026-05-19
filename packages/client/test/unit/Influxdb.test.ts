@@ -877,7 +877,7 @@ at 'ClientOptions.database'
       let special: any
       let oneOff: any
       nock('http://test:8086')
-        .post(`/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`)
+        .post(`/api/v2/write?bucket=${DATABASE}&precision=ns`)
         .reply(
           204,
           function (_uri, _body, callback) {

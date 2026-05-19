@@ -580,7 +580,7 @@ describe('e2e test', () => {
       expect(count).to.be.greaterThan(0)
     }).timeout(7_000)
 
-    it('reports partial write details when acceptPartial=true (default)', async () => {
+    it('reports partial write details when useV2Api=false and acceptPartial=true', async () => {
       const {database, token, url} = getEnvVariables()
       const client = new InfluxDBClient({
         host: url,
@@ -594,7 +594,7 @@ describe('e2e test', () => {
       ].join('\n')
 
       try {
-        await client.write(lp, database)
+        await client.write(lp, database, undefined, {useV2Api: false})
         expect.fail('failure expected')
       } catch (e: any) {
         expect(e).instanceOf(PartialWriteError)
@@ -622,6 +622,7 @@ describe('e2e test', () => {
 
       try {
         await client.write(lp, database, undefined, {
+          useV2Api: false,
           acceptPartial: false,
         })
         expect.fail('failure expected')
@@ -635,7 +636,7 @@ describe('e2e test', () => {
       }
     }).timeout(10_000)
 
-    it('uses v2 compatibility endpoint and returns non-structured error', async () => {
+    it('uses V2 API endpoint and returns non-structured error', async () => {
       const {database, token, url} = getEnvVariables()
       const client = new InfluxDBClient({
         host: url,

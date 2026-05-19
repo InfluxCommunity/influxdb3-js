@@ -22,10 +22,10 @@ const clientOptions: ClientOptions = {
 const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
+const WRITE_PATH_NS = `/api/v2/write?bucket=${DATABASE}&precision=ns`
+const WRITE_PATH_NS_V3 = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
 const WRITE_PATH_NS_V3_NO_SYNC = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&no_sync=true`
 const WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&accept_partial=false`
-const WRITE_PATH_NS_V2 = `/api/v2/write?bucket=${DATABASE}&precision=ns`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
@@ -135,6 +135,7 @@ describe('Write', () => {
             expectedPrecisionParam: v3PrecisionParam,
             writeOptions: {
               precision,
+              useV2Api: false,
             },
           },
           {
@@ -421,29 +422,29 @@ describe('Write', () => {
     })
     ;[
       {
-        title: 'calls v3 api by default',
+        title: 'calls v2 api by default',
         writeOptions: {},
         path: WRITE_PATH_NS,
       },
       {
-        title: 'calls v3 api if noSync=false',
-        writeOptions: {noSync: false},
-        path: WRITE_PATH_NS,
+        title: 'calls v3 api if useV2Api=false',
+        writeOptions: {useV2Api: false},
+        path: WRITE_PATH_NS_V3,
       },
       {
         title: 'calls v3 api if noSync=true',
-        writeOptions: {noSync: true},
+        writeOptions: {useV2Api: false, noSync: true},
         path: WRITE_PATH_NS_V3_NO_SYNC,
       },
       {
         title: 'calls v3 api with accept_partial=false',
-        writeOptions: {acceptPartial: false},
+        writeOptions: {useV2Api: false, acceptPartial: false},
         path: WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE,
       },
       {
         title: 'calls v2 api if useV2Api=true',
         writeOptions: {useV2Api: true},
-        path: WRITE_PATH_NS_V2,
+        path: WRITE_PATH_NS,
       },
     ].forEach(({title, writeOptions, path}) => {
       it(title, async () => {
@@ -481,7 +482,7 @@ describe('Write', () => {
           .catch((e) => {
             expect(e).instanceOf(IllegalArgumentError)
             expect(e.message).equals(
-              'invalid write options: noSync cannot be used with useV2Api'
+              'invalid write options: noSync requires useV2Api=false'
             )
           })
       }
@@ -491,9 +492,11 @@ describe('Write', () => {
     })
 
     it('returns PartialWriteError for v3 partial write data array', async () => {
-      useSubject({})
+      useSubject({
+        useV2Api: false,
+      })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V3)
         .reply(function (_uri) {
           return [
             400,
@@ -533,6 +536,7 @@ describe('Write', () => {
 
     it('returns PartialWriteError for v3 write_lp parsing failed object data', async () => {
       useSubject({
+        useV2Api: false,
         acceptPartial: false,
       })
       nock(clientOptions.host)
@@ -572,7 +576,7 @@ describe('Write', () => {
         useV2Api: true,
       })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V2)
+        .post(WRITE_PATH_NS)
         .reply(function (_uri) {
           return [
             400,
@@ -596,6 +600,37 @@ describe('Write', () => {
       expect(logs.error).to.length(1)
       expect(logs.warn).to.length(0)
       expect(nock.isDone()).to.be.true
+    })
+
+    it('returns endpoint guidance for useV2Api=true on v3-only backend', async () => {
+      useSubject({
+        useV2Api: true,
+      })
+      nock(clientOptions.host).post(WRITE_PATH_NS).reply(405, '', {}).persist()
+
+      await subject.write('test value=1', DATABASE).catch((e) => {
+        expect(e).instanceOf(HttpError)
+        expect(e.message).equals(
+          "Server doesn't support the V2 API endpoint (/api/v2/write). Set useV2Api=false to use the V3 API endpoint."
+        )
+      })
+    })
+
+    it('returns endpoint guidance for useV2Api=false on v2-only backend', async () => {
+      useSubject({
+        useV2Api: false,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V3)
+        .reply(405, '', {})
+        .persist()
+
+      await subject.write('test value=1', DATABASE).catch((e) => {
+        expect(e).instanceOf(HttpError)
+        expect(e.message).equals(
+          "Server doesn't support the V3 API endpoint (/api/v3/write_lp). Set useV2Api=true to use the V2 API endpoint."
+        )
+      })
     })
   })
   describe('propagate error headers', async () => {

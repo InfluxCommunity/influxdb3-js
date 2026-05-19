@@ -72,7 +72,7 @@ export default class WriteApiImpl implements WriteApi {
     if (writeOptionsOrDefault.useV2Api && writeOptionsOrDefault.noSync) {
       return Promise.reject(
         new IllegalArgumentError(
-          'invalid write options: noSync cannot be used with useV2Api'
+          'invalid write options: noSync requires useV2Api=false'
         )
       )
     }
@@ -109,9 +109,15 @@ export default class WriteApiImpl implements WriteApi {
         }
         if (error instanceof HttpError) {
           const statusCode = responseStatusCode ?? error.statusCode
+          if (statusCode === 405 && writeOptionsOrDefault.useV2Api) {
+            error.message =
+              "Server doesn't support the V2 API endpoint (/api/v2/write). " +
+              'Set useV2Api=false to use the V3 API endpoint.'
+          }
           if (statusCode === 405 && !writeOptionsOrDefault.useV2Api) {
             error.message =
-              "Server doesn't support v3 write API. Set useV2Api=true for v2 compatibility endpoint."
+              "Server doesn't support the V3 API endpoint (/api/v3/write_lp). " +
+              'Set useV2Api=true to use the V2 API endpoint.'
           }
           const partialWriteError = PartialWriteError.fromHttpError(error)
           if (partialWriteError) {
