@@ -161,7 +161,7 @@ await client.write(point, database, undefined, {
 
 #### Accept partial writes and inspect failed lines
 
-Partial writes are enabled by default.
+Partial writes are enabled by default when writing through the V3 API endpoint (`useV2Api=false`).
 Configure `acceptPartial` using client `writeOptions`, per-write options, or
 connection/env (`writeAcceptPartial`, `INFLUX_WRITE_ACCEPT_PARTIAL`).
 
