@@ -606,7 +606,10 @@ describe('Write', () => {
       useSubject({
         useV2Api: true,
       })
-      nock(clientOptions.host).post(WRITE_PATH_NS_V2).reply(405, '', {}).persist()
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V2)
+        .reply(405, '', {})
+        .persist()
 
       await subject.write('test value=1', DATABASE).catch((e) => {
         expect(e).instanceOf(HttpError)
