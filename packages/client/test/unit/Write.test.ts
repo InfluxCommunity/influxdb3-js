@@ -22,7 +22,7 @@ const clientOptions: ClientOptions = {
 const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v2/write?bucket=${DATABASE}&precision=ns`
+const WRITE_PATH_NS_V2 = `/api/v2/write?bucket=${DATABASE}&precision=ns`
 const WRITE_PATH_NS_V3 = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
 const WRITE_PATH_NS_V3_NO_SYNC = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&no_sync=true`
 const WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&accept_partial=false`
@@ -219,7 +219,7 @@ describe('Write', () => {
           let failNextRequest = false
           const messages: string[] = []
           nock(clientOptions.host)
-            .post(WRITE_PATH_NS)
+            .post(WRITE_PATH_NS_V2)
             .reply(function (_uri, requestBody) {
               requests++
               if (failNextRequest) {
@@ -306,7 +306,7 @@ describe('Write', () => {
       })
       const messages: string[] = []
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, requestBody) {
           messages.push(requestBody.toString())
           return [204, '', {}]
@@ -330,7 +330,7 @@ describe('Write', () => {
       useSubject({})
       let authorization: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           return [500, '', {}]
@@ -352,7 +352,7 @@ describe('Write', () => {
       useSubject({})
       let authorization: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           return [201, '', {}]
@@ -373,7 +373,7 @@ describe('Write', () => {
       let authorization: any
       let channelLane = ''
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           channelLane = this.req.headers['channel-lane']
@@ -404,7 +404,7 @@ describe('Write', () => {
       let universal: any
       let particular: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           universal = this.req.headers.universal
           particular = this.req.headers.particular
@@ -424,7 +424,7 @@ describe('Write', () => {
       {
         title: 'calls v2 api by default',
         writeOptions: {},
-        path: WRITE_PATH_NS,
+        path: WRITE_PATH_NS_V2,
       },
       {
         title: 'calls v3 api if useV2Api=false',
@@ -444,7 +444,7 @@ describe('Write', () => {
       {
         title: 'calls v2 api if useV2Api=true',
         writeOptions: {useV2Api: true},
-        path: WRITE_PATH_NS,
+        path: WRITE_PATH_NS_V2,
       },
     ].forEach(({title, writeOptions, path}) => {
       it(title, async () => {
@@ -576,7 +576,7 @@ describe('Write', () => {
         useV2Api: true,
       })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri) {
           return [
             400,
@@ -606,7 +606,7 @@ describe('Write', () => {
       useSubject({
         useV2Api: true,
       })
-      nock(clientOptions.host).post(WRITE_PATH_NS).reply(405, '', {}).persist()
+      nock(clientOptions.host).post(WRITE_PATH_NS_V2).reply(405, '', {}).persist()
 
       await subject.write('test value=1', DATABASE).catch((e) => {
         expect(e).instanceOf(HttpError)
@@ -639,7 +639,7 @@ describe('Write', () => {
         ...clientOptions,
       })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           return [
             429,
@@ -669,7 +669,7 @@ describe('Write', () => {
       })
       const retryDate = new Date(new Date().valueOf() + 600000)
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           return [
             503,
@@ -699,7 +699,7 @@ describe('Write', () => {
 
     it('timeout when passing timeout directly to write function will have the highest priority', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
@@ -729,7 +729,7 @@ describe('Write', () => {
 
     it('timeout by timeout property in ClientOptions', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
@@ -753,7 +753,7 @@ describe('Write', () => {
 
     it('WriteOptions.timeout > legacy timeout and new property writeTimeout', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
