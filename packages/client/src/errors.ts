@@ -37,7 +37,9 @@ function parseOriginalLine(value: unknown): string {
   throw new Error('original_line must be string')
 }
 
-function parsePartialWriteDataItem(item: unknown): PartialWriteLineError | null {
+function parsePartialWriteDataItem(
+  item: unknown
+): PartialWriteLineError | null {
   if (item === undefined || item === null) {
     return null
   }
@@ -51,7 +53,9 @@ function parsePartialWriteDataItem(item: unknown): PartialWriteLineError | null 
   if (errorMessage.length === 0) {
     return null
   }
-  const lineNumber = parseLineNumber((item as {line_number?: unknown}).line_number)
+  const lineNumber = parseLineNumber(
+    (item as {line_number?: unknown}).line_number
+  )
   const originalLine = parseOriginalLine(
     (item as {original_line?: unknown}).original_line
   )
@@ -99,7 +103,9 @@ function formatTypedLineErrorDetails(
           `\tline ${lineError.lineNumber}: ${lineError.errorMessage} (${lineError.originalLine})`
         )
       } else {
-        details.push(`\tline ${lineError.lineNumber}: ${lineError.errorMessage}`)
+        details.push(
+          `\tline ${lineError.lineNumber}: ${lineError.errorMessage}`
+        )
       }
     } else {
       details.push(`\t${lineError.errorMessage}`)
