@@ -88,7 +88,7 @@ set INFLUX_TOKEN=<token>
 To get started with influxdb client import `@influxdata/influxdb3-client` package.
 
 ```ts
-import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
+import {InfluxDBClient, PartialWriteError, Point} from '@influxdata/influxdb3-client'
 ```
 
 Assign values for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function.
