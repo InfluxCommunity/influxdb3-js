@@ -52,7 +52,7 @@ export default class InfluxDBClient {
    *   - gzipThreshold - payload size threshold for gzipping data
    *   - writeAcceptPartial - allow partial writes when some lines fail
    *   - writeNoSync - skip waiting for WAL persistence on write
-   *   - writeUseV2Api - use /api/v2/write compatibility endpoint
+   *   - writeUseV2Api - use /api/v2/write V2 API endpoint
    *
    * @param connectionString - connection string
    */
@@ -71,7 +71,7 @@ export default class InfluxDBClient {
    *   - INFLUX_GZIP_THRESHOLD - payload size threshold for gzipping data
    *   - INFLUX_WRITE_ACCEPT_PARTIAL - allow partial writes when some lines fail
    *   - INFLUX_WRITE_NO_SYNC - skip waiting for WAL persistence on write
-   *   - INFLUX_WRITE_USE_V2_API - use /api/v2/write compatibility endpoint
+   *   - INFLUX_WRITE_USE_V2_API - use /api/v2/write V2 API endpoint
    *   - INFLUX_GRPC_OPTIONS - comma separated set of key=value pairs matching @grpc/grpc-js channel options.
    */
   constructor()

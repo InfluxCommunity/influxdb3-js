@@ -102,25 +102,27 @@ export interface WriteOptions {
    * noSync=true means faster write but without the confirmation that the data was persisted.
    *
    * Note: This option is supported by InfluxDB 3 Core and Enterprise servers only.
-   * For other InfluxDB 3 server types (InfluxDB Clustered, InfluxDB Clould Serverless/Dedicated)
+   * For other InfluxDB 3 server types (InfluxDB Clustered, InfluxDB Cloud Dedicated/Serverless)
    * the write operation will fail with an error.
    *
    * Default value: false.
    */
   noSync?: boolean
   /**
-   * Allow partial success when some lines in a write batch are rejected.
+   * Controls partial-write behavior for writes sent to the V3 API endpoint
+   * (useV2Api=false).
+   * The client sends accept_partial=false only when set to false.
    *
+   * For writes sent to the V2 API endpoint (useV2Api=true), this option is not used.
    * Default value: true.
    */
   acceptPartial?: boolean
   /**
-   * Use the v2 compatibility write endpoint.
+   * Forces writes to the V2 API endpoint.
+   * Use this for InfluxDB Clustered and InfluxDB Cloud Dedicated/Serverless.
+   * For InfluxDB 3 Core/Enterprise, set useV2Api=false to write through the V3 API endpoint.
    *
-   * This is intended for InfluxDB Clustered compatibility mode.
-   * When enabled, writes use /api/v2/write and ignore acceptPartial.
-   *
-   * Default value: false.
+   * Default value: true.
    */
   useV2Api?: boolean
   /** default tags
@@ -177,7 +179,7 @@ export const DEFAULT_WriteOptions: WriteOptions = {
   gzipThreshold: 1000,
   noSync: false,
   acceptPartial: true,
-  useV2Api: false,
+  useV2Api: true,
 }
 
 export type QueryType = 'sql' | 'influxql'

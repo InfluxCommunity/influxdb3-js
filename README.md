@@ -88,7 +88,7 @@ set INFLUX_TOKEN=<token>
 To get started with influxdb client import `@influxdata/influxdb3-client` package.
 
 ```ts
-import {InfluxDBClient, Point} from '@influxdata/influxdb3-client'
+import {InfluxDBClient, PartialWriteError, Point} from '@influxdata/influxdb3-client'
 ```
 
 Assign values for environment variables, and then instantiate `InfluxDBClient` inside of an asynchronous function.
@@ -161,25 +161,50 @@ await client.write(point, database, undefined, {
 
 #### Accept partial writes and inspect failed lines
 
-Partial writes are enabled by default.
+Partial writes are enabled by default when writing through the V3 API endpoint (`useV2Api=false`).
 Configure `acceptPartial` using client `writeOptions`, per-write options, or
 connection/env (`writeAcceptPartial`, `INFLUX_WRITE_ACCEPT_PARTIAL`).
 
-When only part of a v3 write request is rejected, the client throws
+When only part of a V3 write request is rejected, the client throws
 `PartialWriteError` with structured `lineErrors`.
 If partial writes are disabled (`acceptPartial: false`), a rejected line causes
 the whole batch to be rejected.
 
-#### Compatibility with InfluxDB Clustered
+To inspect line-level failures, write through the V3 API endpoint and catch
+`PartialWriteError`:
 
-Set `useV2Api: true` to write through the v2 compatibility endpoint.
-You can set it in client `writeOptions`, per-write options, or via
+```ts
+const lp = [
+  'home,room=Sunroom temp=96 1735545600',
+  'home,room=Sunroom temp="hi" 1735549200',
+].join('\n')
+
+try {
+  await client.write(lp, database, undefined, {
+    useV2Api: false,
+  })
+} catch (e: any) {
+  if (e instanceof PartialWriteError) {
+    for (const lineErr of e.lineErrors) {
+      console.log(`line ${lineErr.lineNumber}: ${lineErr.errorMessage} (${lineErr.originalLine})`)
+    }
+  }
+}
+```
+
+#### Compatibility with InfluxDB Clustered and InfluxDB Cloud Dedicated/Serverless
+
+Writes use the V2 API endpoint by default.
+You can set `useV2Api` in client `writeOptions`, per-write options, or via
 connection/env (`writeUseV2Api`, `INFLUX_WRITE_USE_V2_API`).
 
-With `useV2Api`, `acceptPartial` is ignored and rejected writes return flat v2
-errors. `noSync` cannot be used with `useV2Api`; this combination is rejected
-before request dispatch with:
-`invalid write options: noSync cannot be used with useV2Api`.
+Set `useV2Api: false` to write through the V3 API endpoint (InfluxDB 3 Core/Enterprise),
+which supports `noSync` and `acceptPartial` controls.
+
+When writing through the V2 API endpoint, `acceptPartial` is not used by the client.
+Rejected writes return flat V2 errors.
+`noSync` cannot be used with `useV2Api`; this combination is rejected before request
+dispatch with `invalid write options: noSync requires useV2Api=false`.
 
 ### Query data
 

@@ -22,10 +22,10 @@ const clientOptions: ClientOptions = {
 const DATABASE = 'database'
 const PRECISION: WritePrecision = 's'
 
-const WRITE_PATH_NS = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
+const WRITE_PATH_NS_V2 = `/api/v2/write?bucket=${DATABASE}&precision=ns`
+const WRITE_PATH_NS_V3 = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
 const WRITE_PATH_NS_V3_NO_SYNC = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&no_sync=true`
 const WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&accept_partial=false`
-const WRITE_PATH_NS_V2 = `/api/v2/write?bucket=${DATABASE}&precision=ns`
 
 function createApi(options: Partial<WriteOptions>): InfluxDBClient {
   return new InfluxDBClient({
@@ -135,6 +135,7 @@ describe('Write', () => {
             expectedPrecisionParam: v3PrecisionParam,
             writeOptions: {
               precision,
+              useV2Api: false,
             },
           },
           {
@@ -218,7 +219,7 @@ describe('Write', () => {
           let failNextRequest = false
           const messages: string[] = []
           nock(clientOptions.host)
-            .post(WRITE_PATH_NS)
+            .post(WRITE_PATH_NS_V2)
             .reply(function (_uri, requestBody) {
               requests++
               if (failNextRequest) {
@@ -305,7 +306,7 @@ describe('Write', () => {
       })
       const messages: string[] = []
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, requestBody) {
           messages.push(requestBody.toString())
           return [204, '', {}]
@@ -329,7 +330,7 @@ describe('Write', () => {
       useSubject({})
       let authorization: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           return [500, '', {}]
@@ -351,7 +352,7 @@ describe('Write', () => {
       useSubject({})
       let authorization: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           return [201, '', {}]
@@ -372,7 +373,7 @@ describe('Write', () => {
       let authorization: any
       let channelLane = ''
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           authorization = this.req.headers.authorization
           channelLane = this.req.headers['channel-lane']
@@ -403,7 +404,7 @@ describe('Write', () => {
       let universal: any
       let particular: any
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           universal = this.req.headers.universal
           particular = this.req.headers.particular
@@ -421,23 +422,23 @@ describe('Write', () => {
     })
     ;[
       {
-        title: 'calls v3 api by default',
+        title: 'calls v2 api by default',
         writeOptions: {},
-        path: WRITE_PATH_NS,
+        path: WRITE_PATH_NS_V2,
       },
       {
-        title: 'calls v3 api if noSync=false',
-        writeOptions: {noSync: false},
-        path: WRITE_PATH_NS,
+        title: 'calls v3 api if useV2Api=false',
+        writeOptions: {useV2Api: false},
+        path: WRITE_PATH_NS_V3,
       },
       {
         title: 'calls v3 api if noSync=true',
-        writeOptions: {noSync: true},
+        writeOptions: {useV2Api: false, noSync: true},
         path: WRITE_PATH_NS_V3_NO_SYNC,
       },
       {
         title: 'calls v3 api with accept_partial=false',
-        writeOptions: {acceptPartial: false},
+        writeOptions: {useV2Api: false, acceptPartial: false},
         path: WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE,
       },
       {
@@ -481,7 +482,7 @@ describe('Write', () => {
           .catch((e) => {
             expect(e).instanceOf(IllegalArgumentError)
             expect(e.message).equals(
-              'invalid write options: noSync cannot be used with useV2Api'
+              'invalid write options: noSync requires useV2Api=false'
             )
           })
       }
@@ -491,9 +492,11 @@ describe('Write', () => {
     })
 
     it('returns PartialWriteError for v3 partial write data array', async () => {
-      useSubject({})
+      useSubject({
+        useV2Api: false,
+      })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V3)
         .reply(function (_uri) {
           return [
             400,
@@ -533,6 +536,7 @@ describe('Write', () => {
 
     it('returns PartialWriteError for v3 write_lp parsing failed object data', async () => {
       useSubject({
+        useV2Api: false,
         acceptPartial: false,
       })
       nock(clientOptions.host)
@@ -597,6 +601,40 @@ describe('Write', () => {
       expect(logs.warn).to.length(0)
       expect(nock.isDone()).to.be.true
     })
+
+    it('returns endpoint guidance for useV2Api=true on v3-only backend', async () => {
+      useSubject({
+        useV2Api: true,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V2)
+        .reply(405, '', {})
+        .persist()
+
+      await subject.write('test value=1', DATABASE).catch((e) => {
+        expect(e).instanceOf(HttpError)
+        expect(e.message).equals(
+          "Server doesn't support the V2 API endpoint (/api/v2/write). Set useV2Api=false to use the V3 API endpoint."
+        )
+      })
+    })
+
+    it('returns endpoint guidance for useV2Api=false on v2-only backend', async () => {
+      useSubject({
+        useV2Api: false,
+      })
+      nock(clientOptions.host)
+        .post(WRITE_PATH_NS_V3)
+        .reply(405, '', {})
+        .persist()
+
+      await subject.write('test value=1', DATABASE).catch((e) => {
+        expect(e).instanceOf(HttpError)
+        expect(e.message).equals(
+          "Server doesn't support the V3 API endpoint (/api/v3/write_lp). Set useV2Api=true to use the V2 API endpoint."
+        )
+      })
+    })
   })
   describe('propagate error headers', async () => {
     it('propagates retry header on 429', async () => {
@@ -604,7 +642,7 @@ describe('Write', () => {
         ...clientOptions,
       })
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           return [
             429,
@@ -634,7 +672,7 @@ describe('Write', () => {
       })
       const retryDate = new Date(new Date().valueOf() + 600000)
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .reply(function (_uri, _requestBody) {
           return [
             503,
@@ -664,7 +702,7 @@ describe('Write', () => {
 
     it('timeout when passing timeout directly to write function will have the highest priority', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
@@ -694,7 +732,7 @@ describe('Write', () => {
 
     it('timeout by timeout property in ClientOptions', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
@@ -718,7 +756,7 @@ describe('Write', () => {
 
     it('WriteOptions.timeout > legacy timeout and new property writeTimeout', async function () {
       nock(clientOptions.host)
-        .post(WRITE_PATH_NS)
+        .post(WRITE_PATH_NS_V2)
         .delay(1000)
         .reply(function (_uri, _requestBody) {
           return [200, '', {}]
