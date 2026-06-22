@@ -628,7 +628,7 @@ describe('e2e test', () => {
         expect.fail('failure expected')
       } catch (e: any) {
         expect(e).instanceOf(PartialWriteError)
-        expect(e.message).to.include('parsing failed for write_lp endpoint')
+        expect(e.message).to.include('line protocol parsing error')
         expect(e.lineErrors).to.have.length(1)
         expect(e.lineErrors[0].lineNumber).to.equal(2)
       } finally {

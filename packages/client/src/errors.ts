@@ -13,7 +13,8 @@ function isV3PartialWriteErrorMessage(errorMessage: unknown): boolean {
   const normalized = errorMessage.toLowerCase()
   return (
     normalized.includes('partial write of line protocol occurred') ||
-    normalized.includes('parsing failed for write_lp endpoint')
+    normalized.includes('parsing failed for write_lp endpoint') || // Core 3.9 and earlier
+    normalized.includes('line protocol parsing error') // Core 3.10 and later
   )
 }
 
