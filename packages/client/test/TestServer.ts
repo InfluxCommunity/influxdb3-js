@@ -263,29 +263,39 @@ export class MockService {
       const metadata = call.metadata
       const path = call.getPath()
 
-      if (metadata.get('sendblob').length > 0) {
-        let blobSize = Number.parseInt(metadata.get('sendblob').toString())
-        blobSize =
-          Number.isNaN(blobSize) || blobSize < 1
-            ? MockService.defaultBlobSize
-            : blobSize
-        MockService.handleBlob(call, blobSize)
-      } else {
-        // echo metadata back
-        MockService.echoMetadata(call, metadata)
-        // Send empty responses
-        // Send Schema
-        MockService.sendEmptySchema(call)
-        // Send ResponseBody
-        MockService.sendEmptyResponseBody(call, path)
-      }
-
       if (metadata.get('delay').length > 0) {
         timeout = Number.parseInt(metadata.get('delay').toString())
       }
-      setTimeout(() => {
+
+      const sendResponse = () => {
+        if (call.destroyed) {
+          return
+        }
+        if (metadata.get('sendblob').length > 0) {
+          let blobSize = Number.parseInt(metadata.get('sendblob').toString())
+          blobSize =
+            Number.isNaN(blobSize) || blobSize < 1
+              ? MockService.defaultBlobSize
+              : blobSize
+          MockService.handleBlob(call, blobSize)
+        } else {
+          // echo metadata back
+          MockService.echoMetadata(call, metadata)
+          // Send empty responses
+          // Send Schema
+          MockService.sendEmptySchema(call)
+          // Send ResponseBody
+          MockService.sendEmptyResponseBody(call, path)
+        }
         call.end(metadata)
-      }, timeout)
+      }
+
+      if (timeout > 0) {
+        const timer = setTimeout(sendResponse, timeout)
+        call.once('close', () => clearTimeout(timer))
+      } else {
+        sendResponse()
+      }
     },
     doPut(call: grpc.ServerDuplexStream<flt.FlightData, flt.PutResult>): void {
       MockService.callCount.doPut++
