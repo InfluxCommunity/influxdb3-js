@@ -1,9 +1,8 @@
-import {parse} from 'url'
 import * as http from 'http'
 import * as https from 'https'
 import {Buffer} from 'buffer'
-import {RequestTimedOutError, AbortError, HttpError} from '../../errors'
-import {Transport, SendOptions} from '../../transport'
+import {AbortError, HttpError, RequestTimedOutError} from '../../errors'
+import {SendOptions, Transport} from '../../transport'
 import {
   Cancellable,
   CommunicationObserver,
@@ -16,6 +15,7 @@ import {CLIENT_LIB_USER_AGENT} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
+import {parseUrl} from '../../util/fixUrl'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -64,7 +64,7 @@ export class NodeHttpTransport implements Transport {
       transportOptions,
       ...nodeSupportedOptions
     } = connectionOptions
-    const url = parse(proxyUrl || _url)
+    const url = parseUrl(proxyUrl || _url)
     this._token = token
     this._authScheme = authScheme
     this._defaultOptions = {
@@ -76,7 +76,7 @@ export class NodeHttpTransport implements Transport {
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
-    this._contextPath = proxyUrl ? _url : (url.path ?? '')
+    this._contextPath = proxyUrl ? _url : (url.pathname ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -116,7 +116,7 @@ export class NodeHttpTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
-      this._headers['Host'] = parse(_url).host as string
+      this._headers['Host'] = parseUrl(_url).host as string
     }
   }
 
@@ -289,8 +289,13 @@ export class NodeHttpTransport implements Transport {
       headers.authorization = `${authScheme} ${this._token}`
     }
 
+    // IPv6 square brackets must be stripped before passing to http.request or https.request.
+    const hostname = (this._defaultOptions.hostname as string)
+      .replace('[', '')
+      .replace(']', '')
     const options: {[key: string]: any} = {
       ...this._defaultOptions,
+      hostname: hostname,
       path: this._contextPath + path,
       method: sendOptions.method,
       headers: {

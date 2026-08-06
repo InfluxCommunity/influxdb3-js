@@ -1,11 +1,15 @@
 import {Transport} from './transport'
 import {QParamType} from './QueryApi'
+import {parseUrl} from './util/fixUrl'
 
 /**
  * Option for the communication with InfluxDB server.
  */
 export interface ConnectionOptions {
-  /** base host URL */
+  /**
+   * base host URL.
+   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1].
+   */
   host: string
 
   /** authentication token */
@@ -247,18 +251,26 @@ function ensureWriteOptions(options: ClientOptions): WriteOptions {
 }
 
 /**
- * Parses connection string into `ClientOptions`.
+ * Parses connection string into `ClientOptions`<br> NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1].
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
   if (!connectionString) {
     throw Error('Connection string not set!')
   }
-  const url = new URL(connectionString.trim(), 'http://localhost') // artificial base is ignored when url is absolute
+  connectionString = connectionString.trim()
+  let connectStr = ''
+  if (connectionString.indexOf('://') > 0) {
+    connectStr = connectionString
+  } else {
+    connectStr = `http://localhost${connectionString}`
+  }
+
+  const url = parseUrl(connectStr) // artificial base is ignored when url is absolute
   const options: ClientOptions = {
     host:
       connectionString.indexOf('://') > 0
-        ? url.origin + url.pathname
+        ? `${url.protocol}//${url.hostname}:${url.port}${url.pathname}`
         : url.pathname,
   }
   if (url.searchParams.has('token')) {
@@ -304,6 +316,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
 
 /**
  * Creates `ClientOptions` from environment variables.
+ * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]
  */
 export function fromEnv(): ClientOptions {
   if (!process.env.INFLUX_HOST) {

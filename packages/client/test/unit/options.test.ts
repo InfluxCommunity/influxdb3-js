@@ -28,6 +28,16 @@ describe('ClientOptions', () => {
         token: 'my-token',
       })
     })
+    it('is created with IPv6', () => {
+      expect(
+        fromConnectionString(
+          'https://[fe80::1%25eth%250]:15000?token=my-token'
+        ) as ClientOptions
+      ).to.deep.equal({
+        host: 'https://[fe80::1%25eth%250]:15000/',
+        token: 'my-token',
+      })
+    })
     it('is created with relative URL with token + whitespace around (#213)', () => {
       expect(
         fromConnectionString(' /influx?token=my-token ') as ClientOptions

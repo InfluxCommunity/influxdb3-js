@@ -101,6 +101,42 @@ at 'ClientOptions.database'
         token: 'my-token',
       })
     })
+    it('is created with ipv6', () => {
+      const tests = [
+        {
+          url: 'http://[2001:db8::1]',
+        },
+        {
+          url: 'https://[fe80::1%25eth%250]:15000',
+        },
+        {
+          url: 'https://[2001:db8:a0b:12f0::1%25eth0]:15000',
+        },
+        {
+          url: 'https://[fe80::1%25eth%200]',
+        },
+        {
+          url: 'https://example.com:3000',
+        },
+        {
+          url: 'http://example.com',
+        },
+      ]
+      for (const test of tests) {
+        expect(
+          (
+            new InfluxDBClient({
+              host: test.url,
+              token: 'my-token',
+            }) as any
+          )._options
+        ).to.deep.equal({
+          ...DEFAULT_ConnectionOptions,
+          host: test.url,
+          token: 'my-token',
+        })
+      }
+    })
     it('is created with host with trailing slash and token', () => {
       expect(
         (

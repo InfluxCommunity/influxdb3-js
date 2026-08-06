@@ -38,3 +38,75 @@ export const replaceURLProtocolWithPort = (
 
   return {url, safe}
 }
+
+/**
+ * parseUrl parses the given URL string and returns an object containing its components.
+ * It handles both IPv4 and IPv6 addresses, and provides default ports (80 for http, 443 for https) if none are specified.
+ *
+ * @param url - The URL string to parse.
+ * @returns An object containing:
+ *  - rawUrl: The original URL string.
+ *  - protocol: The protocol (e.g., 'http:', 'https:').
+ *  - host: The hostname and port (e.g., 'example.com:80', '[::1]:443').
+ *  - hostname: The hostname (e.g., 'example.com', '[::1]').
+ *  - port: The port number as a string.
+ *  - pathname: The URL path (e.g., '/').
+ *  - searchParams: A URLSearchParams object containing the query parameters.
+ */
+export const parseUrl = (
+  url: string
+): {
+  rawUrl: string
+  protocol: string
+  host: string
+  hostname: string
+  port: string
+  pathname: string
+  searchParams: URLSearchParams
+} => {
+  let hostname = ''
+  let port = ''
+  if (!url || url.trim() === '') {
+    return {
+      rawUrl: url,
+      protocol: '',
+      host: '',
+      hostname: '',
+      port: '',
+      pathname: '',
+      searchParams: new URLSearchParams(),
+    }
+  }
+
+  // If URL is a IPv6 address
+  const bracketStart = url.indexOf('[')
+  const bracketEnd = url.indexOf(']')
+  let tmpUrl = url
+  const isIpv6 = bracketStart != -1 && bracketEnd !== -1
+  if (isIpv6) {
+    hostname = url.substring(bracketStart, bracketEnd + 1)
+
+    // Temporally set the hostname to [::] so It will not throw "Invalid URL" when passing it into `new URL(url)`
+    tmpUrl = url.replace(hostname, '[::]')
+  }
+
+  const u = new URL(tmpUrl)
+  port = u.port
+  if (port === '') {
+    port = u.protocol.startsWith('https') ? '443' : '80'
+  }
+
+  if (!isIpv6) {
+    hostname = u.hostname
+  }
+
+  return {
+    rawUrl: url,
+    protocol: u.protocol,
+    host: `${hostname}:${port}`,
+    hostname: hostname,
+    port: port,
+    pathname: u.pathname,
+    searchParams: u.searchParams,
+  }
+}
