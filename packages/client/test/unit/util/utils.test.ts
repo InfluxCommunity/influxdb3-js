@@ -39,11 +39,11 @@ describe('utils', () => {
     },
     {
       input: 'https://[fe80::1%25eth0]',
-      expected: {safe: true, url: '[fe80::1%25eth0]:443'},
+      expected: {safe: true, url: '[fe80::1%eth0]:443'},
     },
     {
       input: 'https://[fe80::1%25eth0]:8086',
-      expected: {safe: true, url: '[fe80::1%25eth0]:8086'},
+      expected: {safe: true, url: '[fe80::1%eth0]:8086'},
     },
   ]
 
