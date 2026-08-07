@@ -8,22 +8,52 @@ describe('utils', () => {
     expect(() => throwReturn(new Error(message))).to.throw(message)
   })
 
-  it('fixUrl adds port if not present', () => {
-    expect(replaceURLProtocolWithPort('http://example.com')).to.deep.equal({
-      safe: false,
-      url: 'example.com:80',
+  const fixUrlTests = [
+    {
+      input: 'http://example.com',
+      expected: {safe: false, url: 'example.com:80'},
+    },
+    {
+      input: 'https://example.com',
+      expected: {safe: true, url: 'example.com:443'},
+    },
+    {
+      input: 'http://example.com:3000',
+      expected: {safe: false, url: 'example.com:3000'},
+    },
+    {
+      input: 'https://example.com:5000',
+      expected: {safe: true, url: 'example.com:5000'},
+    },
+    {
+      input: 'http://[2001:db8::1]',
+      expected: {safe: false, url: '[2001:db8::1]:80'},
+    },
+    {
+      input: 'https://[2001:db8::1]',
+      expected: {safe: true, url: '[2001:db8::1]:443'},
+    },
+    {
+      input: 'http://[2001:db8::1]:8086',
+      expected: {safe: false, url: '[2001:db8::1]:8086'},
+    },
+    {
+      input: 'https://[fe80::1%25eth0]',
+      expected: {safe: true, url: '[fe80::1%25eth0]:443'},
+    },
+    {
+      input: 'https://[fe80::1%25eth0]:8086',
+      expected: {safe: true, url: '[fe80::1%25eth0]:8086'},
+    },
+  ]
+
+  for (const test of fixUrlTests) {
+    it(`fixUrl handles ${test.input}`, () => {
+      expect(replaceURLProtocolWithPort(test.input)).to.deep.equal(
+        test.expected
+      )
     })
-    expect(replaceURLProtocolWithPort('https://example.com')).to.deep.equal({
-      safe: true,
-      url: 'example.com:443',
-    })
-    expect(replaceURLProtocolWithPort('http://example.com:3000')).to.deep.equal(
-      {safe: false, url: 'example.com:3000'}
-    )
-    expect(
-      replaceURLProtocolWithPort('https://example.com:5000')
-    ).to.deep.equal({safe: true, url: 'example.com:5000'})
-  })
+  }
 
   it('collectAll correctly iterate through the generator', async () => {
     const generator = (async function* () {
