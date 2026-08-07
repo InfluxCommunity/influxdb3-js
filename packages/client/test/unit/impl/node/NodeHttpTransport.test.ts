@@ -152,6 +152,59 @@ describe('NodeHttpTransport', () => {
       nock.enableNetConnect()
     })
     describe('positive', () => {
+      const tests = [
+        {
+          host: 'http://[2001:db8::1]',
+          hostname: '2001:db8::1',
+        },
+        {
+          host: 'https://[fe80::1%25eth%250]:15000',
+          hostname: 'fe80::1%eth%0',
+        },
+        {
+          host: 'https://[2001:db8:a0b:12f0::1%25eth0]:15000',
+          hostname: '2001:db8:a0b:12f0::1%eth0',
+        },
+        {
+          host: 'https://[fe80::1%25eth%200]',
+          hostname: 'fe80::1%eth 0',
+        },
+        {
+          host: 'https://example.com:3000',
+          hostname: 'example.com',
+        },
+        {
+          host: 'http://example.com',
+          hostname: 'example.com',
+        },
+        {
+          host: 'http://192.168.0.1:8086',
+          hostname: '192.168.0.1',
+        },
+      ]
+
+      for (const test of tests) {
+        it(`passes URL hostname for ${test.host} to the request API`, () => {
+          const request = {
+            on: sinon.stub().returnsThis(),
+            write: sinon.fake(),
+            end: sinon.fake(),
+          }
+          let requestOptions: http.RequestOptions | undefined
+          const requestApi = sinon.fake((options: http.RequestOptions) => {
+            requestOptions = options
+            return request
+          })
+          const transport: any = new NodeHttpTransport({host: test.host})
+          transport._requestApi = requestApi
+
+          transport.send('/test', '', {method: 'GET'})
+
+          expect(requestApi.calledOnce).to.be.true
+          expect(requestOptions?.hostname, test.host).to.equal(test.hostname)
+        })
+      }
+
       const transportOptions = {
         url: TEST_URL,
         timeout: 100,
