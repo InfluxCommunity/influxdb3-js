@@ -15,7 +15,7 @@ import {CLIENT_LIB_USER_AGENT} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
-import {parseUrl} from '../../util/fixUrl'
+import {urlToHttpOptions} from 'node:url'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -64,19 +64,20 @@ export class NodeHttpTransport implements Transport {
       transportOptions,
       ...nodeSupportedOptions
     } = connectionOptions
-    const url = parseUrl(proxyUrl || _url)
+    const url = new URL(proxyUrl || _url)
+    const {hostname, port, protocol, path} = urlToHttpOptions(url)
     this._token = token
     this._authScheme = authScheme
     this._defaultOptions = {
       ...nodeSupportedOptions,
       ...transportOptions,
-      port: url.port,
-      protocol: url.protocol,
-      hostname: url.hostname,
+      port: port?.toString(),
+      protocol,
+      hostname,
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
-    this._contextPath = proxyUrl ? _url : (url.pathname ?? '')
+    this._contextPath = proxyUrl ? _url : (path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -116,7 +117,7 @@ export class NodeHttpTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
-      this._headers['Host'] = parseUrl(_url).host as string
+      this._headers['Host'] = new URL(_url).host as string
     }
   }
 
@@ -289,13 +290,8 @@ export class NodeHttpTransport implements Transport {
       headers.authorization = `${authScheme} ${this._token}`
     }
 
-    // IPv6 square brackets must be stripped before passing to http.request or https.request.
-    const hostname = (this._defaultOptions.hostname as string)
-      .replace('[', '')
-      .replace(']', '')
     const options: {[key: string]: any} = {
       ...this._defaultOptions,
-      hostname: hostname,
       path: this._contextPath + path,
       method: sendOptions.method,
       headers: {

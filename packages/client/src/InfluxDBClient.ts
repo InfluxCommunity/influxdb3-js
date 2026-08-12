@@ -41,7 +41,7 @@ export default class InfluxDBClient {
 
   /**
    * Creates a new instance of the `InfluxDBClient` from connection string.<br>
-   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]
+   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
    * @example https://us-east-1-1.aws.cloud2.influxdata.com/?token=my-token&database=my-database
    *
    * Supported query parameters:
@@ -64,7 +64,7 @@ export default class InfluxDBClient {
    *
    * Supported variables:
    *   - INFLUX_HOST - cloud/server URL.<br>
-   *   NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1] (required)
+   *   NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086 and Zone IDs are not supported. (required)
    *   - INFLUX_TOKEN - authentication token (required)
    *   - INFLUX_AUTH_SCHEME - token authentication scheme. Not set for Cloud access, set to 'Bearer' for Core/Enterprise.
    *   - INFLUX_TIMEOUT - I/O timeout

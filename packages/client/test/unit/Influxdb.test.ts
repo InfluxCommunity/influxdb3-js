@@ -101,19 +101,13 @@ at 'ClientOptions.database'
         token: 'my-token',
       })
     })
-    it('is created with ipv6', () => {
+    it('is created with ipv6 and ipv4', () => {
       const tests = [
         {
           url: 'http://[2001:db8::1]',
         },
         {
-          url: 'https://[fe80::1%25eth%250]:15000',
-        },
-        {
-          url: 'https://[2001:db8:a0b:12f0::1%25eth0]:15000',
-        },
-        {
-          url: 'https://[fe80::1%25eth%200]',
+          url: 'http://[2001:db8::1]:80',
         },
         {
           url: 'https://example.com:3000',

@@ -1,6 +1,5 @@
 import {Transport} from './transport'
 import {QParamType} from './QueryApi'
-import {parseUrl} from './util/fixUrl'
 
 /**
  * Option for the communication with InfluxDB server.
@@ -8,7 +7,7 @@ import {parseUrl} from './util/fixUrl'
 export interface ConnectionOptions {
   /**
    * base host URL.
-   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1].
+   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
    */
   host: string
 
@@ -251,26 +250,18 @@ function ensureWriteOptions(options: ClientOptions): WriteOptions {
 }
 
 /**
- * Parses connection string into `ClientOptions`<br> NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1].
+ * Parses connection string into `ClientOptions`<br> NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
   if (!connectionString) {
     throw Error('Connection string not set!')
   }
-  connectionString = connectionString.trim()
-  let connectStr = ''
-  if (connectionString.indexOf('://') > 0) {
-    connectStr = connectionString
-  } else {
-    connectStr = `http://localhost${connectionString}`
-  }
-
-  const url = parseUrl(connectStr) // artificial base is ignored when url is absolute
+  const url = new URL(connectionString.trim(), 'http://localhost') // artificial base is ignored when url is absolute
   const options: ClientOptions = {
     host:
       connectionString.indexOf('://') > 0
-        ? `${url.protocol}//${url.hostname}:${url.port}${url.pathname}`
+        ? url.origin + url.pathname
         : url.pathname,
   }
   if (url.searchParams.has('token')) {
@@ -316,7 +307,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
 
 /**
  * Creates `ClientOptions` from environment variables.
- * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]
+ * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
  */
 export function fromEnv(): ClientOptions {
   if (!process.env.INFLUX_HOST) {

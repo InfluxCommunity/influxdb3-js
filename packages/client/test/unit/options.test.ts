@@ -31,10 +31,10 @@ describe('ClientOptions', () => {
     it('is created with IPv6', () => {
       expect(
         fromConnectionString(
-          'https://[fe80::1%25eth%250]:15000?token=my-token'
+          'http://[2001:db8::1]:15000?token=my-token'
         ) as ClientOptions
       ).to.deep.equal({
-        host: 'https://[fe80::1%25eth%250]:15000/',
+        host: 'http://[2001:db8::1]:15000/',
         token: 'my-token',
       })
     })
@@ -44,6 +44,14 @@ describe('ClientOptions', () => {
       ).to.deep.equal({
         host: '/influx',
         token: 'my-token',
+      })
+    })
+    it('removes encoded token from the returned host', () => {
+      expect(
+        fromConnectionString('https://server.example.com/influx?token=a%20b')
+      ).to.deep.equal({
+        host: 'https://server.example.com/influx',
+        token: 'a b',
       })
     })
   })

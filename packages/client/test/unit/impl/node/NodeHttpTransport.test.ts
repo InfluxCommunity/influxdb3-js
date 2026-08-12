@@ -142,6 +142,14 @@ describe('NodeHttpTransport', () => {
       })
       expect(transport._requestApi).to.equal(http.request)
     })
+    it('preserves the target authority for proxy requests', () => {
+      const transport: any = new NodeHttpTransport({
+        host: 'http://server.example.com',
+        proxyUrl: 'http://proxy.example.com:8080',
+      })
+
+      expect(transport._headers.Host).to.equal('server.example.com')
+    })
   })
   describe('send', () => {
     beforeEach(() => {
@@ -154,20 +162,12 @@ describe('NodeHttpTransport', () => {
     describe('positive', () => {
       const tests = [
         {
-          host: 'http://[2001:db8::1]',
+          host: 'http://[2001:db8::1]:8086',
           hostname: '2001:db8::1',
         },
         {
-          host: 'https://[fe80::1%25eth%250]:15000',
-          hostname: 'fe80::1%eth%0',
-        },
-        {
-          host: 'https://[2001:db8:a0b:12f0::1%25eth0]:15000',
-          hostname: '2001:db8:a0b:12f0::1%eth0',
-        },
-        {
-          host: 'https://[fe80::1%25eth%200]',
-          hostname: 'fe80::1%eth 0',
+          host: 'https://[2001:db8::1]:3000/api?token=mytoken',
+          hostname: '2001:db8::1',
         },
         {
           host: 'https://example.com:3000',
