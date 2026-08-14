@@ -1,5 +1,9 @@
 ## 2.4.0 [unreleased]
 
+### Bugfix
+
+1. [#874](https://github.com/InfluxCommunity/influxdb3-js/pull/874): `NodeHttpTransport` now uses the WHATWG `URL` API instead of the legacy, deprecated `url.parse()`, avoiding a `DEP0169` `DeprecationWarning` logged on every client construction under Node.
+
 ## 2.3.0 [2026-06-11]
 
 ### Features

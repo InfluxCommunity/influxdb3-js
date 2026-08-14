@@ -1,4 +1,3 @@
-import {parse} from 'url'
 import * as http from 'http'
 import * as https from 'https'
 import {Buffer} from 'buffer'
@@ -64,19 +63,22 @@ export class NodeHttpTransport implements Transport {
       transportOptions,
       ...nodeSupportedOptions
     } = connectionOptions
-    const url = parse(proxyUrl || _url)
+    const url = new URL(proxyUrl || _url)
     this._token = token
     this._authScheme = authScheme
     this._defaultOptions = {
       ...nodeSupportedOptions,
       ...transportOptions,
-      port: url.port,
+      // url.port is '' (not null, unlike the legacy url.parse()) when the URL has no
+      // explicit port; normalize to undefined so the cleanup below strips it and
+      // http(s).request() falls back to the protocol's default port.
+      port: url.port || undefined,
       protocol: url.protocol,
       hostname: url.hostname,
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
-    this._contextPath = proxyUrl ? _url : (url.path ?? '')
+    this._contextPath = proxyUrl ? _url : url.pathname + url.search
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -116,7 +118,7 @@ export class NodeHttpTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
-      this._headers['Host'] = parse(_url).host as string
+      this._headers['Host'] = new URL(_url).host
     }
   }
 
