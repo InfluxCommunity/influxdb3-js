@@ -22,6 +22,14 @@ const zlibOptions = {
 }
 const emptyBuffer = Buffer.allocUnsafe(0)
 
+// WHATWG URL wraps IPv6 literals in brackets (e.g. "[::1]"), but Node's
+// http(s).request() `hostname` option must be the bare address.
+function stripIPv6Brackets(hostname: string): string {
+  return hostname.startsWith('[') && hostname.endsWith(']')
+    ? hostname.slice(1, -1)
+    : hostname
+}
+
 class CancellableImpl implements Cancellable {
   private _cancelled = false
   public resume?: () => void
@@ -74,7 +82,10 @@ export class NodeHttpTransport implements Transport {
       // http(s).request() falls back to the protocol's default port.
       port: url.port || undefined,
       protocol: url.protocol,
-      hostname: url.hostname,
+      // url.hostname keeps the brackets around an IPv6 literal (e.g. "[::1]"), but
+      // http(s).request()'s `hostname` option needs the bare address or it fails DNS
+      // lookup on the literal brackets.
+      hostname: stripIPv6Brackets(url.hostname),
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }

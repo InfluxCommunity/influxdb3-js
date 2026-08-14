@@ -87,6 +87,17 @@ describe('NodeHttpTransport', () => {
       })
       expect(transport._requestApi).to.equal(https.request)
     })
+    it('strips brackets from an IPv6 host', () => {
+      const transport: any = new NodeHttpTransport({
+        host: 'http://[::1]:8086',
+      })
+      expect(transport._defaultOptions).to.deep.equal({
+        hostname: '::1',
+        port: '8086',
+        protocol: 'http:',
+      })
+      expect(transport._requestApi).to.equal(http.request)
+    })
     it('creates the transport with _contextPath', () => {
       const transport: any = new NodeHttpTransport({
         host: 'http://test:8086/influx',
@@ -489,6 +500,33 @@ describe('NodeHttpTransport', () => {
             throw e
           })
       })
+    })
+  })
+  describe('send over IPv6', () => {
+    let server: http.Server
+    let url = ''
+    before(async () => {
+      await new Promise<void>((resolve, reject) => {
+        server = http.createServer((_req, res) => res.end('ipv6 ok'))
+        server.listen(0, '::1', () => {
+          const addr = server.address() as AddressInfo
+          url = `http://[::1]:${addr.port}`
+          resolve()
+        })
+        server.on('error', reject)
+      })
+    })
+    after(() => {
+      server.close()
+    })
+    it('connects to a bracketed IPv6 host', async () => {
+      const data = await sendTestData(
+        {host: url, timeout: 10000},
+        {
+          method: 'GET',
+        }
+      )
+      expect(data).to.equal('ipv6 ok')
     })
   })
   describe('send.backpressure', () => {
