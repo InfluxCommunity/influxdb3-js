@@ -1,9 +1,8 @@
-import {parse} from 'url'
 import * as http from 'http'
 import * as https from 'https'
 import {Buffer} from 'buffer'
-import {RequestTimedOutError, AbortError, HttpError} from '../../errors'
-import {Transport, SendOptions} from '../../transport'
+import {AbortError, HttpError, RequestTimedOutError} from '../../errors'
+import {SendOptions, Transport} from '../../transport'
 import {
   Cancellable,
   CommunicationObserver,
@@ -16,6 +15,7 @@ import {CLIENT_LIB_USER_AGENT} from '../version'
 import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
+import {urlToHttpOptions} from 'node:url'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -64,19 +64,20 @@ export class NodeHttpTransport implements Transport {
       transportOptions,
       ...nodeSupportedOptions
     } = connectionOptions
-    const url = parse(proxyUrl || _url)
+    const url = new URL(proxyUrl || _url)
+    const {hostname, port, protocol, path} = urlToHttpOptions(url)
     this._token = token
     this._authScheme = authScheme
     this._defaultOptions = {
       ...nodeSupportedOptions,
       ...transportOptions,
-      port: url.port,
-      protocol: url.protocol,
-      hostname: url.hostname,
+      port: port?.toString(),
+      protocol,
+      hostname,
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
-    this._contextPath = proxyUrl ? _url : (url.path ?? '')
+    this._contextPath = proxyUrl ? _url : (path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
         0,
@@ -116,7 +117,7 @@ export class NodeHttpTransport implements Transport {
       ...connectionOptions.headers,
     }
     if (proxyUrl) {
-      this._headers['Host'] = parse(_url).host as string
+      this._headers['Host'] = new URL(_url).host as string
     }
   }
 

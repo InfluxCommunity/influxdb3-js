@@ -28,12 +28,30 @@ describe('ClientOptions', () => {
         token: 'my-token',
       })
     })
+    it('is created with IPv6', () => {
+      expect(
+        fromConnectionString(
+          'http://[2001:db8::1]:15000?token=my-token'
+        ) as ClientOptions
+      ).to.deep.equal({
+        host: 'http://[2001:db8::1]:15000/',
+        token: 'my-token',
+      })
+    })
     it('is created with relative URL with token + whitespace around (#213)', () => {
       expect(
         fromConnectionString(' /influx?token=my-token ') as ClientOptions
       ).to.deep.equal({
         host: '/influx',
         token: 'my-token',
+      })
+    })
+    it('removes encoded token from the returned host', () => {
+      expect(
+        fromConnectionString('https://server.example.com/influx?token=a%20b')
+      ).to.deep.equal({
+        host: 'https://server.example.com/influx',
+        token: 'a b',
       })
     })
   })

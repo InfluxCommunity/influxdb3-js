@@ -23,6 +23,39 @@ describe('utils', () => {
     expect(
       replaceURLProtocolWithPort('https://example.com:5000')
     ).to.deep.equal({safe: true, url: 'example.com:5000'})
+
+    expect(replaceURLProtocolWithPort('http://[2001:db8::1]')).to.deep.equal({
+      safe: false,
+      url: '[2001:db8::1]:80',
+    })
+    expect(replaceURLProtocolWithPort('https://[2001:db8::1]')).to.deep.equal({
+      safe: true,
+      url: '[2001:db8::1]:443',
+    })
+    expect(
+      replaceURLProtocolWithPort('http://[2001:db8::1]:8086')
+    ).to.deep.equal({
+      safe: false,
+      url: '[2001:db8::1]:8086',
+    })
+    expect(
+      replaceURLProtocolWithPort('https://[2001:db8::1]:8086')
+    ).to.deep.equal({
+      safe: true,
+      url: '[2001:db8::1]:8086',
+    })
+    expect(
+      replaceURLProtocolWithPort('https://[2001:db8::1]:443')
+    ).to.deep.equal({
+      safe: true,
+      url: '[2001:db8::1]:443',
+    })
+    expect(
+      replaceURLProtocolWithPort('https://[2001:db8::1]:8086/influx')
+    ).to.deep.equal({
+      safe: true,
+      url: '[2001:db8::1]:8086',
+    })
   })
 
   it('collectAll correctly iterate through the generator', async () => {

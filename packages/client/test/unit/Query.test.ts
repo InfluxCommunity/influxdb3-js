@@ -6,6 +6,7 @@ import {QParamType} from '../../src/QueryApi'
 import {allParamsMatched, queryHasParams} from '../../src/util/sql'
 import {RpcMetadata} from '@protobuf-ts/runtime-rpc'
 import {CLIENT_LIB_VERSION} from '../../src/impl/version'
+import {createQueryTransport} from '../../src/impl/browser/rpc'
 
 const testSQLTicket = {
   db: 'TestDB',
@@ -189,5 +190,14 @@ describe('Query', () => {
     expect(meta['authorization']).to.equal('Bearer TEST_TOKEN')
     expect(meta['hunter']).to.equal('Herbie Hancock')
     expect(meta['feeder']).to.equal('Jefferson Airplane')
+  })
+  it('preserves the browser gRPC context path', () => {
+    const transport: any = createQueryTransport({
+      host: 'https://server.example.com/influx',
+    })
+
+    expect(transport.defaultOptions.baseUrl).to.equal(
+      'https://server.example.com/influx'
+    )
   })
 })

@@ -142,6 +142,14 @@ describe('NodeHttpTransport', () => {
       })
       expect(transport._requestApi).to.equal(http.request)
     })
+    it('preserves the target authority for proxy requests', () => {
+      const transport: any = new NodeHttpTransport({
+        host: 'http://server.example.com',
+        proxyUrl: 'http://proxy.example.com:8080',
+      })
+
+      expect(transport._headers.Host).to.equal('server.example.com')
+    })
   })
   describe('send', () => {
     beforeEach(() => {
@@ -152,6 +160,51 @@ describe('NodeHttpTransport', () => {
       nock.enableNetConnect()
     })
     describe('positive', () => {
+      const tests = [
+        {
+          host: 'http://[2001:db8::1]:8086',
+          hostname: '2001:db8::1',
+        },
+        {
+          host: 'https://[2001:db8::1]:3000/api?token=mytoken',
+          hostname: '2001:db8::1',
+        },
+        {
+          host: 'https://example.com:3000',
+          hostname: 'example.com',
+        },
+        {
+          host: 'http://example.com',
+          hostname: 'example.com',
+        },
+        {
+          host: 'http://192.168.0.1:8086',
+          hostname: '192.168.0.1',
+        },
+      ]
+
+      for (const test of tests) {
+        it(`passes URL hostname for ${test.host} to the request API`, () => {
+          const request = {
+            on: sinon.stub().returnsThis(),
+            write: sinon.fake(),
+            end: sinon.fake(),
+          }
+          let requestOptions: http.RequestOptions | undefined
+          const requestApi = sinon.fake((options: http.RequestOptions) => {
+            requestOptions = options
+            return request
+          })
+          const transport: any = new NodeHttpTransport({host: test.host})
+          transport._requestApi = requestApi
+
+          transport.send('/test', '', {method: 'GET'})
+
+          expect(requestApi.calledOnce).to.be.true
+          expect(requestOptions?.hostname, test.host).to.equal(test.hostname)
+        })
+      }
+
       const transportOptions = {
         url: TEST_URL,
         timeout: 100,

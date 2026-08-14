@@ -87,6 +87,10 @@ describe('FetchTransport', () => {
         ],
       ])
     })
+    it('preserves a relative host', () => {
+      const transport: any = new FetchTransport({host: '/influx'})
+      expect(transport._url).to.equal('/influx')
+    })
   })
   describe('request', () => {
     const transport = new FetchTransport({host: 'http://test:8086'})

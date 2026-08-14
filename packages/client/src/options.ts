@@ -5,7 +5,10 @@ import {QParamType} from './QueryApi'
  * Option for the communication with InfluxDB server.
  */
 export interface ConnectionOptions {
-  /** base host URL */
+  /**
+   * base host URL.
+   * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
+   */
   host: string
 
   /** authentication token */
@@ -247,7 +250,7 @@ function ensureWriteOptions(options: ClientOptions): WriteOptions {
 }
 
 /**
- * Parses connection string into `ClientOptions`.
+ * Parses connection string into `ClientOptions`<br> NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
  * @param connectionString - connection string
  */
 export function fromConnectionString(connectionString: string): ClientOptions {
@@ -304,6 +307,7 @@ export function fromConnectionString(connectionString: string): ClientOptions {
 
 /**
  * Creates `ClientOptions` from environment variables.
+ * NOTE: IPv6 must be wrapped inside square brackets, e.g. http://[2001:db8::1]:8086, and Zone IDs are not supported.
  */
 export function fromEnv(): ClientOptions {
   if (!process.env.INFLUX_HOST) {

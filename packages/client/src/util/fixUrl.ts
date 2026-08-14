@@ -10,31 +10,25 @@ const HTTPS_PREFIX = 'https://'
  * - If the URL starts with "http://", the communication is considered unsafe, and the returned boolean value will be false.
  * - If the URL does not start with either "http://" or "https://", the returned boolean value will be undefined.
  *
- * @param url - The URL to process.
+ * @param input - The URL to process.
  * @returns An object containing the modified URL with the protocol replaced by the port and a boolean value indicating the safety of communication (true for safe, false for unsafe) or undefined if not detected.
  */
 export const replaceURLProtocolWithPort = (
-  url: string
+  input: string
 ): {url: string; safe: boolean | undefined} => {
-  url = url.replace(/\/$/, '')
+  input = input.replace(/\/$/, '')
 
   let safe: boolean | undefined
-
-  if (url.startsWith(HTTP_PREFIX)) {
-    url = url.slice(HTTP_PREFIX.length)
+  if (input.startsWith(HTTP_PREFIX)) {
     safe = false
-
-    if (!url.includes(':')) {
-      url = `${url}:80`
-    }
-  } else if (url.startsWith(HTTPS_PREFIX)) {
-    url = url.slice(HTTPS_PREFIX.length)
+  } else if (input.startsWith(HTTPS_PREFIX)) {
     safe = true
-
-    if (!url.includes(':')) {
-      url = `${url}:443`
-    }
+  } else {
+    return {url: input, safe: undefined}
   }
 
-  return {url, safe}
+  const u = new URL(input)
+  const port = u.port || (u.protocol === 'https:' ? '443' : '80')
+
+  return {url: `${u.hostname}:${port}`, safe}
 }
