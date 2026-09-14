@@ -3,7 +3,7 @@
 ### Bug Fixes
 
 1. [#903](https://github.com/InfluxCommunity/influxdb3-js/pull/903):
-   - Only throws `InfluxDBPartialWriteException` when:
+   - Only throws `PartialWriteError` when:
       - Error response status code is `400`.
       - Error response format `{"error":"...","data":[{"error_message":"...","line_number":2,"original_line": "..."}]}` is returned with `data` must be an array.
       - `accept_partial` is set to `true`.
