@@ -1,5 +1,14 @@
 ## 2.5.0 [unreleased]
 
+### Bug Fixes
+
+1. [#903](https://github.com/InfluxCommunity/influxdb3-js/pull/903):
+   - Only throws `InfluxDBPartialWriteException` when:
+      - Error response status code is `400`.
+      - Error response format `{"error":"...","data":[{"error_message":"...","line_number":2,"original_line": "..."}]}` is returned with `data` must be an array.
+      - `accept_partial` is set to `true`.
+      - Write endpoint must be `api/v3/write_lp`.
+
 ## 2.4.0 [2026-08-27]
 
 > :warning: **Breaking Changes**: Node v20 support is dropped. Node v22 or newer is now required ([#881](https://github.com/InfluxCommunity/influxdb3-js/pull/881)).

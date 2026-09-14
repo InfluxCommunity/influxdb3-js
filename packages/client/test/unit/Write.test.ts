@@ -6,6 +6,7 @@ import {
   IllegalArgumentError,
   InfluxDBClient,
   PartialWriteError,
+  PartialWriteLineError,
   Point,
   WriteOptions,
   WritePrecision,
@@ -180,6 +181,270 @@ describe('Write', () => {
         }
       }
     }).timeout(20000)
+  })
+
+  interface TestCase {
+    name: string
+    statusCode: number
+    contentType?: string
+    responseBody: string
+    useV2API?: boolean
+    acceptPartial?: boolean
+    expectedMsg: string
+    expectPartial?: boolean
+    expectedLines?: PartialWriteLineError[]
+  }
+  describe('TestWriteErrorClassification', () => {
+    const rejectedLine = `home,room=Sunroom temp="hi" 1735545610`
+    const rejectedLineJSON = `home,room=Sunroom temp=\\"hi\\" 1735545610`
+    const lineError =
+      "invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::string"
+
+    const testCases: TestCase[] = [
+      {
+        name: 'V3 accept partial with renamed error and non-empty array',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\tline 2: ${lineError} (${rejectedLine})`,
+        expectPartial: true,
+        expectedLines: [
+          {
+            errorMessage: lineError,
+            lineNumber: 2,
+            originalLine: rejectedLine,
+          },
+        ],
+      },
+      {
+        name: 'V3 accept partial without content type',
+        statusCode: 400,
+        responseBody: `{"error":"write completed with rejected rows","data":[{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\tline 2: ${lineError} (${rejectedLine})`,
+        expectPartial: true,
+        expectedLines: [
+          {
+            errorMessage: lineError,
+            lineNumber: 2,
+            originalLine: rejectedLine,
+          },
+        ],
+      },
+      {
+        name: 'V3 accept partial with malformed non-empty array',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[{"line_number":"invalid","original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\t{"line_number":"invalid","original_line":"${rejectedLineJSON}"}`,
+        expectPartial: true,
+      },
+      {
+        name: 'V3 accept partial with mixed primitive and typed entries',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[1,{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\t1\n\t{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}`,
+        expectPartial: true,
+        expectedLines: [
+          {
+            errorMessage: lineError,
+            lineNumber: 2,
+            originalLine: rejectedLine,
+          },
+        ],
+      },
+      {
+        name: 'V3 accept partial with string entries',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":["${rejectedLineJSON}"]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\t"${rejectedLineJSON}"`,
+        expectPartial: true,
+      },
+      {
+        name: 'V3 accept partial with error message only',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[{"error_message":"${lineError}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\t${lineError}`,
+        expectPartial: true,
+        expectedLines: [
+          {
+            lineNumber: undefined,
+            errorMessage: lineError,
+            originalLine: '',
+          },
+        ],
+      },
+      {
+        name: 'V3 accept partial with line number but no original line',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[{"error_message":"${lineError}","line_number":2}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\tline 2: ${lineError}`,
+        expectPartial: true,
+        expectedLines: [
+          {
+            lineNumber: 2,
+            errorMessage: lineError,
+            originalLine: '',
+          },
+        ],
+      },
+      {
+        name: 'V3 accept partial with entry missing error message',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write completed with rejected rows","data":[{"line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: `write completed with rejected rows:\n\t{"line_number":2,"original_line":"${rejectedLineJSON}"}`,
+        expectPartial: true,
+      },
+      {
+        name: 'V3 accept partial with empty array',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write failed","data":[]}`,
+        acceptPartial: true,
+        expectedMsg: 'write failed',
+      },
+      {
+        name: 'V3 accept partial with object details remains generic',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"line protocol parsing error","data":{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}}`,
+        acceptPartial: true,
+        expectedMsg: `line protocol parsing error:\n\tline 2: ${lineError} (${rejectedLine})`,
+      },
+      {
+        name: 'V3 reject partial with object details',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"line protocol parsing error","data":{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}}`,
+        acceptPartial: false,
+        expectedMsg: `line protocol parsing error:\n\tline 2: ${lineError} (${rejectedLine})`,
+      },
+      {
+        name: 'V3 reject write with object details invalid line_number',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"line protocol parsing error","data":{"error_message":"bad line","line_number":"aa","original_line":"${rejectedLineJSON}"}}`,
+        acceptPartial: false,
+        expectedMsg: 'line protocol parsing error:\n\tbad line',
+      },
+      {
+        name: 'V2 never returns partial write error',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"partial write of line protocol occurred","data":[{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        useV2API: true,
+        acceptPartial: true,
+        expectedMsg: 'partial write of line protocol occurred',
+        expectPartial: false,
+      },
+      {
+        name: 'V3 non-400 never returns partial write error',
+        statusCode: 500,
+        contentType: 'application/json',
+        responseBody: `{"error":"partial write of line protocol occurred","data":[{"error_message":"${lineError}","line_number":2,"original_line":"${rejectedLineJSON}"}]}`,
+        acceptPartial: true,
+        expectedMsg: 'partial write of line protocol occurred',
+        expectPartial: false,
+      },
+      {
+        name: 'V3 scalar data remains generic',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write failed","data":"invalid"}`,
+        acceptPartial: true,
+        expectedMsg: 'write failed',
+      },
+      {
+        name: 'V3 empty object data remains generic',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write failed","data":{}}`,
+        acceptPartial: true,
+        expectedMsg: 'write failed',
+      },
+      {
+        name: 'V3 null data remains generic',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write failed","data":null}`,
+        acceptPartial: true,
+        expectedMsg: 'write failed',
+        expectPartial: false,
+      },
+      {
+        name: 'V3 malformed JSON preserves raw response',
+        statusCode: 400,
+        contentType: 'application/json',
+        responseBody: `{"error":"write failed"`,
+        acceptPartial: true,
+        expectedMsg: `400 Bad Request : {"error":"write failed"`,
+        expectPartial: false,
+      },
+    ]
+
+    for (const tc of testCases) {
+      it(tc.name, async () => {
+        let url = ''
+        if (tc.useV2API) {
+          url = WRITE_PATH_NS_V2
+        } else if (tc.acceptPartial == true && !tc.useV2API) {
+          url = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond`
+        } else {
+          url = `/api/v3/write_lp?db=${DATABASE}&precision=nanosecond&accept_partial=false`
+        }
+
+        nock(clientOptions.host)
+          .post(url)
+          .delay(1000)
+          .reply(function (_uri, _requestBody) {
+            return [
+              tc.statusCode,
+              tc.responseBody,
+              tc.contentType ? {'content-type': tc.contentType} : {},
+            ]
+          })
+          .persist()
+
+        const client: InfluxDBClient = new InfluxDBClient({
+          ...clientOptions,
+          writeOptions: {
+            useV2Api: tc.useV2API,
+            acceptPartial: tc.acceptPartial,
+          },
+        })
+        try {
+          await client.write(
+            Point.measurement('test').setFloatField('value', 1),
+            DATABASE
+          )
+          expect.fail('failure expected')
+        } catch (e: any) {
+          if (tc.expectPartial) {
+            expect(e).instanceOf(PartialWriteError)
+            const partialErr = e as PartialWriteError
+            expect(partialErr.message).equals(tc.expectedMsg)
+            if (tc.expectedLines) {
+              expect(partialErr.lineErrors).deep.equals(tc.expectedLines)
+            }
+          } else {
+            expect(e).instanceOf(HttpError)
+            expect((e as Error).message).equals(tc.expectedMsg)
+          }
+        }
+      })
+    }
   })
 
   describe('usage of server API', () => {
@@ -528,43 +793,6 @@ describe('Write', () => {
         .catch((e) => {
           expect(e).instanceOf(PartialWriteError)
           expect(e.lineErrors).to.have.length(2)
-        })
-      expect(logs.error).to.length(1)
-      expect(logs.warn).to.length(0)
-      expect(nock.isDone()).to.be.true
-    })
-
-    it('returns PartialWriteError for v3 write_lp parsing failed object data', async () => {
-      useSubject({
-        useV2Api: false,
-        acceptPartial: false,
-      })
-      nock(clientOptions.host)
-        .post(WRITE_PATH_NS_V3_ACCEPT_PARTIAL_FALSE)
-        .reply(function (_uri) {
-          return [
-            400,
-            JSON.stringify({
-              error: 'parsing failed for write_lp endpoint',
-              data: {
-                error_message:
-                  "invalid column type for column 'temp', expected iox::column_type::field::float, got iox::column_type::field::string",
-                line_number: 2,
-                original_line: 'home,room=Sunroom te',
-              },
-            }),
-            {'content-type': 'application/json'},
-          ]
-        })
-        .persist()
-
-      await subject
-        .write('test value=1', DATABASE)
-        .then(() => expect.fail('failure expected'))
-        .catch((e) => {
-          expect(e).instanceOf(PartialWriteError)
-          expect(e.lineErrors).to.have.length(1)
-          expect(e.message).contains('parsing failed for write_lp endpoint')
         })
       expect(logs.error).to.length(1)
       expect(logs.warn).to.length(0)
