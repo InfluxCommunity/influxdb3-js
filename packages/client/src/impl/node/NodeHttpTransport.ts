@@ -1,7 +1,12 @@
 import * as http from 'http'
 import * as https from 'https'
 import {Buffer} from 'buffer'
-import {AbortError, HttpError, RequestTimedOutError} from '../../errors'
+import {
+  AbortError,
+  ERROR_HEADER_KEYS,
+  HttpError,
+  RequestTimedOutError,
+} from '../../errors'
 import {SendOptions, Transport} from '../../transport'
 import {
   Cancellable,
@@ -16,6 +21,7 @@ import {Log} from '../../util/logger'
 import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
 import {urlToHttpOptions} from 'node:url'
+import {IncomingHttpHeaders} from 'node:http'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -355,8 +361,8 @@ export class NodeHttpTransport implements Transport {
         }
       })
       responseData.on('end', () => {
-        if (body === '' && !!res.headers['x-influxdb-error']) {
-          body = res.headers['x-influxdb-error'].toString()
+        if (body === '') {
+          body = this.getErrorMessageHeader(res.headers)
         }
         reject(
           new HttpError(
@@ -449,6 +455,24 @@ export class NodeHttpTransport implements Transport {
       req.write(requestMessage.body)
     }
     req.end()
+  }
+
+  private getErrorMessageHeader(headers: IncomingHttpHeaders): string {
+    let msg = ''
+    if (!headers) {
+      return msg
+    }
+
+    for (const key of ERROR_HEADER_KEYS) {
+      const value =
+        headers[key] ??
+        Object.entries(headers).find(([k]) => k.toLowerCase() === key)?.[1]
+      if (value) {
+        msg = Array.isArray(value) ? value.join(',') : value.toString()
+      }
+    }
+
+    return msg
   }
 }
 export default NodeHttpTransport

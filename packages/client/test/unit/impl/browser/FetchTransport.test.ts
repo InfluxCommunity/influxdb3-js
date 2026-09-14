@@ -752,4 +752,93 @@ describe('FetchTransport', () => {
       }
     )
   })
+
+  describe('getErrorMessageHeader', () => {
+    const transport = new FetchTransport({host: 'http://test:8086'}) as any
+
+    it('returns empty string if headers are undefined or null', () => {
+      expect(transport.getErrorMessageHeader(undefined)).to.equal('')
+      expect(transport.getErrorMessageHeader(null)).to.equal('')
+    })
+
+    it('returns empty string when no error header exists', () => {
+      expect(transport.getErrorMessageHeader({})).to.equal('')
+      const headers = new Headers()
+      headers.set('content-type', 'application/json')
+      expect(transport.getErrorMessageHeader(headers)).to.equal('')
+    })
+
+    it('extracts x-platform-error-code header (case-insensitive) from Headers instance', () => {
+      const headers1 = new Headers()
+      headers1.set('x-platform-error-code', 'err-platform')
+      expect(transport.getErrorMessageHeader(headers1)).to.equal('err-platform')
+
+      const headers2 = new Headers()
+      headers2.set('X-Platform-Error-Code', 'err-platform')
+      expect(transport.getErrorMessageHeader(headers2)).to.equal('err-platform')
+    })
+
+    it('extracts x-influx-error header (case-insensitive) from Headers instance', () => {
+      const headers1 = new Headers()
+      headers1.set('x-influx-error', 'err-influx')
+      expect(transport.getErrorMessageHeader(headers1)).to.equal('err-influx')
+
+      const headers2 = new Headers()
+      headers2.set('X-Influx-Error', 'err-influx')
+      expect(transport.getErrorMessageHeader(headers2)).to.equal('err-influx')
+    })
+
+    it('extracts x-influxdb-error header (case-insensitive) from Headers instance', () => {
+      const headers1 = new Headers()
+      headers1.set('x-influxdb-error', 'err-influxdb')
+      expect(transport.getErrorMessageHeader(headers1)).to.equal('err-influxdb')
+
+      const headers2 = new Headers()
+      headers2.set('X-Influxdb-Error', 'err-influxdb')
+      expect(transport.getErrorMessageHeader(headers2)).to.equal('err-influxdb')
+
+      const headers3 = new Headers()
+      headers3.set('X-InfluxDb-Error', 'err-influxdb')
+      expect(transport.getErrorMessageHeader(headers3)).to.equal('err-influxdb')
+    })
+
+    it('extracts headers from plain object/record (case-insensitive)', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'X-Platform-Error-Code': 'err-platform',
+        })
+      ).to.equal('err-platform')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-Influx-Error': 'err-influx',
+        })
+      ).to.equal('err-influx')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-InfluxDb-Error': 'err-influxdb',
+        })
+      ).to.equal('err-influxdb')
+    })
+
+    it('handles header priority when multiple error headers are present', () => {
+      const headers1 = new Headers()
+      headers1.set('x-platform-error-code', 'err-platform')
+      headers1.set('x-influx-error', 'err-influx')
+      expect(transport.getErrorMessageHeader(headers1)).to.equal('err-influx')
+
+      const headers2 = new Headers()
+      headers2.set('x-platform-error-code', 'err-platform')
+      headers2.set('x-influx-error', 'err-influx')
+      headers2.set('x-influxdb-error', 'err-influxdb')
+      expect(transport.getErrorMessageHeader(headers2)).to.equal('err-influxdb')
+    })
+
+    it('handles array values in plain object headers', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-influxdb-error': ['error1', 'error2'],
+        })
+      ).to.equal('error1,error2')
+    })
+  })
 })

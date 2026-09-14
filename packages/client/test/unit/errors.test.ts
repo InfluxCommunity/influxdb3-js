@@ -1,11 +1,11 @@
 import {expect} from 'chai'
 import * as http from 'http'
 import {
-  HttpError,
-  RequestTimedOutError,
   AbortError,
+  HttpError,
   IllegalArgumentError,
   PartialWriteError,
+  RequestTimedOutError,
 } from '../../src'
 
 describe('errors', () => {
@@ -77,73 +77,52 @@ describe('errors', () => {
       expect(err.message).equals('parsing failed for write_lp endpoint')
       expect(err.code).equals('internal')
     })
-    it('verifies v3 write error format with details', () => {
-      const body = JSON.stringify({
-        error: 'partial write of line protocol occurred',
-        data: [
-          {
-            error_message: 'invalid column type for column v',
-            line_number: 2,
-            original_line: '**.DBG.remote_***',
-          },
-          {
-            error_message: 'only error message',
-          },
-          null,
-        ],
-      })
-      expect(new HttpError(400, 'Bad Request', body).message).equals(
-        'partial write of line protocol occurred:\n' +
-          '\tline 2: invalid column type for column v (**.DBG.remote_***)\n' +
-          '\tonly error message'
-      )
-    })
     it('verifies v3 write error format without details', () => {
       const body = JSON.stringify({
-        error: 'partial write of line protocol occurred',
-        data: [{line_number: 2}],
+        error: 'line protocol parsing error',
+        data: {line_number: 2},
       })
       expect(new HttpError(400, 'Bad Request', body).message).equals(
-        'partial write of line protocol occurred:\n\t{"line_number":2}'
+        'line protocol parsing error'
       )
     })
     it('verifies v3 write error message includes details', () => {
       const body = JSON.stringify({
-        error: 'partial write of line protocol occurred',
-        data: [
-          {
-            error_message:
-              "invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float",
-            line_number: 2,
-            original_line: 'testa6a3ad v=1 17702',
-          },
-        ],
+        error: 'line protocol parsing error',
+        data: {
+          error_message:
+            "invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float",
+          line_number: 2,
+          original_line: 'testa6a3ad v=1 17702',
+        },
       })
       const message = new HttpError(400, 'Bad Request', body).message
-      expect(message).to.include('partial write of line protocol occurred')
-      expect(message).to.include('line 2')
-      expect(message).to.include(
-        "invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float"
-      )
-      expect(message).to.include('testa6a3ad v=1 17702')
-    })
-    it('verifies v3 write error message with untyped data fallback details', () => {
-      const body = JSON.stringify({
-        error: 'partial write of line protocol occurred',
-        data: ['bad line', true, null],
-      })
-      expect(new HttpError(400, 'Bad Request', body).message).equals(
-        'partial write of line protocol occurred:\n\t"bad line"\n\ttrue'
+      expect(message).to.equals(
+        'line protocol parsing error:\n' +
+          "\tline 2: invalid column type for column 'v', expected iox::column_type::field::integer, got iox::column_type::field::float (testa6a3ad v=1 17702)"
       )
     })
+
     it('formats line_number without original_line', () => {
       const body = JSON.stringify({
         error: 'partial write of line protocol occurred',
-        data: [{error_message: 'bad line', line_number: 3}],
+        data: {error_message: 'bad line', line_number: 3},
       })
       expect(new HttpError(400, 'Bad Request', body).message).equals(
         'partial write of line protocol occurred:\n\tline 3: bad line'
       )
+    })
+    it('handles non-object json or empty error', () => {
+      expect(new HttpError(400, 'Bad Request', '["error"]').message).equals(
+        '400 Bad Request : ["error"]'
+      )
+      expect(new HttpError(400, 'Bad Request', '{"error": ""}').message).equals(
+        '400 Bad Request : {"error": ""}'
+      )
+      expect(
+        new HttpError(400, 'Bad Request', '{"message": "", "error": "err"}')
+          .message
+      ).equals('err')
     })
   })
   describe('http error values', () => {
@@ -202,14 +181,7 @@ describe('errors', () => {
             original_line: 'm,t=a value=1',
           },
         },
-        expectPartial: true,
-        expectedLineErrors: [
-          {
-            lineNumber: 2,
-            errorMessage: 'bad value',
-            originalLine: 'm,t=a value=1',
-          },
-        ],
+        expectPartial: false,
       },
       {
         title: 'is created from object with error_message and line_number only',
@@ -217,14 +189,7 @@ describe('errors', () => {
           error: 'partial write of line protocol occurred',
           data: {error_message: 'bad value', line_number: 3},
         },
-        expectPartial: true,
-        expectedLineErrors: [
-          {
-            lineNumber: 3,
-            errorMessage: 'bad value',
-            originalLine: '',
-          },
-        ],
+        expectPartial: false,
       },
       {
         title: 'is not created for non-partial-write error',
@@ -234,23 +199,132 @@ describe('errors', () => {
         },
         expectPartial: false,
       },
-    ].forEach(({title, body, expectPartial, expectedLineErrors}) => {
-      it(title, () => {
-        const error = new HttpError(
-          400,
-          'Bad Request',
-          JSON.stringify(body),
-          'application/json'
-        )
-        const partial = PartialWriteError.fromHttpError(error)
-        expect(!!partial).to.equal(expectPartial)
-        if (expectPartial) {
-          expect(partial).instanceOf(PartialWriteError)
-          expect(partial?.lineErrors).to.deep.equal(expectedLineErrors)
-        } else {
-          expect(partial).to.equal(undefined)
-        }
-      })
+      {
+        title: 'is created from typed data array with missing lineNumber',
+        body: {
+          error: 'partial write of line protocol occurred',
+          data: [
+            {
+              error_message: 'bad value',
+            },
+          ],
+        },
+        expectPartial: true,
+        expectedLineErrors: [
+          {
+            lineNumber: undefined,
+            errorMessage: 'bad value',
+            originalLine: '',
+          },
+        ],
+        expectedMessage:
+          'partial write of line protocol occurred:\n\tbad value',
+      },
+      {
+        title: 'is created from typed data array with non-string originalLine',
+        body: {
+          error: 'partial write of line protocol occurred',
+          data: [
+            {
+              error_message: 'bad value',
+              line_number: 1,
+              original_line: 123,
+            },
+          ],
+        },
+        expectPartial: true,
+        expectedLineErrors: [
+          {
+            lineNumber: 1,
+            errorMessage: 'bad value',
+            originalLine: '',
+          },
+        ],
+        expectedMessage:
+          'partial write of line protocol occurred:\n\tline 1: bad value',
+      },
+      {
+        title:
+          'falls back to untyped if line_number is invalid (e.g. string or <= 0)',
+        body: {
+          error: 'partial write error',
+          data: [{error_message: 'bad value', line_number: 'invalid'}],
+        },
+        expectPartial: true,
+        expectedLineErrors: [],
+        expectedMessage:
+          'partial write error:\n\t{"error_message":"bad value","line_number":"invalid"}',
+      },
+      {
+        title: 'falls back to untyped if error_message is empty',
+        body: {
+          error: 'partial write error',
+          data: [{error_message: '', line_number: 1}],
+        },
+        expectPartial: true,
+        expectedLineErrors: [],
+        expectedMessage:
+          'partial write error:\n\t{"error_message":"","line_number":1}',
+      },
+      {
+        title: 'is created from untyped data array',
+        body: {
+          error: 'partial write error',
+          data: ['some raw error', null, {foo: 'bar'}],
+        },
+        expectPartial: true,
+        expectedLineErrors: [],
+        expectedMessage:
+          'partial write error:\n\t"some raw error"\n\t{"foo":"bar"}',
+      },
+      {
+        title: 'is not created if data array is empty',
+        body: {
+          error: 'partial write error',
+          data: [],
+        },
+        expectPartial: false,
+      },
+      {
+        title: 'is not created if error text is empty',
+        body: {
+          error: '',
+          data: [{error_message: 'err'}],
+        },
+        expectPartial: false,
+      },
+    ].forEach(
+      ({
+        title,
+        body,
+        expectPartial,
+        expectedLineErrors,
+        expectedMessage,
+      }: any) => {
+        it(title, () => {
+          const error = new HttpError(
+            400,
+            'Bad Request',
+            JSON.stringify(body),
+            'application/json'
+          )
+          const partial = PartialWriteError.fromHttpError(error)
+          expect(!!partial).to.equal(expectPartial)
+          if (expectPartial) {
+            expect(partial).instanceOf(PartialWriteError)
+            expect(partial?.lineErrors).to.deep.equal(expectedLineErrors)
+            if (expectedMessage) {
+              expect(partial?.message).to.equal(expectedMessage)
+            }
+          } else {
+            expect(partial).to.equal(undefined)
+          }
+        })
+      }
+    )
+    it('returns undefined if error.json is undefined', () => {
+      const error = new HttpError(500, 'Server Error')
+      expect(PartialWriteError.fromHttpError(error)).to.equal(undefined)
     })
   })
 })
