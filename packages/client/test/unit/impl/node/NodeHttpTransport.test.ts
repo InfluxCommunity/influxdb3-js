@@ -461,6 +461,32 @@ describe('NodeHttpTransport', () => {
             expect(e).property('body').equals(errorMessage)
           })
       })
+      it(`uses X-Influx-Error header when no body is returned`, async () => {
+        const errorMessage = 'this is an influx error message'
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(500, '', {'X-Influx-Error': errorMessage})
+        await sendTestData(transportOptions, {method: 'GET'})
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e: any) => {
+            expect(e).property('body').equals(errorMessage)
+          })
+      })
+      it(`uses X-Platform-Error-Code header when no body is returned`, async () => {
+        const errorMessage = 'this is a platform error code'
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(500, '', {'X-Platform-Error-Code': errorMessage})
+        await sendTestData(transportOptions, {method: 'GET'})
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e: any) => {
+            expect(e).property('body').equals(errorMessage)
+          })
+      })
       it(`is aborted by a signal before response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
@@ -929,6 +955,32 @@ describe('NodeHttpTransport', () => {
             expect(e).property('body').equals(errorMessage)
           })
       })
+      it(`uses X-Influx-Error header when no body is returned`, async () => {
+        const errorMessage = 'this is an influx error message'
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(500, '', {'X-Influx-Error': errorMessage})
+        await iterateTestData(transportOptions, {method: 'GET'})
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e: any) => {
+            expect(e).property('body').equals(errorMessage)
+          })
+      })
+      it(`uses X-Platform-Error-Code header when no body is returned`, async () => {
+        const errorMessage = 'this is a platform error code'
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(500, '', {'X-Platform-Error-Code': errorMessage})
+        await iterateTestData(transportOptions, {method: 'GET'})
+          .then(() => {
+            throw new Error('must not succeed')
+          })
+          .catch((e: any) => {
+            expect(e).property('body').equals(errorMessage)
+          })
+      })
       it(`is aborted by a signal before the whole response arrives`, async () => {
         let remainingChunks = 2
         const ac = new AbortController()
@@ -1255,6 +1307,90 @@ describe('NodeHttpTransport', () => {
       } catch (e: any) {
         expect(e.toString()).to.include('timed')
       }
+    })
+  })
+  describe('getErrorMessageHeader', () => {
+    const transport = new NodeHttpTransport({host: TEST_URL}) as any
+
+    it('returns empty string if headers are undefined or null', () => {
+      expect(transport.getErrorMessageHeader(undefined)).to.equal('')
+      expect(transport.getErrorMessageHeader(null)).to.equal('')
+    })
+
+    it('returns empty string when no error header exists', () => {
+      expect(transport.getErrorMessageHeader({})).to.equal('')
+      expect(
+        transport.getErrorMessageHeader({'content-type': 'application/json'})
+      ).to.equal('')
+    })
+
+    it('extracts x-platform-error-code header (case-insensitive)', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-platform-error-code': 'err-platform',
+        })
+      ).to.equal('err-platform')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-Platform-Error-Code': 'err-platform',
+        })
+      ).to.equal('err-platform')
+    })
+
+    it('extracts x-influx-error header (case-insensitive)', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-influx-error': 'err-influx',
+        })
+      ).to.equal('err-influx')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-Influx-Error': 'err-influx',
+        })
+      ).to.equal('err-influx')
+    })
+
+    it('extracts x-influxdb-error header (case-insensitive)', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-influxdb-error': 'err-influxdb',
+        })
+      ).to.equal('err-influxdb')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-Influxdb-Error': 'err-influxdb',
+        })
+      ).to.equal('err-influxdb')
+      expect(
+        transport.getErrorMessageHeader({
+          'X-InfluxDb-Error': 'err-influxdb',
+        })
+      ).to.equal('err-influxdb')
+    })
+
+    it('handles header priority when multiple error headers are present', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-platform-error-code': 'err-platform',
+          'x-influx-error': 'err-influx',
+        })
+      ).to.equal('err-influx')
+
+      expect(
+        transport.getErrorMessageHeader({
+          'x-platform-error-code': 'err-platform',
+          'x-influx-error': 'err-influx',
+          'x-influxdb-error': 'err-influxdb',
+        })
+      ).to.equal('err-influxdb')
+    })
+
+    it('handles array values in headers', () => {
+      expect(
+        transport.getErrorMessageHeader({
+          'x-influxdb-error': ['error1', 'error2'],
+        })
+      ).to.equal('error1,error2')
     })
   })
 })

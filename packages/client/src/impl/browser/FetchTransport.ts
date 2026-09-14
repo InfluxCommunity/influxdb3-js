@@ -1,5 +1,5 @@
-import {Transport, SendOptions} from '../../transport'
-import {AbortError, HttpError} from '../../errors'
+import {SendOptions, Transport} from '../../transport'
+import {AbortError, ERROR_HEADER_KEYS, HttpError} from '../../errors'
 import completeCommunicationObserver from '../completeCommunicationObserver'
 import {Log} from '../../util/logger'
 import {
@@ -41,9 +41,8 @@ export default class FetchTransport implements Transport {
     }
     if (this._connectionOptions.token) {
       const authScheme = this._connectionOptions.authScheme ?? 'Token'
-      this._defaultHeaders[
-        'Authorization'
-      ] = `${authScheme} ${this._connectionOptions.token}`
+      this._defaultHeaders['Authorization'] =
+        `${authScheme} ${this._connectionOptions.token}`
     }
     this._url = String(this._connectionOptions.host)
     if (this._url.endsWith('/')) {
@@ -149,7 +148,7 @@ export default class FetchTransport implements Transport {
       try {
         text = await response.text()
         if (!text) {
-          const headerError = response.headers.get('x-influxdb-error')
+          const headerError = this.getErrorMessageHeader(response.headers)
           if (headerError) {
             text = headerError
           }
@@ -241,8 +240,8 @@ export default class FetchTransport implements Transport {
         method === 'GET' || method === 'HEAD'
           ? undefined
           : typeof body === 'string'
-          ? body
-          : JSON.stringify(body),
+            ? body
+            : JSON.stringify(body),
       headers: {
         ...this._defaultHeaders,
         ...headers,
@@ -283,4 +282,24 @@ export default class FetchTransport implements Transport {
     options: SendOptions,
     url: string
   ) => void = function () {}
+
+  private getErrorMessageHeader(headers: globalThis.Headers | Headers): string {
+    let msg = ''
+    if (!headers) {
+      return msg
+    }
+
+    for (const key of ERROR_HEADER_KEYS) {
+      const value =
+        typeof (headers as any)?.get === 'function'
+          ? (headers as any).get(key)
+          : ((headers as any)[key] ??
+            Object.entries(headers).find(([k]) => k.toLowerCase() === key)?.[1])
+      if (value) {
+        msg = Array.isArray(value) ? value.join(',') : value.toString()
+      }
+    }
+
+    return msg
+  }
 }
