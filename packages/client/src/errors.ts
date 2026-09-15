@@ -6,6 +6,12 @@ export interface PartialWriteLineError {
   originalLine: string
 }
 
+export const ERROR_HEADER_KEYS = [
+  'x-platform-error-code',
+  'x-influx-error',
+  'x-influxdb-error',
+]
+
 function parseLineNumber(value: unknown): number {
   if (value === undefined || value === null) {
     return 0
