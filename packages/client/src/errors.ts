@@ -1,22 +1,16 @@
 import {Headers} from './results'
 
 export interface PartialWriteLineError {
-  lineNumber: number
+  lineNumber: number | undefined
   errorMessage: string
   originalLine: string
 }
 
-function isV3PartialWriteErrorMessage(errorMessage: unknown): boolean {
-  if (typeof errorMessage !== 'string' || errorMessage.length === 0) {
-    return false
-  }
-  const normalized = errorMessage.toLowerCase()
-  return (
-    normalized.includes('partial write of line protocol occurred') ||
-    normalized.includes('parsing failed for write_lp endpoint') || // Core 3.9 and earlier
-    normalized.includes('line protocol parsing error') // Core 3.10 and later
-  )
-}
+export const ERROR_HEADER_KEYS = [
+  'x-platform-error-code',
+  'x-influx-error',
+  'x-influxdb-error',
+]
 
 function parseLineNumber(value: unknown): number {
   if (value === undefined || value === null) {
@@ -26,6 +20,25 @@ function parseLineNumber(value: unknown): number {
     return value
   }
   throw new Error('line_number must be number')
+}
+
+export function isV3PartialWriteErrorMessage(
+  statusCode: number,
+  root: any,
+  acceptPartial?: boolean,
+  useV2Api?: boolean
+): boolean {
+  // path == '/api/v3/write_lp'
+  return (
+    statusCode == 400 &&
+    acceptPartial != false &&
+    !useV2Api &&
+    root &&
+    typeof root == 'object' &&
+    root.error &&
+    Array.isArray(root.data) &&
+    root.data.length > 0
+  )
 }
 
 function parseOriginalLine(value: unknown): string {
@@ -45,52 +58,60 @@ function parsePartialWriteDataItem(
     return null
   }
   if (typeof item !== 'object' || Array.isArray(item)) {
-    throw new Error('item is not an object')
+    return null
   }
   const errorMessage = (item as {error_message?: unknown}).error_message
   if (typeof errorMessage !== 'string') {
-    throw new Error('error_message must be string')
+    return null
   }
   if (errorMessage.length === 0) {
     return null
   }
-  const lineNumber = parseLineNumber(
-    (item as {line_number?: unknown}).line_number
-  )
-  const originalLine = parseOriginalLine(
-    (item as {original_line?: unknown}).original_line
-  )
+  let lineNumber
+  try {
+    if ((item as {line_number?: unknown}).line_number) {
+      lineNumber = parseLineNumber(
+        (item as {line_number?: unknown}).line_number
+      )
+      if (lineNumber === null || lineNumber == 0) {
+        return null
+      }
+    }
+  } catch (e) {
+    return null
+  }
+
+  let originalLine = ''
+  try {
+    originalLine = parseOriginalLine(
+      (item as {original_line?: unknown}).original_line
+    )
+  } catch (e) {
+    originalLine = ''
+  }
+
   return {lineNumber, errorMessage, originalLine}
 }
 
 function parseTypedLineErrors(
   data: unknown
-): PartialWriteLineError[] | undefined {
+): [boolean, PartialWriteLineError[]] {
   if (!Array.isArray(data)) {
-    return undefined
+    return [false, []]
   }
-  const lineErrors: PartialWriteLineError[] = []
-  try {
-    for (const item of data) {
-      const lineError = parsePartialWriteDataItem(item)
-      if (lineError) {
-        lineErrors.push(lineError)
-      }
-    }
-  } catch {
-    return undefined
-  }
-  return lineErrors.length > 0 ? lineErrors : undefined
-}
 
-function parseSingleLineError(
-  data: unknown
-): PartialWriteLineError | undefined {
-  try {
-    return parsePartialWriteDataItem(data) ?? undefined
-  } catch {
-    return undefined
+  let allTyped = true
+  const lineErrors: PartialWriteLineError[] = []
+  for (const item of data) {
+    const lineError = parsePartialWriteDataItem(item)
+    if (!lineError) {
+      allTyped = false
+      continue
+    }
+    lineErrors.push(lineError)
   }
+
+  return [allTyped, lineErrors]
 }
 
 function formatTypedLineErrorDetails(
@@ -98,8 +119,11 @@ function formatTypedLineErrorDetails(
 ): string[] {
   const details: string[] = []
   for (const lineError of lineErrors) {
-    if (lineError.lineNumber !== 0) {
-      if (lineError.originalLine.length > 0) {
+    if (lineError.lineNumber) {
+      if (
+        lineError.originalLine !== undefined &&
+        lineError.originalLine.length > 0
+      ) {
         details.push(
           `\tline ${lineError.lineNumber}: ${lineError.errorMessage} (${lineError.originalLine})`
         )
@@ -115,50 +139,54 @@ function formatTypedLineErrorDetails(
   return details
 }
 
+function formatObjectDataError(dataNode: any, errormsg: string): string {
+  if (errormsg == undefined || errormsg == '') {
+    return ''
+  }
+
+  const lineNumber = dataNode.line_number ?? ''
+  const errorMessage = dataNode.error_message ?? ''
+  const originalLine = dataNode.original_line ?? ''
+
+  const isLineInteger =
+    !isNaN(Number(lineNumber)) &&
+    Number.isInteger(Number(lineNumber)) &&
+    lineNumber !== ''
+
+  if (errorMessage && (!lineNumber || !isLineInteger)) {
+    return `${errormsg}:\n\t${errorMessage}`
+  } else if (errorMessage && isLineInteger && !originalLine) {
+    return `${errormsg}:\n\tline ${lineNumber}: ${errorMessage}`
+  } else if (errorMessage && originalLine) {
+    return `${errormsg}:\n\tline ${lineNumber}: ${errorMessage} (${originalLine})`
+  }
+
+  return errormsg
+}
+
 function formatErrorMessage(node: any): string | undefined {
   if (!node || typeof node !== 'object' || Array.isArray(node)) {
     return undefined
   }
-  const message = typeof node.message === 'string' ? node.message : undefined
-  if (message) {
-    return message
+
+  if (typeof node.message === 'string' && node.message) {
+    return node.message
   }
 
   const errorText = typeof node.error === 'string' ? node.error : undefined
-  const data = node.data
-  if (errorText && isV3PartialWriteErrorMessage(errorText)) {
-    const typedArray = parseTypedLineErrors(data)
-    if (typedArray) {
-      const details = formatTypedLineErrorDetails(typedArray)
-      return `${errorText}:\n${details.join('\n')}`
-    }
-    if (Array.isArray(data)) {
-      const details: string[] = []
-      for (const item of data) {
-        if (item == null) {
-          continue
-        }
-        const raw = JSON.stringify(item)
-        if (raw && raw.toLowerCase() !== 'null') {
-          details.push(`\t${raw}`)
-        }
-      }
-      if (details.length) {
-        return `${errorText}:\n${details.join('\n')}`
-      }
-      return errorText
-    }
-    const single = parseSingleLineError(data)
-    if (single) {
-      return `${errorText}:\n${formatTypedLineErrorDetails([single]).join('\n')}`
-    }
-    return errorText
-  }
-  if (errorText) {
-    return errorText
+  if (!errorText) {
+    return undefined
   }
 
-  return undefined
+  const {data} = node
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    const formatted = formatObjectDataError(data, errorText)
+    if (formatted) {
+      return formatted
+    }
+  }
+
+  return errorText
 }
 
 /** IllegalArgumentError is thrown when illegal argument is supplied. */
@@ -201,6 +229,8 @@ export class HttpError extends Error {
           if (typeof this.json?.code === 'string') {
             this.code = this.json.code
           }
+          // Core/Enterprise object format:
+          // {"error":"...","data":{"error_message":"..."}}
           const parsedMessage = formatErrorMessage(this.json)
           if (parsedMessage) {
             this.message = parsedMessage
@@ -234,40 +264,45 @@ export class PartialWriteError extends HttpError {
   }
 
   static fromHttpError(error: HttpError): PartialWriteError | undefined {
-    const bodyJson = error.json
-    if (!bodyJson || typeof bodyJson !== 'object' || Array.isArray(bodyJson)) {
+    const json = error.json
+    if (
+      !json ||
+      typeof json !== 'object' ||
+      typeof json.error !== 'string' ||
+      !json.error ||
+      !Array.isArray(json.data) ||
+      json.data.length === 0
+    ) {
       return undefined
     }
-    const errorMessage = (bodyJson as {error?: unknown}).error
-    if (!isV3PartialWriteErrorMessage(errorMessage)) {
-      return undefined
-    }
-    const data = (bodyJson as {data?: unknown}).data
-    const typedArray = parseTypedLineErrors(data)
-    if (typedArray) {
-      return new PartialWriteError(
-        error.statusCode,
-        error.statusMessage,
-        error.body,
-        error.contentType,
-        error.headers,
-        error.message,
-        typedArray
-      )
-    }
-    const single = parseSingleLineError(data)
-    if (single) {
-      return new PartialWriteError(
-        error.statusCode,
-        error.statusMessage,
-        error.body,
-        error.contentType,
-        error.headers,
-        error.message,
-        [single]
-      )
-    }
-    return undefined
+
+    const {error: errorText, data} = json
+    const [allTyped, lineErrors] = parseTypedLineErrors(data)
+    const details = allTyped
+      ? formatTypedLineErrorDetails(lineErrors)
+      : (data as unknown[])
+          .map((item: unknown) =>
+            item != null ? JSON.stringify(item) : undefined
+          )
+          .filter(
+            (raw: string | undefined): raw is string =>
+              raw !== undefined && raw !== '' && raw.toLowerCase() !== 'null'
+          )
+          .map((raw: string) => `\t${raw}`)
+
+    const message = details.length
+      ? `${errorText}:\n${details.join('\n')}`
+      : errorText
+
+    return new PartialWriteError(
+      error.statusCode,
+      error.statusMessage,
+      error.body,
+      error.contentType,
+      error.headers,
+      message,
+      lineErrors
+    )
   }
 }
 
