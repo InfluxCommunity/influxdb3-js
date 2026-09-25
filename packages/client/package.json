@@ -15,7 +15,7 @@
     "test:all": "mocha 'test/**/*.test.ts' --exit",
     "test:unit": "mocha 'test/unit/**/*.test.ts' --exit",
     "test:integration": "mocha 'test/integration/**/*.test.ts' --exit",
-    "test:ci": "yarn run lint:ci && yarn run test:all --exit --reporter mocha-junit-reporter --reporter-options mochaFile=../../reports/core_mocha/test-results.xml",
+    "test:ci": "yarn run lint:ci && mocha 'test/**/*.test.ts' --exit --reporter xunit --reporter-option output=../../reports/core_mocha/test-results.xml",
     "test:watch": "mocha 'test/unit/**/*.test.ts' --watch-extensions ts --watch",
     "typecheck": "tsc --noEmit --pretty",
     "lint": "eslint src/**/*.ts test/**/*.ts",
