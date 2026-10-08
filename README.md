@@ -186,7 +186,7 @@ try {
 } catch (e: any) {
   if (e instanceof PartialWriteError) {
     for (const lineErr of e.lineErrors) {
-      console.log(`line ${lineErr.lineNumber}: ${lineErr.errorMessage} (${lineErr.originalLine})`)
+      console.log(`line ${lineErr.lineNumber ?? 0}: ${lineErr.errorMessage} (${lineErr.originalLine})`)
     }
   }
 }
