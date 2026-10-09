@@ -8,7 +8,7 @@
       - Error response format `{"error":"...","data":[{"error_message":"...","line_number":2,"original_line": "..."}]}` is returned with `data` must be an array.
       - `accept_partial` is set to `true`.
       - Write endpoint must be `api/v3/write_lp`.
-      - Please note that `PartialWriteError.lineNumber` in typescript can now be `undefined`. Previously `undefined` line numbers defaulted to `0`.  This may break strict TypeScript consumers.
+      - Please note that `PartialWriteError.lineNumber` in TypeScript can now be `undefined`. Previously `undefined` line numbers defaulted to `0`.  This may break strict TypeScript consumers.
 
 ## 2.4.0 [2026-08-27]
 
