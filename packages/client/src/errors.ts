@@ -69,7 +69,10 @@ function parsePartialWriteDataItem(
   }
   let lineNumber
   try {
-    if ((item as {line_number?: unknown}).line_number) {
+    if (
+      (item as {line_number?: unknown}).line_number ||
+      (item as {line_number?: unknown}).line_number === 0
+    ) {
       lineNumber = parseLineNumber(
         (item as {line_number?: unknown}).line_number
       )
