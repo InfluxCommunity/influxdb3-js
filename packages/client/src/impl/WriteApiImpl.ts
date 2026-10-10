@@ -9,7 +9,12 @@ import {
 import {Transport} from '../transport'
 import {Headers} from '../results'
 import {Log} from '../util/logger'
-import {HttpError, IllegalArgumentError, PartialWriteError} from '../errors'
+import {
+  HttpError,
+  IllegalArgumentError,
+  isV3PartialWriteErrorMessage,
+  PartialWriteError,
+} from '../errors'
 import {impl} from './implSelector'
 
 export default class WriteApiImpl implements WriteApi {
@@ -119,9 +124,21 @@ export default class WriteApiImpl implements WriteApi {
               "Server doesn't support the V3 API endpoint (/api/v3/write_lp). " +
               'Set useV2Api=true to use the V2 API endpoint.'
           }
-          const partialWriteError = PartialWriteError.fromHttpError(error)
-          if (partialWriteError) {
-            error = partialWriteError
+
+          if (
+            isV3PartialWriteErrorMessage(
+              error.statusCode,
+              error.json,
+              writeOptionsOrDefault.acceptPartial,
+              writeOptionsOrDefault.useV2Api
+            )
+          ) {
+            // InfluxDB 3 Core/Enterprise partial write error format:
+            // {"error":"...","data":[{"error_message":"...","line_number":2,"original_line": "..."}]}
+            const partialWriteError = PartialWriteError.fromHttpError(error)
+            if (partialWriteError) {
+              error = partialWriteError
+            }
           }
         }
         Log.error(`Write to InfluxDB failed.`, error)
