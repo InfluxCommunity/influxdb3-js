@@ -627,10 +627,12 @@ describe('e2e test', () => {
         })
         expect.fail('failure expected')
       } catch (e: any) {
-        expect(e).instanceOf(PartialWriteError)
-        expect(e.message).to.include('line protocol parsing error')
-        expect(e.lineErrors).to.have.length(1)
-        expect(e.lineErrors[0].lineNumber).to.equal(2)
+        expect(e).instanceOf(HttpError)
+        expect(e.message).to.include(
+          'line protocol parsing error:\n' +
+            "\tline 2: invalid column type for column 'temp', " +
+            'expected iox::column_type::field::float, got iox::column_type::field::string (home,room=Sunroom te)'
+        )
       } finally {
         await client.close()
       }
