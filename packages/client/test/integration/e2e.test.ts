@@ -215,7 +215,7 @@ describe('e2e test', () => {
           .map(async (data) => {
             const queryValues: typeof values = []
 
-            for (let tries = 10; tries--;) {
+            for (let tries = 10; tries--; ) {
               for await (const row of data) {
                 queryValues.push({
                   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -286,7 +286,7 @@ describe('e2e test', () => {
     `
       const queryValues: typeof values = []
 
-      for (let tries = 10; tries--;) {
+      for (let tries = 10; tries--; ) {
         const data = client.queryPoints(query, database)
 
         for await (const row of data) {
