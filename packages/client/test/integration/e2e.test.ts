@@ -65,6 +65,10 @@ const range: {
 const sleep = async (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 describe('e2e test', () => {
+  // These tests exercise real HTTP and Flight connections, not Nock fixtures.
+  before(() => nock.restore())
+  after(() => nock.activate())
+
   describe('with environment variables', () => {
     it('write and query data', async () => {
       const {database, token, url} = getEnvVariables()
@@ -856,7 +860,6 @@ describe('e2e test', () => {
     }).timeout(7000)
 
     it(`communicates through a proxy`, async () => {
-      nock.restore()
       const headers: {host: string | undefined} = {host: undefined}
       const targetUrl = 'http://target:3000'
 
@@ -886,8 +889,6 @@ describe('e2e test', () => {
       } finally {
         server.close()
       }
-
-      nock.activate()
     }).timeout(7000)
   })
 })

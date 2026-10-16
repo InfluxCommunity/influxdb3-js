@@ -12,7 +12,6 @@ import {
   WritePrecision,
 } from '../../src'
 import {CollectedLogs, collectLogging, unhandledRejections} from '../util'
-import zlib from 'zlib'
 import {rejects} from 'assert'
 import {isDefined} from '../../src/util/common'
 
@@ -155,9 +154,9 @@ describe('Write', () => {
           let timestamp = ''
           nock(clientOptions.host)
             .post(test.writePath)
-            .reply(function (_uri, _requestBody) {
-              uri = _uri
-              timestamp = _requestBody.split(' ')[2]
+            .reply(async (request: Request) => {
+              uri = request.url
+              timestamp = (await request.text()).split(' ')[2]
               return [200, '', {}]
             })
             .persist()
@@ -407,8 +406,8 @@ describe('Write', () => {
 
         nock(clientOptions.host)
           .post(url)
-          .delay(1000)
-          .reply(function (_uri, _requestBody) {
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 1000))
             return [
               tc.statusCode,
               tc.responseBody,
@@ -486,19 +485,14 @@ describe('Write', () => {
           const messages: string[] = []
           nock(clientOptions.host)
             .post(WRITE_PATH_NS_V2)
-            .reply(function (_uri, requestBody) {
+            .reply(async (request: Request) => {
               requests++
               if (failNextRequest) {
                 failNextRequest = false
                 return [429, '', {'retry-after': '1'}]
               } else {
-                let plain = requestBody.toString()
-                if (this.req.headers['content-encoding'] == 'gzip') {
-                  plain = zlib
-                    .gunzipSync(Buffer.from(requestBody.toString(), 'hex'))
-                    .toString()
-                }
-                messages.push(plain.toString())
+                // Nock 15 decompresses the body before invoking the reply callback.
+                messages.push(await request.text())
                 return [204, '', {'retry-after': '1'}]
               }
             })
@@ -573,8 +567,8 @@ describe('Write', () => {
       const messages: string[] = []
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, requestBody) {
-          messages.push(requestBody.toString())
+        .reply(async (request: Request) => {
+          messages.push(await request.text())
           return [204, '', {}]
         })
         .persist()
@@ -597,8 +591,8 @@ describe('Write', () => {
       let authorization: any
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
-          authorization = this.req.headers.authorization
+        .reply((request: Request) => {
+          authorization = request.headers.get('authorization')
           return [500, '', {}]
         })
         .persist()
@@ -619,8 +613,8 @@ describe('Write', () => {
       let authorization: any
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
-          authorization = this.req.headers.authorization
+        .reply((request: Request) => {
+          authorization = request.headers.get('authorization')
           return [201, '', {}]
         })
         .persist()
@@ -640,9 +634,9 @@ describe('Write', () => {
       let channelLane = ''
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
-          authorization = this.req.headers.authorization
-          channelLane = this.req.headers['channel-lane']
+        .reply((request: Request) => {
+          authorization = request.headers.get('authorization')
+          channelLane = request.headers.get('channel-lane') ?? ''
           return [204, '', {}]
         })
         .persist()
@@ -671,9 +665,9 @@ describe('Write', () => {
       let particular: any
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
-          universal = this.req.headers.universal
-          particular = this.req.headers.particular
+        .reply((request: Request) => {
+          universal = request.headers.get('universal')
+          particular = request.headers.get('particular')
           return [204, '', {}]
         })
         .persist()
@@ -717,7 +711,7 @@ describe('Write', () => {
         useSubject(writeOptions)
         nock(clientOptions.host)
           .post(path)
-          .reply(function (_uri) {
+          .reply(() => {
             return [204, {}]
           })
           .persist()
@@ -763,7 +757,7 @@ describe('Write', () => {
       })
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V3)
-        .reply(function (_uri) {
+        .reply(() => {
           return [
             400,
             JSON.stringify({
@@ -806,7 +800,7 @@ describe('Write', () => {
       })
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri) {
+        .reply(() => {
           return [
             400,
             JSON.stringify({
@@ -872,7 +866,7 @@ describe('Write', () => {
       })
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
+        .reply(() => {
           return [
             429,
             '{ message: "see status code"}',
@@ -902,7 +896,7 @@ describe('Write', () => {
       const retryDate = new Date(new Date().valueOf() + 600000)
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .reply(function (_uri, _requestBody) {
+        .reply(() => {
           return [
             503,
             '{ message: "see status code"}',
@@ -932,8 +926,8 @@ describe('Write', () => {
     it('timeout when passing timeout directly to write function will have the highest priority', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .delay(1000)
-        .reply(function (_uri, _requestBody) {
+        .reply(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
           return [200, '', {}]
         })
         .persist()
@@ -962,8 +956,8 @@ describe('Write', () => {
     it('timeout by timeout property in ClientOptions', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .delay(1000)
-        .reply(function (_uri, _requestBody) {
+        .reply(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
           return [200, '', {}]
         })
         .persist()
@@ -986,8 +980,8 @@ describe('Write', () => {
     it('WriteOptions.timeout > legacy timeout and new property writeTimeout', async function () {
       nock(clientOptions.host)
         .post(WRITE_PATH_NS_V2)
-        .delay(1000)
-        .reply(function (_uri, _requestBody) {
+        .reply(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
           return [200, '', {}]
         })
         .persist()
