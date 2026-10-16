@@ -54,6 +54,35 @@ async function iterateTestData(
   }
   return data
 }
+// Nock 15's Fetch-based interceptor cannot preserve GET request bodies.
+async function withGetServer(
+  handler: http.RequestListener,
+  run: (host: string) => Promise<void>
+): Promise<void> {
+  let requestMethod: string | undefined
+  let requestPath: string | undefined
+  const server = http.createServer((req, res) => {
+    requestMethod = req.method
+    requestPath = req.url
+    handler(req, res)
+  })
+  nock.restore()
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once('error', reject)
+      server.listen(0, '127.0.0.1', resolve)
+    })
+    const {port} = server.address() as AddressInfo
+    await run(`http://127.0.0.1:${port}`)
+    expect(requestMethod).equals('GET')
+    expect(requestPath).equals('/test')
+  } finally {
+    server.closeAllConnections()
+    await new Promise<void>((resolve) => server.close(() => resolve()))
+    nock.activate()
+  }
+}
+
 const TEST_URL = 'http://test:8086'
 
 describe('NodeHttpTransport', () => {
@@ -236,7 +265,7 @@ describe('NodeHttpTransport', () => {
             let responseRead = false
             const context = nock(transportOptions.url)
               .post(`${extras._contextPath ?? ''}/test`)
-              .reply((_uri, _requestBody) => [
+              .reply(() => [
                 200,
                 new Readable({
                   read(): any {
@@ -252,11 +281,7 @@ describe('NodeHttpTransport', () => {
                   },
                 }),
                 {
-                  'content-encoding': (
-                    _req: any,
-                    _res: any,
-                    _body: any
-                  ): string =>
+                  'content-encoding': (): string =>
                     (extras.headers ?? {})['accept-encoding'] ?? 'identity',
                 },
               ])
@@ -342,7 +367,7 @@ describe('NodeHttpTransport', () => {
         let responseRead = false
         nock(transportOptions.host)
           .get('/test')
-          .reply((_uri, _requestBody) => [
+          .reply(() => [
             200,
             new Readable({
               read(): any {
@@ -367,8 +392,10 @@ describe('NodeHttpTransport', () => {
       it(`fails on socket timeout`, async () => {
         nock(transportOptions.host)
           .get('/test')
-          .delayConnection(2000)
-          .reply(200, 'ok')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await sendTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
           {method: 'GET', timeout: 100}
@@ -383,8 +410,10 @@ describe('NodeHttpTransport', () => {
       it(`fails on connection timeout`, async () => {
         nock(transportOptions.host)
           .get('/test')
-          .delayConnection(2000)
-          .reply(200, 'ok')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await sendTestData(
           {...transportOptions, timeout: 10_000},
           {method: 'GET', timeout: 100}
@@ -397,7 +426,12 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on response timeout`, async () => {
-        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await sendTestData({...transportOptions, timeout: 100}, {method: 'GET'})
           .then(() => {
             throw new Error('must not succeed')
@@ -407,7 +441,12 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`passing timeout directly to send function will have highest priority`, async () => {
-        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await sendTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
           {timeout: 100, method: 'GET'},
@@ -492,7 +531,7 @@ describe('NodeHttpTransport', () => {
         const ac = new AbortController()
         nock(transportOptions.host)
           .get('/test')
-          .reply((_uri, _requestBody) => [
+          .reply(() => [
             200,
             new Readable({
               read(): any {
@@ -522,8 +561,10 @@ describe('NodeHttpTransport', () => {
       it(`is cancelled before the response arrives`, async () => {
         nock(transportOptions.host)
           .get('/test')
-          .delayConnection(2000)
-          .reply(200, 'yes')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'yes']
+          })
           .persist()
         await sendTestData(
           {...transportOptions, timeout: 1000},
@@ -544,7 +585,7 @@ describe('NodeHttpTransport', () => {
           .get('/test')
           .reply(
             200,
-            (_uri, _requestBody) =>
+            () =>
               new Readable({
                 read(): any {
                   remainingChunks--
@@ -574,6 +615,7 @@ describe('NodeHttpTransport', () => {
     let server: http.Server
     let url = ''
     before(async () => {
+      nock.restore()
       await new Promise<void>((resolve) => {
         server = http.createServer()
         server.listen(() => {
@@ -587,8 +629,10 @@ describe('NodeHttpTransport', () => {
         })
       })
     })
-    after(() => {
-      server.close()
+    after(async () => {
+      server.closeAllConnections()
+      await new Promise<void>((resolve) => server.close(() => resolve()))
+      nock.activate()
     })
     afterEach(async () => {
       server.removeAllListeners('request')
@@ -774,7 +818,7 @@ describe('NodeHttpTransport', () => {
           let responseRead = false
           const context = nock(transportOptions.url)
             .post(`${extras._contextPath ?? ''}/test`)
-            .reply((_uri, _requestBody) => [
+            .reply(() => [
               200,
               new Readable({
                 read(): any {
@@ -788,11 +832,7 @@ describe('NodeHttpTransport', () => {
                 },
               }),
               {
-                'content-encoding': (
-                  _req: any,
-                  _res: any,
-                  _body: any
-                ): string =>
+                'content-encoding': (): string =>
                   (extras.headers ?? {})['accept-encoding'] ?? 'identity',
               },
             ])
@@ -850,7 +890,7 @@ describe('NodeHttpTransport', () => {
         let responseRead = false
         nock(transportOptions.host)
           .get('/test')
-          .reply((_uri, _requestBody) => [
+          .reply(() => [
             200,
             new Readable({
               read(): any {
@@ -875,8 +915,10 @@ describe('NodeHttpTransport', () => {
       it(`fails on connection timeout`, async () => {
         nock(transportOptions.host)
           .get('/test')
-          .delayConnection(2000)
-          .reply(200, 'ok')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await iterateTestData(
           {...transportOptions, timeout: 100},
           {method: 'GET'}
@@ -889,7 +931,12 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`fails on response timeout`, async () => {
-        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await iterateTestData(
           {...transportOptions, timeout: 100},
           {method: 'GET'}
@@ -902,7 +949,12 @@ describe('NodeHttpTransport', () => {
           })
       })
       it(`passing timeout directly to iterate function`, async () => {
-        nock(transportOptions.host).get('/test').delay(2000).reply(200, 'ok')
+        nock(transportOptions.host)
+          .get('/test')
+          .reply(async () => {
+            await new Promise((resolve) => setTimeout(resolve, 2000))
+            return [200, 'ok']
+          })
         await iterateTestData(
           {...transportOptions, timeout: 10_000, queryTimeout: 10_000},
           {method: 'GET', timeout: 100}
@@ -986,7 +1038,7 @@ describe('NodeHttpTransport', () => {
         const ac = new AbortController()
         nock(transportOptions.host)
           .get('/test')
-          .reply((_uri, _requestBody) => [
+          .reply(() => [
             200,
             new Readable({
               read(): any {
@@ -1034,34 +1086,28 @@ describe('NodeHttpTransport', () => {
       ] as Array<Array<any>>
     ).forEach((pair, i) => {
       it(`returns string response ${i}`, async () => {
-        let remainingChunks = 2
-        let body: any = undefined
-        nock(transportOptions.host)
-          .get('/test')
-          .reply(
-            200,
-            (_uri, requestBody) => {
-              body = requestBody
-              return new Readable({
-                read(): any {
-                  remainingChunks--
-                  this.push(remainingChunks < 0 ? null : '.')
-                },
-              })
-            },
-            {
-              'content-type': 'text/plain',
-            }
-          )
-          .persist()
-        const retVal = await new NodeHttpTransport({
-          ...transportOptions,
-          timeout: 10000,
-        }).request('/test', pair[0], {
-          method: 'GET',
-          headers: {'content-type': 'text/plain'},
-        })
-        expect(retVal).equals('..')
+        let body = ''
+        await withGetServer(
+          (req, res) => {
+            req.on('data', (chunk) => (body += chunk.toString()))
+            req.on('end', () => {
+              res.setHeader('content-type', 'text/plain')
+              res.write('.')
+              res.end('.')
+            })
+          },
+          async (host) => {
+            const retVal = await new NodeHttpTransport({
+              ...transportOptions,
+              host,
+              timeout: 10000,
+            }).request('/test', pair[0], {
+              method: 'GET',
+              headers: {'content-type': 'text/plain'},
+            })
+            expect(retVal).equals('..')
+          }
+        )
         expect(body).equals(pair[1])
       })
     })
@@ -1073,26 +1119,23 @@ describe('NodeHttpTransport', () => {
       ] as Array<Array<any>>
     ).forEach((pair) => {
       it(`returns ${pair[2]} response`, async () => {
-        nock(transportOptions.host)
-          .get('/test')
-          .reply(
-            200,
-            (_uri, requestBody) => {
-              return requestBody
-            },
-            {
-              'content-type': pair[2],
-            }
-          )
-          .persist()
-        const retVal = await new NodeHttpTransport({
-          ...transportOptions,
-          timeout: 10000,
-        }).request('/test', pair[0], {
-          method: 'GET',
-          headers: {'content-type': pair[2]},
-        })
-        expect(retVal).deep.equals(pair[1])
+        await withGetServer(
+          (req, res) => {
+            res.setHeader('content-type', pair[2])
+            req.pipe(res)
+          },
+          async (host) => {
+            const retVal = await new NodeHttpTransport({
+              ...transportOptions,
+              host,
+              timeout: 10000,
+            }).request('/test', pair[0], {
+              method: 'GET',
+              headers: {'content-type': pair[2]},
+            })
+            expect(retVal).deep.equals(pair[1])
+          }
+        )
       })
     })
     it(`return text even without explicit request headers `, async () => {
@@ -1266,9 +1309,9 @@ describe('NodeHttpTransport', () => {
         .get('/test')
         .reply(
           200,
-          function (_uri, _body, callback) {
-            extra = this.req.headers['extra']
-            callback(null, '..')
+          (request: Request) => {
+            extra = request.headers.get('extra')
+            return '..'
           },
           {
             'content-type': 'application/csv',
@@ -1288,7 +1331,13 @@ describe('NodeHttpTransport', () => {
       expect(extra).equals('yes')
     })
     it(`passing timeout directly to request function`, async () => {
-      nock(transportOptions.host).get('/test').delay(2000).reply(200).persist()
+      nock(transportOptions.host)
+        .get('/test')
+        .reply(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 2000))
+          return [200]
+        })
+        .persist()
       const transport = new NodeHttpTransport({
         ...transportOptions,
         timeout: 10_000,

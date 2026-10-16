@@ -910,11 +910,11 @@ at 'ClientOptions.database'
         .post(`/api/v2/write?bucket=${DATABASE}&precision=ns`)
         .reply(
           204,
-          function (_uri, _body, callback) {
-            extra = this.req.headers['extra']
-            special = this.req.headers['special']
-            oneOff = this.req.headers['one-off']
-            callback(null, '..')
+          (request: Request) => {
+            extra = request.headers.get('extra')
+            special = request.headers.get('special')
+            oneOff = request.headers.get('one-off')
+            return '..'
           },
           {
             'content-type': 'application/csv',

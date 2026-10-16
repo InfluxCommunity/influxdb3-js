@@ -1,3 +1,4 @@
+import nock from 'nock'
 import {BaseFlightService, MockService, TestServer} from '../TestServer'
 import * as grpc from '@grpc/grpc-js'
 import * as flt from '../../src/generated/flight/Flight'
@@ -29,6 +30,10 @@ const grpcVersion: string =
 const USER_AGENT = `grpc-node-js/${grpcVersion}`
 
 describe('query api tests', () => {
+  // The Flight test server uses real connections rather than Nock fixtures.
+  before(() => nock.restore())
+  after(() => nock.activate())
+
   describe('query api common TestServer tests', () => {
     let server: TestServer
     before('start server', async () => {
