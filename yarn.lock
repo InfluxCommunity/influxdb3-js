@@ -4191,9 +4191,9 @@ neo-async@^2.6.2:
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
 nock@^15.0.1:
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/nock/-/nock-15.0.2.tgz#63b8c075ff3a02540f23df60f9591730ebe0c6be"
-  integrity sha512-kz2EsEGshxe/zw0iMMoJFqdDp3ZBju5tgLA03CepBi9R0NHckyF/UgfmoyEYt2DNFZoe8tpx1V9M187qt43WJg==
+  version "15.0.4"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-15.0.4.tgz#f481fc38fdbdee6ed217426757c9da4fe6057675"
+  integrity sha512-quP113SfbjFQCvYCE8eKjEFYqFuHoNTnz+JOfwUnTbqwvH7bB/Z1yLS6xxfI0s+7x86V+EptbHv22CxH065FYw==
   dependencies:
     "@mswjs/interceptors" "^0.44.0"
 
