@@ -22,6 +22,7 @@ import {pipeline, Readable} from 'stream'
 import {ConnectionOptions} from '../../options'
 import {urlToHttpOptions} from 'node:url'
 import {IncomingHttpHeaders} from 'node:http'
+import fs from 'fs'
 
 const zlibOptions = {
   flush: zlib.constants.Z_SYNC_FLUSH,
@@ -68,12 +69,16 @@ export class NodeHttpTransport implements Transport {
       token,
       authScheme,
       transportOptions,
+      serverCertPath,
+      clientCertPath,
+      clientKeyPath,
       ...nodeSupportedOptions
     } = connectionOptions
     const url = new URL(proxyUrl || _url)
     const {hostname, port, protocol, path} = urlToHttpOptions(url)
     this._token = token
     this._authScheme = authScheme
+
     this._defaultOptions = {
       ...nodeSupportedOptions,
       ...transportOptions,
@@ -83,6 +88,17 @@ export class NodeHttpTransport implements Transport {
       timeout:
         nodeSupportedOptions.timeout ?? nodeSupportedOptions.writeTimeout,
     }
+
+    if (serverCertPath) {
+      this._defaultOptions.ca = fs.readFileSync(serverCertPath)
+    }
+    if (clientCertPath) {
+      this._defaultOptions.cert = fs.readFileSync(clientCertPath)
+    }
+    if (clientKeyPath) {
+      this._defaultOptions.key = fs.readFileSync(clientKeyPath)
+    }
+
     this._contextPath = proxyUrl ? _url : (path ?? '')
     if (this._contextPath.endsWith('/')) {
       this._contextPath = this._contextPath.substring(
