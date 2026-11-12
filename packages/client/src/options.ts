@@ -65,6 +65,22 @@ export interface ConnectionOptions {
    * Grpc options to be passed when instantiating query transport. See supported channel options in @grpc/grpc-js/README.md.
    */
   grpcOptions?: Record<string, any>
+
+  /**
+   * Path to the server certificate file used for TLS or SSL configuration.
+   * If omitted, no explicit server certificate path is configured.
+   */
+  serverCertPath?: string
+
+  /**
+   * Path to the client certificate file used for mutual TLS authentication.
+   */
+  clientCertPath?: string
+
+  /**
+   * Path to the client private key file used for authentication.
+   */
+  clientKeyPath?: string
 }
 
 /** default connection options */

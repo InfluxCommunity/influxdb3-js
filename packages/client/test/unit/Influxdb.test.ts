@@ -12,6 +12,11 @@ import type WriteApi from '../../src/WriteApi'
 import type QueryApi from '../../src/QueryApi'
 import {rejects} from 'assert'
 import nock from 'nock'
+import {MockService, TestServer} from '../TestServer'
+import {expectThrowsAsync, startHttpsServer, stopHttpsServer} from '../util'
+import path from 'path'
+import fs from 'fs'
+import https from 'https'
 
 describe('InfluxDB', () => {
   afterEach(() => {
@@ -1078,7 +1083,7 @@ at 'ClientOptions.database'
           'X-Influxdb-Version': '2.0',
         }
       )
-      const version = await getInfuxDbClient().getServerVersion()
+      const version = await getInfluxDbClient().getServerVersion()
       expect(version).to.equal('2.0')
     })
     it('should return server version success', async () => {
@@ -1089,14 +1094,14 @@ at 'ClientOptions.database'
           'x-influxdb-version': '2.0',
         }
       )
-      const version = await getInfuxDbClient().getServerVersion()
+      const version = await getInfluxDbClient().getServerVersion()
       expect(version).to.equal('2.0')
     })
     it('should return server version success from body', async () => {
       nock('http://test:8086')
         .get('/ping')
         .reply(200, {version: '3.0'}, {something: '2.0'})
-      const version = await getInfuxDbClient().getServerVersion()
+      const version = await getInfluxDbClient().getServerVersion()
       expect(version).to.equal('3.0')
     })
     it('should return undefined server version', async () => {
@@ -1107,7 +1112,7 @@ at 'ClientOptions.database'
           something: '2.0',
         }
       )
-      const version = await getInfuxDbClient().getServerVersion()
+      const version = await getInfluxDbClient().getServerVersion()
       expect(version).to.equal(undefined)
     })
     it('should throws exception', () => {
@@ -1118,16 +1123,208 @@ at 'ClientOptions.database'
           'Some-header': '2.0',
         }
       )
-      getInfuxDbClient()
+      getInfluxDbClient()
         .getServerVersion()
         .catch((reason) => {
           expect(reason).to.equal('400')
         })
     })
   })
+
+  describe('write and query with secure server', () => {
+    interface TlsTest {
+      name: string
+      serverCertPath: string
+      clientCertPath?: string
+      clientKeyPath?: string
+      requireClientAuth: boolean
+      expectFail: boolean
+    }
+
+    const certsDir = ((): string => {
+      let dir = __dirname
+      while (dir !== path.dirname(dir)) {
+        const candidate = path.join(dir, 'test/testdata/certificates')
+        if (fs.existsSync(candidate)) return candidate
+        // TODO remove candidate2
+        const candidate2 = path.join(dir, 'certificates')
+        if (fs.existsSync(candidate2)) return candidate2
+        dir = path.dirname(dir)
+      }
+      return path.join(__dirname, 'certificates')
+    })()
+
+    const serverCert = path.join(certsDir, 'influxdb.crt')
+    const serverKey = path.join(certsDir, 'influxdb.key')
+
+    const otherServerCert = path.join(certsDir, 'other-server.crt')
+    const otherServerKey = path.join(certsDir, 'other-server.key')
+    const otherServerPem = path.join(certsDir, 'other-server.pem')
+
+    const clientCert = path.join(certsDir, 'client.crt')
+    const clientKey = path.join(certsDir, 'client.key')
+    const clientPem = path.join(certsDir, 'client.pem')
+
+    const testCases: TlsTest[] = [
+      {
+        name: 'tls success with correct server certificate',
+        serverCertPath: serverCert,
+        requireClientAuth: false,
+        expectFail: false,
+      },
+      {
+        name: 'tls fail with incorrect server certificate',
+        serverCertPath: otherServerCert,
+        requireClientAuth: false,
+        expectFail: true,
+      },
+      {
+        name: 'mtls success with correct client and server certificates',
+        serverCertPath: serverCert,
+        clientCertPath: clientCert,
+        clientKeyPath: clientKey,
+        requireClientAuth: true,
+        expectFail: false,
+      },
+      {
+        name: 'mtls success with correct client cert and key bundled inside .pem',
+        serverCertPath: serverCert,
+        clientCertPath: clientPem,
+        clientKeyPath: clientPem,
+        requireClientAuth: true,
+        expectFail: false,
+      },
+      {
+        name: 'mtls failed with incorrect client cert and key bundled inside .pem',
+        serverCertPath: serverCert,
+        clientCertPath: otherServerPem,
+        clientKeyPath: otherServerPem,
+        requireClientAuth: true,
+        expectFail: true,
+      },
+      {
+        name: 'mtls fail with incorrect client certificates',
+        serverCertPath: serverCert,
+        clientCertPath: otherServerCert,
+        clientKeyPath: otherServerKey,
+        requireClientAuth: true,
+        expectFail: true,
+      },
+      {
+        name: 'mtls fail without a client certificate',
+        serverCertPath: serverCert,
+        requireClientAuth: true,
+        expectFail: true,
+      },
+    ]
+
+    before('deactivate nock', () => {
+      // nock patches node's socket layer, which breaks real gRPC/TLS connections
+      nock.cleanAll()
+      nock.restore()
+    })
+
+    after('reactivate nock', () => {
+      if (!nock.isActive()) {
+        nock.activate()
+      }
+    })
+
+    beforeEach('reset server', async () => {
+      MockService.resetAll()
+    })
+
+    describe('write with secure server', () => {
+      testCases.forEach((testCase) => {
+        it(testCase.name, async () => {
+          let server: https.Server | undefined
+          try {
+            const runningServer = await startHttpsServer(
+              serverCert,
+              serverKey,
+              testCase.clientCertPath ? clientCert : undefined,
+              testCase.requireClientAuth
+            )
+            server = runningServer.server
+
+            const client = new InfluxDBClient({
+              host: `https://localhost:${runningServer.port}`,
+              token: 'TEST_TOKEN',
+              database: 'CI_TEST',
+              serverCertPath: testCase.serverCertPath,
+              clientCertPath: testCase.clientCertPath,
+              clientKeyPath: testCase.clientKeyPath,
+            })
+
+            const writePromise = client.write(
+              '$cpu,unit=temperature avg=28,max=40.3'
+            )
+            if (testCase.expectFail) {
+              await expectThrowsAsync(async () => writePromise)
+            } else {
+              await writePromise
+            }
+          } finally {
+            await stopHttpsServer(server)
+          }
+        })
+      })
+    })
+
+    describe('query with secure server', () => {
+      testCases.forEach((testCase) => {
+        it(testCase.name, async () => {
+          MockService.resetAll()
+          const serverCredentials = TestServer.createServerCredentials(
+            serverCert,
+            serverKey,
+            testCase.clientCertPath ? clientCert : undefined,
+            testCase.requireClientAuth
+          )
+
+          const server = new TestServer(undefined, 8443, serverCredentials)
+          await server.start()
+
+          let client: InfluxDBClient | undefined
+          try {
+            client = new InfluxDBClient({
+              host: `https://localhost:${server.port}`,
+              token: 'TEST_TOKEN',
+              database: 'CI_TEST',
+              serverCertPath: testCase.serverCertPath,
+              clientCertPath: testCase.clientCertPath,
+              clientKeyPath: testCase.clientKeyPath,
+            })
+
+            const executeQuery = async () => {
+              const data = (client as InfluxDBClient).query(
+                'SELECT * FROM wumpus',
+                'CI_TEST'
+              )
+              await data.next()
+            }
+
+            if (testCase.expectFail) {
+              await expectThrowsAsync(
+                executeQuery,
+                /^No connection established.*/,
+                'RpcError'
+              )
+            } else {
+              await executeQuery()
+              expect(MockService.callCount.doGet).to.equal(1)
+            }
+          } finally {
+            await client?.close()
+            await server.shutdown()
+          }
+        })
+      })
+    })
+  })
 })
 
-function getInfuxDbClient() {
+function getInfluxDbClient() {
   return new InfluxDBClient({
     host: 'http://test:8086',
     token: 'TEST_TOKEN',
