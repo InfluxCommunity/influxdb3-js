@@ -22,3 +22,7 @@ export const createTransport: CreateQueryTransport = ({
     timeout: timeout,
   })
 }
+
+export const createChannelCredentials = (): grpc.ChannelCredentials => {
+  return grpc.credentials.createSsl()
+}
