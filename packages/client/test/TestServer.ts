@@ -29,6 +29,7 @@ import {
   SchemaResult,
   Ticket,
 } from './generated/flight/Flight'
+import * as fs from 'node:fs'
 
 setLogger({
   error(message: string, error) {
@@ -437,46 +438,72 @@ export abstract class BaseFlightService implements fsv.IFlightService {
   ): void {}
 }
 
-/*
-    Since this is to be used only for testing for now use insecure
-    todo - implement security - should be able to check TLS
- */
 export class TestServer {
   readonly service: fsv.IFlightService
   readonly port: number
   readonly server: grpc.Server
 
-  constructor(service = MockService.service, port = DEFAULT_PORT) {
+  private readonly serverCredentials: grpc.ServerCredentials
+
+  constructor(
+    service = MockService.service,
+    port = DEFAULT_PORT,
+    serverCredentials?: grpc.ServerCredentials
+  ) {
     this.service = service
     this.port = port
+    this.serverCredentials = serverCredentials ? serverCredentials : grpc.ServerCredentials.createInsecure()
     this.server = new grpc.Server()
   }
 
   start = async (): Promise<void> => {
     this.server.addService(fsv.flightServiceDefinition, this.service)
-    this.server.bindAsync(
-      `0.0.0.0:${this.port}`,
-      grpc.ServerCredentials.createInsecure(),
-      (err, port) => {
-        if (err) {
-          Log.error.call(Log, `Failed to start server: ${err}`)
-          return Promise.reject(err)
-        } else {
-          Log.warn.call(Log, `Server start: ${port}`)
+    return new Promise<void>((resolve, reject) => {
+      this.server.bindAsync(
+        `0.0.0.0:${this.port}`,
+        this.serverCredentials,
+        (err, port) => {
+          if (err) {
+            Log.error.call(Log, `Failed to start server: ${err}`)
+            reject(err)
+          } else {
+            Log.warn.call(Log, `Server start: ${port}`)
+            resolve()
+          }
         }
-      }
-    )
-    return Promise.resolve()
+      )
+    })
   }
 
   shutdown = async (): Promise<void> => {
-    this.server.tryShutdown((err) => {
-      if (err) {
-        Log.error.call(Log, `Failed to shutdown server:`, err)
-        return Promise.reject(err)
-      }
+    return new Promise<void>((resolve, reject) => {
+      this.server.tryShutdown((err) => {
+        if (err) {
+          Log.error.call(Log, `Failed to shutdown server:`, err)
+          reject(err)
+        } else {
+          Log.warn.call(Log, `Server shutdown`)
+          resolve()
+        }
+      })
     })
-    Log.warn.call(Log, `Server shutdown`)
-    return Promise.resolve()
+  }
+
+  // TODO refactor this
+  static createServerCredentials(
+    serverCert: string,
+    serverKey: string,
+    clientCert: string | undefined
+  ): grpc.ServerCredentials {
+    const serverCertByte = fs.readFileSync(serverCert)
+    const serverKeyByte = fs.readFileSync(serverKey)
+    const clientCertByte = clientCert ? fs.readFileSync(clientCert) : null
+
+    const clientValidateRequired = clientCert !== undefined
+    return grpc.ServerCredentials.createSsl(
+      clientCertByte,
+      [{private_key: serverKeyByte, cert_chain: serverCertByte}],
+      clientValidateRequired
+    )
   }
 }
