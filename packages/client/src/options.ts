@@ -65,6 +65,12 @@ export interface ConnectionOptions {
    * Grpc options to be passed when instantiating query transport. See supported channel options in @grpc/grpc-js/README.md.
    */
   grpcOptions?: Record<string, any>
+
+  serverCertPath?: string
+
+  clientCertPath?: string
+
+  clientKeyPath?: string
 }
 
 /** default connection options */
