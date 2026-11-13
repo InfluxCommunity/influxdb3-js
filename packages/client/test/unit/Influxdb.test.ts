@@ -12,6 +12,16 @@ import type WriteApi from '../../src/WriteApi'
 import type QueryApi from '../../src/QueryApi'
 import {rejects} from 'assert'
 import nock from 'nock'
+import {MockService, TestServer} from '../TestServer'
+import {
+  clientCert,
+  clientKey,
+  expectThrowsAsync,
+  otherServerCert,
+  otherServerKey,
+  serverCert,
+  serverKey,
+} from '../util'
 
 describe('InfluxDB', () => {
   afterEach(() => {
@@ -1123,6 +1133,87 @@ at 'ClientOptions.database'
         .catch((reason) => {
           expect(reason).to.equal('400')
         })
+    })
+  })
+  describe('read, write with secure server', () => {
+    let server: TestServer
+
+    beforeEach('reset server', async () => {
+      MockService.resetAll()
+    })
+    it('query with secure server', async () => {
+      const testCases = [
+        {
+          name: 'tls success with correct server certificate',
+          serverCertPath: serverCert,
+          clientCertPath: undefined,
+          clientKeypath: undefined,
+          expectFail: false,
+        },
+
+        {
+          name: 'tls fail with incorrect server certificate',
+          serverCertPath: otherServerCert,
+          clientCertPath: undefined,
+          clientKeypath: undefined,
+          expectFail: true,
+        },
+
+        {
+          name: 'mtls success with correct client and server certificates',
+          serverCertPath: serverCert,
+          clientCertPath: clientCert,
+          clientKeypath: clientKey,
+          expectFail: false,
+        },
+
+        {
+          name: 'mtls fail with incorrect client certificates',
+          serverCertPath: serverCert,
+          clientCertPath: otherServerCert,
+          clientKeypath: otherServerKey,
+          expectFail: true,
+        },
+      ]
+
+      for (let testCase of testCases) {
+        MockService.resetAll()
+        try {
+          const serverCredentials = TestServer.createServerCredentials(
+            serverCert,
+            serverKey,
+            testCase.clientCertPath ? clientCert : undefined
+          )
+
+          server = new TestServer(undefined, undefined, serverCredentials)
+          await server.start()
+
+          const client = new InfluxDBClient({
+            host: `https://localhost:${server.port}`,
+            token: 'TEST_TOKEN',
+            database: 'CI_TEST',
+            serverCertPath: testCase.serverCertPath,
+            clientCertPath: testCase.clientCertPath,
+            clientKeyPath: testCase.clientKeypath,
+          })
+          if (testCase.expectFail) {
+            await expectThrowsAsync(
+              async () => {
+                const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+                await data.next()
+              },
+              /^No connection established.*/,
+              'RpcError'
+            )
+          } else {
+            const data = client.query('SELECT * FROM wumpus', 'CI_TEST')
+            await data.next()
+            expect(MockService.callCount.doGet).to.equal(1)
+          }
+        } finally {
+          await server.shutdown()
+        }
+      }
     })
   })
 })

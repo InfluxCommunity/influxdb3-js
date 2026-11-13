@@ -2,6 +2,8 @@ import {assert, expect} from 'chai'
 import {setLogger} from '../src/util/logger'
 import {Cancellable, ConnectionOptions, SendOptions} from '../src'
 import NodeHttpTransport from '../src/impl/node/NodeHttpTransport'
+import path from 'path'
+import fs from 'fs'
 
 let previous: any
 
@@ -146,3 +148,31 @@ export const iterateTestData = async (
   }
   return data
 }
+
+const certsDir = ((): string => {
+  let dir = __dirname
+  while (dir !== path.dirname(dir)) {
+    const candidate = path.join(dir, 'test/testdata/certificates')
+    if (fs.existsSync(candidate)) return candidate
+    const candidate2 = path.join(dir, 'testdata/certificates')
+    if (fs.existsSync(candidate2)) return candidate2
+    dir = path.dirname(dir)
+  }
+  return path.join(__dirname, 'certificates')
+})()
+
+export const serverCert = path.join(certsDir, 'influxdb.crt')
+export const serverKey = path.join(certsDir, 'influxdb.key')
+// const serverP12 = path.join(certsDir, 'influxdb.p12')
+//
+export const otherServerCert = path.join(certsDir, 'other-server.crt')
+export const otherServerKey = path.join(certsDir, 'other-server.key')
+// const otherServerP12 = path.join(certsDir, 'other-server.p12')
+// const otherServerPem = path.join(certsDir, 'other-server.pem')
+//
+export const clientCert = path.join(certsDir, 'client.crt')
+export const clientKey = path.join(certsDir, 'client.key')
+// const clientP12 = path.join(certsDir, 'client.p12')
+// const clientPem = path.join(certsDir, 'client.pem')
+//
+// const p12Password = 'changeit'

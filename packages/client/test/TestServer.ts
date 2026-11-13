@@ -448,11 +448,11 @@ export class TestServer {
   constructor(
     service = MockService.service,
     port = DEFAULT_PORT,
-    serverCredentials: grpc.ServerCredentials
+    serverCredentials?: grpc.ServerCredentials
   ) {
     this.service = service
     this.port = port
-    this.serverCredentials = serverCredentials
+    this.serverCredentials = serverCredentials ? serverCredentials : grpc.ServerCredentials.createInsecure()
     this.server = new grpc.Server()
   }
 
@@ -493,15 +493,17 @@ export class TestServer {
   static createServerCredentials(
     serverCert: string,
     serverKey: string,
-    clientCert: string | null
+    clientCert: string | undefined
   ): grpc.ServerCredentials {
     const serverCertByte = fs.readFileSync(serverCert)
     const serverKeyByte = fs.readFileSync(serverKey)
     const clientCertByte = clientCert ? fs.readFileSync(clientCert) : null
+
+    const clientValidateRequired = clientCert !== undefined
     return grpc.ServerCredentials.createSsl(
       clientCertByte,
-      [{cert_chain: serverCertByte, private_key: serverKeyByte}],
-      clientCert != null
+      [{private_key: serverKeyByte, cert_chain: serverCertByte}],
+      clientValidateRequired
     )
   }
 }
