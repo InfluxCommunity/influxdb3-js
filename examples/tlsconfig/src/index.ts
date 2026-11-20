@@ -23,17 +23,15 @@ async function main() {
     host,
     token,
     database,
-    transportOptions: {
-      serverCertPath: 'path/to/your/server.crt', // Config server certificate for TLS.
+    serverCertPath: 'path/to/your/server.crt', // Config server certificate for TLS.
 
-      // Optional. Config mTLS with client certificate and key files.
-      // clientCertPath: 'path/to/your/client.crt',
-      // clientKeyPath: 'path/to/your/client.key',
+    // Optional. Config mTLS with client certificate and key files.
+    // clientCertPath: 'path/to/your/client.crt',
+    // clientKeyPath: 'path/to/your/client.key',
 
-      // Optional. If you have a .pem file bundle certificate and key inside, set clientCertPath and clientKeyPath with that same file path.
-      // clientCertPath: "path/to/your/client.pem",
-      // clientKeyPath: "path/to/your/client.pem",
-    },
+    // Optional. If you have a .pem file bundle certificate and key inside, set clientCertPath and clientKeyPath with that same file path.
+    // clientCertPath: "path/to/your/client.pem",
+    // clientKeyPath: "path/to/your/client.pem",
   })
 
   try {
