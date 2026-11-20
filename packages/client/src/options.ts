@@ -79,6 +79,8 @@ export interface ConnectionOptions {
 
   /**
    * Path to the client private key file used for authentication.
+   * If certificate and key are bundled together in a single .pem file, set `clientKeyPath` to the same file you use for
+   * clientCertPath.
    */
   clientKeyPath?: string
 }

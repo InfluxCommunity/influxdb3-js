@@ -1146,9 +1146,6 @@ at 'ClientOptions.database'
       while (dir !== path.dirname(dir)) {
         const candidate = path.join(dir, 'test/testdata/certificates')
         if (fs.existsSync(candidate)) return candidate
-        // TODO remove candidate2
-        const candidate2 = path.join(dir, 'certificates')
-        if (fs.existsSync(candidate2)) return candidate2
         dir = path.dirname(dir)
       }
       return path.join(__dirname, 'certificates')
