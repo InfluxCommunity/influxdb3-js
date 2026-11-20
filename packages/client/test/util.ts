@@ -2,6 +2,9 @@ import {assert, expect} from 'chai'
 import {setLogger} from '../src/util/logger'
 import {Cancellable, ConnectionOptions, SendOptions} from '../src'
 import NodeHttpTransport from '../src/impl/node/NodeHttpTransport'
+import fs from 'fs'
+import https from 'https'
+import {AddressInfo} from 'net'
 
 let previous: any
 
@@ -130,6 +133,38 @@ export const sendTestData = (
       },
     })
   })
+}
+
+export const startHttpsServer = (
+  serverCert: string,
+  serverCertKey: string,
+  ca?: string,
+  requireClientAuth = false
+): Promise<{server: https.Server; port: number}> => {
+  const options: https.ServerOptions = {
+    cert: fs.readFileSync(serverCert),
+    key: fs.readFileSync(serverCertKey),
+    ca: ca ? fs.readFileSync(ca) : undefined,
+    rejectUnauthorized: requireClientAuth,
+    requestCert: requireClientAuth,
+  }
+
+  return new Promise((resolve, reject) => {
+    const server = https.createServer(options, (_req, res) => {
+      res.writeHead(200, {'content-type': 'text/plain'})
+      res.end('Success')
+    })
+    server.on('error', reject)
+    server.listen(0, () => {
+      const addr = server.address() as AddressInfo
+      resolve({server, port: addr.port})
+    })
+  })
+}
+
+export const stopHttpsServer = async (server?: https.Server): Promise<void> => {
+  if (!server) return
+  return new Promise((resolve) => server.close(() => resolve()))
 }
 
 export const iterateTestData = async (

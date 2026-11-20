@@ -1,5 +1,9 @@
 ## 2.5.0 [unreleased]
 
+### Features
+
+1. [#967](https://github.com/InfluxCommunity/influxdb3-js/pull/967): Add support for TLS/mTLS config.
+
 ### Bug Fixes
 
 1. [#903](https://github.com/InfluxCommunity/influxdb3-js/pull/903):
