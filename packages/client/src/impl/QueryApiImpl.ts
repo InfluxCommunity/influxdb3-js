@@ -1,4 +1,4 @@
-import {DataType, RecordBatchReader, Type as ArrowType} from 'apache-arrow'
+import {DataType, RecordBatchReader} from 'apache-arrow'
 import QueryApi, {QParamType} from '../QueryApi'
 import {Ticket} from '../generated/flight/Flight'
 import {FlightServiceClient} from '../generated/flight/Flight.client'
@@ -152,7 +152,6 @@ export default class QueryApiImpl implements QueryApi {
           const columnSchema = batch.schema.fields[columnIndex]
           const {name, type} = columnSchema
           const value = batch.getChildAt(columnIndex)?.get(rowIndex)
-          const arrowTypeId = columnSchema.typeId
           const metaType = columnSchema.metadata.get('iox::column::type')
 
           if (value === undefined || value === null) continue
@@ -166,7 +165,7 @@ export default class QueryApiImpl implements QueryApi {
           }
 
           if (!metaType) {
-            if (name === 'time' && arrowTypeId === ArrowType.Timestamp) {
+            if (name === 'time' && DataType.isTimestamp(type)) {
               values.setTimestamp(value)
             } else if (typeof value === 'bigint' && DataType.isInt(type)) {
               const integer = Number(value)
