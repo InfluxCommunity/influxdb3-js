@@ -9,6 +9,7 @@
       - `accept_partial` is set to `true`.
       - Write endpoint must be `api/v3/write_lp`.
       - Please note that `PartialWriteError.lineNumber` in TypeScript can now be `undefined`. Previously `undefined` line numbers defaulted to `0`.  This may break strict TypeScript consumers.
+2. [#979](https://github.com/InfluxCommunity/influxdb3-js/issues/979): `queryPoints()` returns 64-bit integer results without InfluxDB column metadata, including SQL `COUNT` aggregates. It reports an error for integers outside JavaScript's safe integer range and for unsupported field types without column metadata.
 
 ## 2.4.0 [2026-08-27]
 

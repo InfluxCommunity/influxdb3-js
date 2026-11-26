@@ -3,21 +3,20 @@ import {BaseFlightService, MockService, TestServer} from '../TestServer'
 import * as grpc from '@grpc/grpc-js'
 import * as flt from '../../src/generated/flight/Flight'
 import {
+  Binary,
+  Float64,
   Int32,
+  Int64,
   MessageReader,
   Table,
   tableToIPC,
+  Uint64,
   Utf8,
   vectorFromArray,
 } from 'apache-arrow'
 import {Message} from 'apache-arrow/ipc/metadata/message'
 import {assert, expect} from 'chai'
-import {
-  DEFAULT_QueryOptions,
-  InfluxDBClient,
-  Point,
-  QueryOptions,
-} from '../../src'
+import {DEFAULT_QueryOptions, InfluxDBClient, QueryOptions} from '../../src'
 import {expectResolve, expectThrowsAsync} from '../util'
 ;(BigInt.prototype as any).toJSON = function () {
   return this.toString()
@@ -483,15 +482,15 @@ describe('query api tests', () => {
   })
 
   describe('query with mock Flight Server with actual data', () => {
-    it('query null fields success', async () => {
+    let table: Table
+    let server: TestServer
+    let client: InfluxDBClient
+
+    before(async () => {
       const service = new (class extends BaseFlightService {
         doGet(
           call: grpc.ServerWritableStream<flt.Ticket, flt.FlightData>
         ): void {
-          const table = new Table({
-            gpu: vectorFromArray(['amd', null], new Utf8()),
-            model: vectorFromArray([2009, 2018], new Int32()),
-          })
           const messageReader = new MessageReader(tableToIPC(table))
           let message = messageReader.readMessage()
           while (message) {
@@ -506,35 +505,78 @@ describe('query api tests', () => {
           call.end()
         }
       })()
-      const testServer = new TestServer(service, 5555)
-      try {
-        await testServer.start()
-        const client: InfluxDBClient = new InfluxDBClient({
-          host: `http://0.0.0.0:${testServer.port}`,
-          token: 'TEST_TOKEN',
-          database: 'CI_TEST',
-        })
-        const query = `SELECT * FROM wumpus`
-        let data = client.query(query, 'CI_TEST')
-        let row = (await data.next()).value as Record<string, any>
-        expect(row['gpu']).equals('amd')
-        expect(row['model']).equals(2009)
+      server = new TestServer(service, 5555)
+      await server.start()
+      client = new InfluxDBClient({
+        host: `http://localhost:${server.port}`,
+        token: 'TEST_TOKEN',
+        database: 'CI_TEST',
+      })
+    })
 
-        row = (await data.next()).value as Record<string, any>
-        expect(row['gpu']).to.null
-        expect(row['model']).equals(2018)
+    after(async () => {
+      await client.close()
+      await server.shutdown()
+    })
 
-        data = client.queryPoints(query, 'CI_TEST')
-        let point = (await data.next()).value as Point
-        expect(point.getField('gpu')).equals('amd')
-        expect(point.getField('model')).equals(2009)
+    it('query null fields success', async () => {
+      table = new Table({
+        gpu: vectorFromArray(['amd', null], new Utf8()),
+        model: vectorFromArray([2009, 2018], new Int32()),
+      })
+      const query = `SELECT * FROM wumpus`
+      const rows = client.query(query)
+      expect((await rows.next()).value).to.deep.equal({gpu: 'amd', model: 2009})
+      expect((await rows.next()).value).to.deep.equal({gpu: null, model: 2018})
+      expect((await rows.next()).done).to.be.true
 
-        point = (await data.next()).value as Point
-        expect(point.getField('gpu')).undefined
-        expect(point.getField('model')).equals(2018)
-      } finally {
-        await testServer.shutdown()
-      }
+      const points = client.queryPoints(query)
+      const first = (await points.next()).value
+      expect(first?.getField('gpu')).to.equal('amd')
+      expect(first?.getField('model')).to.equal(2009)
+
+      const second = (await points.next()).value
+      expect(second?.getField('gpu')).to.be.undefined
+      expect(second?.getField('model')).to.equal(2018)
+      expect((await points.next()).done).to.be.true
+    })
+
+    it('keeps 64-bit integer aggregate fields without metadata in queryPoints', async () => {
+      table = new Table({
+        n: vectorFromArray([2n], new Int64()),
+        count_v: vectorFromArray([2n], new Int64()),
+        sum_v: vectorFromArray([3.5], new Float64()),
+        max_u: vectorFromArray([3n], new Uint64()),
+      })
+      const points = client.queryPoints(
+        'SELECT COUNT(*) AS n, COUNT(v) AS count_v, SUM(v) AS sum_v, MAX(u) AS max_u FROM wumpus'
+      )
+      const point = (await points.next()).value
+      expect(point?.getIntegerField('n')).to.equal(2)
+      expect(point?.getIntegerField('count_v')).to.equal(2)
+      expect(point?.getFloatField('sum_v')).to.equal(3.5)
+      expect(point?.getUintegerField('max_u')).to.equal(3)
+      expect((await points.next()).done).to.be.true
+    })
+
+    it('rejects 64-bit integer fields outside the safe integer range in queryPoints', async () => {
+      table = new Table({
+        n: vectorFromArray([9007199254740993n], new Int64()),
+      })
+      await expectThrowsAsync(
+        () => client.queryPoints('SELECT COUNT(*) AS n FROM wumpus').next(),
+        /field 'n'.*outside the safe integer range/
+      )
+    })
+
+    it('rejects unsupported fields without metadata in queryPoints', async () => {
+      table = new Table({
+        blob: vectorFromArray([Uint8Array.of(1)], new Binary()),
+      })
+      await expectThrowsAsync(
+        () => client.queryPoints('SELECT blob FROM wumpus').next(),
+        /unsupported Arrow type.*field 'blob'/
+      )
     })
   })
 })
